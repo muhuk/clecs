@@ -1,19 +1,34 @@
 (ns clecs.backend.atom-world
-  (:require [clecs.world :refer [IWorld]]))
+  (:require [clecs.world :as world]
+            [clecs.component :as component]))
 
 
-(def ^:const EMPTY_WORLD {:entities {:last-index 0}})
+(def ^:const EMPTY_WORLD {:components {}
+                          :entities {:last-index 0}})
 
 
 (declare add-entity last-entity-id process!)
 
 
 (deftype AtomWorld [state]
-  IWorld
+  world/IWorld
+  (add-component! [this eid f] (world/add-component! this eid f []))
+  (add-component! [this eid f args]
+                  (swap! state #(apply add-component (concat [% eid f] args)))
+                  nil)
   (add-entity! [this]
                (swap! state add-entity)
                (last-entity-id @state))
   (process! [this] (process! this) nil))
+
+
+(defn add-component [state eid f & args]
+  (let [c (apply f (cons eid args))
+        ct (component/component-type c)]
+    (-> state
+        (update-in [:entities eid] conj ct)
+        (update-in [:components ct] #(or % {}))
+        (update-in [:components ct] conj [eid c]))))
 
 
 (defn add-entity [state]
