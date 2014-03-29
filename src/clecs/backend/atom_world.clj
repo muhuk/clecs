@@ -5,12 +5,14 @@
 (def ^:const EMPTY_WORLD {:entities {:last-index 0}})
 
 
-(declare add-entity process!)
+(declare add-entity last-entity-id process!)
 
 
 (deftype AtomWorld [state]
   IWorld
-  (add-entity! [this] (swap! state add-entity) nil)
+  (add-entity! [this]
+               (swap! state add-entity)
+               (last-entity-id @state))
   (process! [this] (process! this) nil))
 
 
@@ -19,6 +21,10 @@
     (-> state
         (assoc-in [:entities eid] #{})
         (assoc-in [:entities :last-index] eid))))
+
+
+(defn last-entity-id [state]
+  (get-in state [:entities :last-index]))
 
 
 (defn make-world

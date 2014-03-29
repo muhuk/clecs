@@ -28,13 +28,14 @@
 
 
 (fact "world/add-entity! delegates to add-entity!"
-      (let [world (make-world ..state..)]
-        (world/add-entity! world) => nil
-        (provided (add-entity ..state..) => ..result..)))
+      (world/add-entity! (make-world ..state..)) => ..eid..
+      (provided (add-entity ..state..) => ..new-state..
+                (last-entity-id ..new-state..) => ..eid..))
 
 
 ;; Entity operations.
 
-(facts "adding an entity returns a new entity-id."
+(facts "adding an entity returns a new entity-id and the modified state."
        (get-in (add-entity EMPTY_WORLD) [:entities 1]) => #{}
-       (get-in (add-entity EMPTY_WORLD) [:entities :last-index]) => 1)
+       (last-entity-id (add-entity EMPTY_WORLD)) => 1
+       (last-entity-id (add-entity {:entities {:last-index 41}})) => 42)
