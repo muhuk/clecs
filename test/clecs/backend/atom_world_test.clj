@@ -27,9 +27,15 @@
 ;; Protocol delegation.
 
 
-(facts "world/add-component! delegates to add-component"
-       (world/add-component! (make-world ..state..) ..eid.. ..f..) => nil
-       (provided (add-component ..state.. ..eid.. ..f..) => ..new-state..))
+(facts "world/add-component! delegates to add-component."
+       (let [w (make-world ..state..)]
+         (world/add-component! w ..eid.. ..f..) => nil
+         (provided (add-component ..state.. ..eid.. ..f..) => ..new-state..)
+         @(.state w) => ..new-state..)
+       (let [w (make-world ..state..)]
+         (world/add-component! w ..eid.. ..f.. [..a.. ..b..]) => nil
+         (provided (add-component ..state.. ..eid.. ..f.. ..a.. ..b..) => ..new-state..)
+         @(.state w) => ..new-state..))
 
 
 (fact "world/add-entity! delegates to add-entity!"
@@ -44,6 +50,11 @@
         (provided (process! world) => ..result..)))
 
 
+(fact "world/remove-component! delegates to remove-component."
+      (world/remove-component! (make-world ..state..) ..eid.. ..component-type..) => nil
+      (provided (remove-component ..state.. ..eid.. ..component-type..) => ..new-state..))
+
+
 ;; Entity operations.
 
 (facts "adding an entity returns a new entity-id and the modified state."
@@ -54,7 +65,7 @@
 
 ;; Component operations.
 
-(fact "adding a component to an entity creates the component index."
+(fact "adding a component."
       (let [state (add-entity EMPTY_WORLD)
             eid (last-entity-id state)
             expected-state {:components {..component-type.. {1 ..component..}}
@@ -63,3 +74,11 @@
         (add-component state eid ->TestComponent ..a.. ..b..) => expected-state
         (provided (->TestComponent eid ..a.. ..b..) => ..component..
                   (component/component-type ..component..) => ..component-type..)))
+
+
+(fact "removing a component."
+      (let [state {:components {..component-type.. {..eid.. ..component..}}
+                   :entities {..eid.. #{..component-type..}}}
+            expected-state {:components {..component-type.. {}}
+                            :entities {..eid.. #{}}}]
+        (remove-component state ..eid.. ..component-type..) => expected-state))

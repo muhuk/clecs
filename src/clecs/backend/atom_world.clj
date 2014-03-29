@@ -19,7 +19,8 @@
   (add-entity! [this]
                (swap! state add-entity)
                (last-entity-id @state))
-  (process! [this] (process! this) nil))
+  (process! [this] (process! this) nil)
+  (remove-component! [this eid ct] (swap! state remove-component eid ct) nil))
 
 
 (defn add-component [state eid f & args]
@@ -49,3 +50,9 @@
 
 (defn process! [world]
   (throw (UnsupportedOperationException.)))
+
+
+(defn remove-component [state eid ct]
+  (-> state
+      (update-in [:entities eid] disj ct)
+      (update-in [:components ct] dissoc eid)))
