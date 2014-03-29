@@ -2,4 +2,5 @@
 
 
 (defprotocol IWorld
+  (add-entity! [this])
   (process! [this]))
