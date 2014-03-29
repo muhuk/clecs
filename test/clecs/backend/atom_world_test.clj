@@ -27,7 +27,7 @@
 ;; Protocol delegation.
 
 
-(facts "world/add-component! delegates to add-component."
+(facts "world/add-component! delegates to -add-component."
        (let [w (make-world ..state..)]
          (world/add-component w ..eid.. ..f..) => nil
          (provided (-add-component ..state.. ..eid.. ..f..) => ..new-state..)
@@ -38,21 +38,48 @@
          @(.state w) => ..new-state..))
 
 
-(fact "world/add-entity! delegates to add-entity!"
+(fact "world/add-entity! delegates to -add-entity!"
       (world/add-entity! (make-world ..state..)) => ..eid..
       (provided (-add-entity ..state..) => ..new-state..
                 (-last-entity-id ..new-state..) => ..eid..))
 
 
-(fact "world/process! delegates to process!"
+(fact "world/process! delegates to -process!"
       (let [world (make-world ..state..)]
         (world/process! world) => nil
         (provided (-process! world) => ..result..)))
 
 
-(fact "world/remove-component! delegates to remove-component."
+(fact "world/transaction! delegates to -transaction!"
+      (let [w (make-world ..state..)]
+        (world/transaction! w --f--) => ..result..
+        (provided (-transaction! w --f--) => ..result..)))
+
+
+(fact "world/remove-component! delegates to -remove-component."
       (world/remove-component! (make-world ..state..) ..eid.. ..component-type..) => nil
       (provided (-remove-component ..state.. ..eid.. ..component-type..) => ..new-state..))
+
+
+;; Transactions.
+
+(fact "-transaction! calls function with the world."
+      (let [w (make-world ..state..)]
+        (-transaction! w --f--) => nil
+        (provided (--f-- w) => anything)))
+
+
+(fact "-transaction! binds *state* to world's state."
+      (let [w (make-world ..state..)
+            a (atom nil)]
+        (-transaction! w (fn [_] (reset! a *state*)))
+        @a => ..state..))
+
+
+(fact "-transaction! sets the state of the world to the result of the function."
+      (let [w (make-world ..state..)]
+        (-transaction! w (fn [_] (var-set #'*state* ..new-state..))) => nil
+        @(.state w) => ..new-state..))
 
 
 ;; Entity operations.

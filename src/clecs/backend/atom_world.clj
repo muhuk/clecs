@@ -7,20 +7,29 @@
                           :entities {:last-index 0}})
 
 
-(declare -add-component -add-entity -last-entity-id -process! -remove-component)
+(def ^:dynamic *state*)
+
+
+(declare -add-component
+         -add-entity
+         -last-entity-id
+         -process!
+         -remove-component
+         -transaction!)
 
 
 (deftype AtomWorld [state]
   world/IWorld
   (add-component [this eid f] (world/add-component this eid f []))
-  (add-component [this eid f args]
+  (add-component [_ eid f args]
                   (swap! state #(apply -add-component (concat [% eid f] args)))
                   nil)
-  (add-entity! [this]
+  (add-entity! [_]
                (swap! state -add-entity)
                (-last-entity-id @state))
   (process! [this] (-process! this) nil)
-  (remove-component! [this eid ct] (swap! state -remove-component eid ct) nil))
+  (remove-component! [_ eid ct] (swap! state -remove-component eid ct) nil)
+  (transaction! [this f] (-transaction! this f)))
 
 
 
@@ -57,3 +66,12 @@
   (-> state
       (update-in [:entities eid] disj ct)
       (update-in [:components ct] dissoc eid)))
+
+
+(defn -transaction! [world f]
+  (swap! (.state world)
+         (fn [state]
+           (binding [*state* state]
+             (f world)
+             *state*)))
+  nil)
