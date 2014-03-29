@@ -29,49 +29,49 @@
 
 (facts "world/add-component! delegates to add-component."
        (let [w (make-world ..state..)]
-         (world/add-component! w ..eid.. ..f..) => nil
-         (provided (add-component ..state.. ..eid.. ..f..) => ..new-state..)
+         (world/add-component w ..eid.. ..f..) => nil
+         (provided (-add-component ..state.. ..eid.. ..f..) => ..new-state..)
          @(.state w) => ..new-state..)
        (let [w (make-world ..state..)]
-         (world/add-component! w ..eid.. ..f.. [..a.. ..b..]) => nil
-         (provided (add-component ..state.. ..eid.. ..f.. ..a.. ..b..) => ..new-state..)
+         (world/add-component w ..eid.. ..f.. [..a.. ..b..]) => nil
+         (provided (-add-component ..state.. ..eid.. ..f.. ..a.. ..b..) => ..new-state..)
          @(.state w) => ..new-state..))
 
 
 (fact "world/add-entity! delegates to add-entity!"
       (world/add-entity! (make-world ..state..)) => ..eid..
-      (provided (add-entity ..state..) => ..new-state..
-                (last-entity-id ..new-state..) => ..eid..))
+      (provided (-add-entity ..state..) => ..new-state..
+                (-last-entity-id ..new-state..) => ..eid..))
 
 
 (fact "world/process! delegates to process!"
       (let [world (make-world ..state..)]
         (world/process! world) => nil
-        (provided (process! world) => ..result..)))
+        (provided (-process! world) => ..result..)))
 
 
 (fact "world/remove-component! delegates to remove-component."
       (world/remove-component! (make-world ..state..) ..eid.. ..component-type..) => nil
-      (provided (remove-component ..state.. ..eid.. ..component-type..) => ..new-state..))
+      (provided (-remove-component ..state.. ..eid.. ..component-type..) => ..new-state..))
 
 
 ;; Entity operations.
 
 (facts "adding an entity returns a new entity-id and the modified state."
-       (get-in (add-entity EMPTY_WORLD) [:entities 1]) => #{}
-       (last-entity-id (add-entity EMPTY_WORLD)) => 1
-       (last-entity-id (add-entity {:entities {:last-index 41}})) => 42)
+       (get-in (-add-entity EMPTY_WORLD) [:entities 1]) => #{}
+       (-last-entity-id (-add-entity EMPTY_WORLD)) => 1
+       (-last-entity-id (-add-entity {:entities {:last-index 41}})) => 42)
 
 
 ;; Component operations.
 
 (fact "adding a component."
-      (let [state (add-entity EMPTY_WORLD)
-            eid (last-entity-id state)
+      (let [state (-add-entity EMPTY_WORLD)
+            eid (-last-entity-id state)
             expected-state {:components {..component-type.. {1 ..component..}}
                             :entities {1 #{..component-type..}
                                        :last-index 1}}]
-        (add-component state eid ->TestComponent ..a.. ..b..) => expected-state
+        (-add-component state eid ->TestComponent ..a.. ..b..) => expected-state
         (provided (->TestComponent eid ..a.. ..b..) => ..component..
                   (component/component-type ..component..) => ..component-type..)))
 
@@ -81,4 +81,4 @@
                    :entities {..eid.. #{..component-type..}}}
             expected-state {:components {..component-type.. {}}
                             :entities {..eid.. #{}}}]
-        (remove-component state ..eid.. ..component-type..) => expected-state))
+        (-remove-component state ..eid.. ..component-type..) => expected-state))
