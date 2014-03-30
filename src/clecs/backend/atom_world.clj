@@ -12,7 +12,6 @@
 
 (declare -add-component
          -add-entity
-         -last-entity-id
          -process!
          -remove-component
          -transaction!)
@@ -21,16 +20,19 @@
 (deftype AtomWorld [state]
   world/IWorld
   (add-component [this eid f] (world/add-component this eid f []))
-  (add-component [_ eid f args]
-                  (swap! state #(apply -add-component (concat [% eid f] args)))
-                  nil)
-  (add-entity! [_]
-               (swap! state -add-entity)
-               (-last-entity-id @state))
+  (add-component [_ eid f args] (apply -add-component (concat [eid f] args)))
+  (add-entity [_] (-add-entity))
   (process! [this] (-process! this) nil)
-  (remove-component! [_ eid ct] (swap! state -remove-component eid ct) nil)
+  (remove-component [_ eid ct] (-remove-component eid ct))
   (transaction! [this f] (-transaction! this f)))
 
+
+
+(defmacro ^{:private true} ensure-transaction [& body]
+  `(do
+     (when-not (bound? #'*state*)
+       (throw (IllegalStateException. "Not in a transaction.")))
+     ~@body))
 
 
 (defn make-world
@@ -38,37 +40,46 @@
   ([state] (->AtomWorld (atom state))))
 
 
-(defn -add-component [state eid f & args]
-  (let [c (apply f (cons eid args))
-        ct (component/component-type c)]
-    (-> state
-        (update-in [:entities eid] conj ct)
-        (update-in [:components ct] #(or % {}))
-        (update-in [:components ct] conj [eid c]))))
+(defn -add-component [eid f & args]
+  (ensure-transaction
+   (let [state *state*
+         c (apply f (cons eid args))
+         ct (component/component-type c)]
+     (var-set #'*state*
+              (-> state
+                  (update-in [:entities eid] conj ct)
+                  (update-in [:components ct] #(or % {}))
+                  (update-in [:components ct] conj [eid c])))
+     nil)))
 
 
-(defn -add-entity [state]
-  (let [eid (inc (get-in state [:entities :last-index]))]
-    (-> state
-        (assoc-in [:entities eid] #{})
-        (assoc-in [:entities :last-index] eid))))
-
-
-(defn -last-entity-id [state]
-  (get-in state [:entities :last-index]))
+(defn -add-entity []
+  (ensure-transaction
+   (let [state *state*
+         eid (inc (get-in state [:entities :last-index]))]
+     (var-set #'*state*
+              (-> state
+                  (assoc-in [:entities eid] #{})
+                  (assoc-in [:entities :last-index] eid)))
+     eid)))
 
 
 (defn -process! [world]
   (throw (UnsupportedOperationException.)))
 
 
-(defn -remove-component [state eid ct]
-  (-> state
-      (update-in [:entities eid] disj ct)
-      (update-in [:components ct] dissoc eid)))
+(defn -remove-component [eid ct]
+  (ensure-transaction
+   (var-set #'*state*
+            (-> *state*
+                (update-in [:entities eid] disj ct)
+                (update-in [:components ct] dissoc eid))))
+  nil)
 
 
 (defn -transaction! [world f]
+  (when (bound? #'*state*)
+    (throw (IllegalStateException. "transaction! cannot be called within a transaction.")))
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]
