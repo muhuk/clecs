@@ -20,7 +20,7 @@
 (deftype AtomWorld [state]
   world/IWorld
   (add-component [this eid f] (world/add-component this eid f []))
-  (add-component [_ eid f args] (apply -add-component (concat [eid f] args)))
+  (add-component [_ eid f args] (-add-component eid f args))
   (add-entity [_] (-add-entity))
   (process! [this] (-process! this) nil)
   (remove-component [_ eid ct] (-remove-component eid ct))
@@ -40,7 +40,7 @@
   ([state] (->AtomWorld (atom state))))
 
 
-(defn -add-component [eid f & args]
+(defn -add-component [eid f args]
   (ensure-transaction
    (let [state *state*
          c (apply f (cons eid args))

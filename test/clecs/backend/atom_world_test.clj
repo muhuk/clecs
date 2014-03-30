@@ -34,10 +34,10 @@
 (facts "world/add-component delegates to -add-component."
        (let [w (make-world ..state..)]
          (world/add-component w ..eid.. ..f..) => nil
-         (provided (-add-component ..eid.. ..f..) => nil))
+         (provided (-add-component ..eid.. ..f.. []) => nil))
        (let [w (make-world ..state..)]
-         (world/add-component w ..eid.. ..f.. [..a.. ..b..]) => nil
-         (provided (-add-component ..eid.. ..f.. ..a.. ..b..) => nil)))
+         (world/add-component w ..eid.. ..f.. ..args..) => nil
+         (provided (-add-component ..eid.. ..f.. ..args..) => nil)))
 
 
 (fact "world/add-entity delegates to -add-entity"
@@ -117,7 +117,7 @@
 ;; Component operations.
 
 (fact "-add-component can only be called within a transaction."
-      (-add-component ..eid.. ..f..) => (throws IllegalStateException))
+      (-add-component ..eid.. ..f.. ..args..) => (throws IllegalStateException))
 
 
 (fact "-add-component works with a constructor without parameters."
@@ -130,7 +130,7 @@
                            :entities {eid #{ct}
                                       :last-index eid}}]
         (binding [*state* initial-state]
-          (-add-component eid ->TestComponentA) => nil
+          (-add-component eid ->TestComponentA []) => nil
           *state* => expected-state)))
 
 
@@ -144,7 +144,7 @@
                            :entities {eid #{ct}
                                       :last-index eid}}]
         (binding [*state* initial-state]
-          (-add-component eid ->TestComponentB ..a.. ..b..) => nil
+          (-add-component eid ->TestComponentB [..a.. ..b..]) => nil
           *state* => expected-state)))
 
 
