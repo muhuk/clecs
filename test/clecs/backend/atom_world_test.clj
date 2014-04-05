@@ -40,7 +40,7 @@
          (provided (-add-component ..eid.. ..f.. ..args..) => nil)))
 
 
-(fact "world/add-entity delegates to -add-entity"
+(fact "world/add-entity delegates to -add-entity."
       (world/add-entity (make-world ..state..)) => ..eid..
       (provided (-add-entity) => ..eid..))
 
@@ -49,6 +49,12 @@
       (let [world (make-world ..state..)]
         (world/process! world) => nil
         (provided (-process! world) => ..result..)))
+
+
+(fact "world/remove-entity delegates to -remove-entity."
+      (let [world (make-world ..state..)]
+        (world/remove-entity world ..eid..) => nil
+        (provided (-remove-entity ..eid..) => nil)))
 
 
 (fact "world/transaction! delegates to -transaction!"
@@ -112,6 +118,29 @@
       (binding [*state* {:entities {:last-index 0}}]
         (-add-entity)
         (get-in *state* [:entities :last-index]) => 1))
+
+
+(fact "-remove-entity can only be called within a transaction."
+      (-remove-entity ..eid..) => (throws IllegalStateException))
+
+
+(fact "-remove-entity removes entity-id from entity index."
+      (binding [*state* {:components {}
+                         :entities {:last-index 1 1 #{}}}]
+        (-remove-entity 1) => nil
+        *state* => {:components {}
+                    :entities {:last-index 1}}))
+
+
+(fact "-remove-entity removes entity's components."
+      (let [ct :clecs.backend.atom_world_test.TestComponentA
+            initial-state {:components {ct {..eid.. ..i.. ..other-eid.. ..j..}}
+                           :entities {}}
+            expected-state {:components {ct {..other-eid.. ..j..}}
+                            :entities {}}]
+        (binding [*state* initial-state]
+          (-remove-entity ..eid..) => nil
+          *state* => expected-state)))
 
 
 ;; Component operations.

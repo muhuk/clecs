@@ -1,6 +1,7 @@
 (ns clecs.backend.atom-world
   (:require [clecs.world :as world]
-            [clecs.component :as component]))
+            [clecs.component :as component]
+            [clecs.util :refer [map-values]]))
 
 
 (def ^:const EMPTY_WORLD {:components {}
@@ -14,6 +15,7 @@
          -add-entity
          -process!
          -remove-component
+         -remove-entity
          -transaction!)
 
 
@@ -24,8 +26,8 @@
   (add-entity [_] (-add-entity))
   (process! [this] (-process! this) nil)
   (remove-component [_ eid ct] (-remove-component eid ct))
+  (remove-entity [_ eid] (-remove-entity eid))
   (transaction! [this f] (-transaction! this f)))
-
 
 
 (defmacro ^{:private true} ensure-transaction [& body]
@@ -74,6 +76,17 @@
             (-> *state*
                 (update-in [:entities eid] disj ct)
                 (update-in [:components ct] dissoc eid))))
+  nil)
+
+
+(defn -remove-entity [eid]
+  (ensure-transaction
+   (let [state *state*]
+     (var-set #'*state*
+              (-> state
+                  (update-in [:entities] dissoc eid)
+                  (update-in [:components]
+                             (partial map-values #(dissoc % eid)))))))
   nil)
 
 

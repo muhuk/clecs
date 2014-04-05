@@ -6,4 +6,5 @@
   (add-entity [this])
   (process! [this])
   (remove-component [this eid ct])
+  (remove-entity [this eid])
   (transaction! [this f]))
