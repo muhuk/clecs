@@ -14,9 +14,11 @@
 (declare -add-component
          -add-entity
          -process!
+         -query
          -remove-component
          -remove-entity
-         -transaction!)
+         -transaction!
+         -with-state)
 
 
 (deftype AtomWorld [state]
@@ -25,6 +27,7 @@
   (add-component [_ eid f args] (-add-component eid f args))
   (add-entity [_] (-add-entity))
   (process! [this] (-process! this) nil)
+  (query [_ q] (-query state q))
   (remove-component [_ eid ct] (-remove-component eid ct))
   (remove-entity [_ eid] (-remove-entity eid))
   (transaction! [this f] (-transaction! this f)))
@@ -70,6 +73,22 @@
   (throw (UnsupportedOperationException.)))
 
 
+(defn -query [state-atom q]
+  (letfn [(normalize-query [q] (->> (if (sequential? q) q [q])
+                                    (map #(if (set? %) % #{%}))))
+          (entities-with [entities q1]
+                         (filter #(some q1 (second %)) entities))
+          (f [state q]
+             (loop [entities (:entities state)
+                    q q]
+               (if (empty? q)
+                 entities
+                 (recur (entities-with entities (first q))
+                        (rest q)))))]
+    (lazy-seq (keys (->> (normalize-query q)
+                         (-with-state state-atom f))))))
+
+
 (defn -remove-component [eid ct]
   (ensure-transaction
    (var-set #'*state*
@@ -99,3 +118,8 @@
              (f world)
              *state*)))
   nil)
+
+
+(defn -with-state [state-atom f & args]
+  (let [state (if (bound? #'*state*) *state* @state-atom)]
+    (apply f (cons state args))))

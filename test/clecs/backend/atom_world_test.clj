@@ -51,6 +51,13 @@
         (provided (-process! world) => ..result..)))
 
 
+(fact "world/query delegates to -query"
+      (let [world (make-world ..state..)
+            state-atom (.state world)]
+        (world/query world ..q..) => nil
+        (provided (-query state-atom ..q..) => nil)))
+
+
 (fact "world/remove-entity delegates to -remove-entity."
       (let [world (make-world ..state..)]
         (world/remove-entity world ..eid..) => nil
@@ -189,3 +196,40 @@
         (binding [*state* initial-state]
           (-remove-component ..eid.. ..component-type..) => nil
           *state* => expected-state)))
+
+
+;; Queries
+
+(facts "-query dereferences the state outside of a transaction."
+      (bound? #'*state*) => false
+      (-query (atom {:entities {..eid.. #{..ct..}}}) ..ct..) => [..eid..])
+
+
+(fact "-query uses bound state within a transaction."
+      (binding [*state* {:entities {..eid.. #{..ct..}}}]
+        (-query ..state-atom.. ..ct..) => [..eid..]))
+
+
+(fact "Querying with a list returns entities that have ALL component types."
+      (binding [*state* {:entities {..e1.. #{..A.. ..B..}
+                                    ..e2.. #{..A..}
+                                    ..e3.. #{..B..}}}]
+        (-query ..state-atom.. [..A.. ..B..]) => [..e1..]))
+
+
+(fact "Querying with a set returns entities that have ANY component types."
+      (binding [*state* {:entities {..e1.. #{..A..}
+                                    ..e2.. #{..B..}
+                                    ..e3.. #{..C..}}}]
+        (set (-query ..state-atom..
+                     #{..A.. ..B..})) => #{..e1.. ..e2..}))
+
+
+(fact "-query supports a combination of conjunctions and disjunctions."
+      (binding [*state* {:entities {..e1.. #{..A..}
+                                    ..e2.. #{..A.. ..B..}
+                                    ..e3.. #{..A.. ..B.. ..D..}
+                                    ..e4.. #{..A.. ..C.. ..D..}
+                                    ..e5.. #{..A.. ..D..}}}]
+        (set (-query ..state-atom..
+                     [..A.. #{..B.. ..C..} ..D..])) => #{..e3.. ..e4..}))
