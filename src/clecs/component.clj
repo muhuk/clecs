@@ -1,7 +1,8 @@
 (ns clecs.component)
 
 
-(defprotocol IComponent)
+(defprotocol IComponent
+  (entity-id [this]))
 
 
 (defn component-type [c]

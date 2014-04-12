@@ -7,11 +7,13 @@
 
 
 (defrecord TestComponentA [eid]
-  component/IComponent)
+  component/IComponent
+  (entity-id [_] eid))
 
 
 (defrecord TestComponentB [eid a b]
-  component/IComponent)
+  component/IComponent
+  (entity-id [_] eid))
 
 
 ;; World Initialization.
