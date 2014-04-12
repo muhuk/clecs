@@ -47,6 +47,13 @@
       (provided (-add-entity) => ..eid..))
 
 
+(fact "world/component delegates to -component."
+      (let [world (make-world ..state..)
+            state-atom (.state world)]
+        (world/component world ..eid.. ..ct..) => ..component..
+        (provided (-component state-atom ..eid.. ..ct..) => ..component..)))
+
+
 (fact "world/process! delegates to -process!"
       (let [world (make-world ..state..)]
         (world/process! world) => nil
@@ -201,6 +208,18 @@
 
 
 ;; Queries
+
+
+(fact "-component dereferences the state outside of a transaction."
+      (let [state {:components {..ct.. {..eid.. ..component..}}}]
+        (bound? #'*state*) => false
+        (-component (atom state) ..eid.. ..ct..) => ..component..))
+
+
+(fact "-component uses bound state within a transaction."
+      (binding [*state* {:components {..ct.. {..eid.. ..component..}}}]
+        (-component ..state-atom.. ..eid.. ..ct..) => ..component..))
+
 
 (facts "-query dereferences the state outside of a transaction."
       (bound? #'*state*) => false

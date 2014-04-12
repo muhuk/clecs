@@ -13,6 +13,7 @@
 
 (declare -add-component
          -add-entity
+         -component
          -process!
          -query
          -remove-component
@@ -26,6 +27,7 @@
   (add-component [this eid f] (world/add-component this eid f []))
   (add-component [_ eid f args] (-add-component eid f args))
   (add-entity [_] (-add-entity))
+  (component [_ eid ct] (-component state eid ct))
   (process! [this] (-process! this) nil)
   (query [_ q] (-query state q))
   (remove-component [_ eid ct] (-remove-component eid ct))
@@ -67,6 +69,10 @@
                   (assoc-in [:entities eid] #{})
                   (assoc-in [:entities :last-index] eid)))
      eid)))
+
+
+(defn -component [state-atom eid ct]
+  (-with-state state-atom get-in [:components ct eid]))
 
 
 (defn -process! [world]
