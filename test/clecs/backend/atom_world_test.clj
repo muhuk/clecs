@@ -222,35 +222,16 @@
 
 
 (facts "-query dereferences the state outside of a transaction."
-      (bound? #'*state*) => false
-      (-query (atom {:entities {..eid.. #{..ct..}}}) ..ct..) => [..eid..])
+       (bound? #'*state*) => false
+       (-query (atom {:entities {..E1.. ..C1..
+                                 ..E2.. ..C2..}}) --q--) => [..E2..]
+       (provided (--q-- ..C1..) => false
+                 (--q-- ..C2..) => true))
 
 
 (fact "-query uses bound state within a transaction."
-      (binding [*state* {:entities {..eid.. #{..ct..}}}]
-        (-query ..state-atom.. ..ct..) => [..eid..]))
-
-
-(fact "Querying with a list returns entities that have ALL component types."
-      (binding [*state* {:entities {..e1.. #{..A.. ..B..}
-                                    ..e2.. #{..A..}
-                                    ..e3.. #{..B..}}}]
-        (-query ..state-atom.. [..A.. ..B..]) => [..e1..]))
-
-
-(fact "Querying with a set returns entities that have ANY component types."
-      (binding [*state* {:entities {..e1.. #{..A..}
-                                    ..e2.. #{..B..}
-                                    ..e3.. #{..C..}}}]
-        (set (-query ..state-atom..
-                     #{..A.. ..B..})) => #{..e1.. ..e2..}))
-
-
-(fact "-query supports a combination of conjunctions and disjunctions."
-      (binding [*state* {:entities {..e1.. #{..A..}
-                                    ..e2.. #{..A.. ..B..}
-                                    ..e3.. #{..A.. ..B.. ..D..}
-                                    ..e4.. #{..A.. ..C.. ..D..}
-                                    ..e5.. #{..A.. ..D..}}}]
-        (set (-query ..state-atom..
-                     [..A.. #{..B.. ..C..} ..D..])) => #{..e3.. ..e4..}))
+      (binding [*state* {:entities {..E1.. ..C1..
+                                    ..E2.. ..C2..}}]
+        (-query (atom ..state-atom..) --q--) => [..E2..]
+        (provided (--q-- ..C1..) => false
+                  (--q-- ..C2..) => true)))

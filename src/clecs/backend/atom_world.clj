@@ -80,19 +80,13 @@
 
 
 (defn -query [state-atom q]
-  (letfn [(normalize-query [q] (->> (if (sequential? q) q [q])
-                                    (map #(if (set? %) % #{%}))))
-          (entities-with [entities q1]
-                         (filter #(some q1 (second %)) entities))
-          (f [state q]
-             (loop [entities (:entities state)
-                    q q]
-               (if (empty? q)
-                 entities
-                 (recur (entities-with entities (first q))
-                        (rest q)))))]
-    (lazy-seq (keys (->> (normalize-query q)
-                         (-with-state state-atom f))))))
+  (-with-state state-atom
+               #(reduce-kv (fn [coll k v]
+                             (if (q v)
+                               (conj coll k)
+                               coll))
+                           []
+                           (:entities %))))
 
 
 (defn -remove-component [eid ct]
