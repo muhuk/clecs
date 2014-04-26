@@ -2,7 +2,6 @@
 
 
 (defprotocol IWorld
-  (add-component [this eid f] [this eid f args])
   (add-entity [this])
   (component [this eid ct])
   (process! [this])

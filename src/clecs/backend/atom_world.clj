@@ -11,8 +11,7 @@
 (def ^:dynamic *state*)
 
 
-(declare -add-component
-         -add-entity
+(declare -add-entity
          -component
          -process!
          -query
@@ -25,8 +24,6 @@
 
 (deftype AtomWorld [state]
   world/IWorld
-  (add-component [this eid f] (world/add-component this eid f []))
-  (add-component [_ eid f args] (-add-component eid f args))
   (add-entity [_] (-add-entity))
   (component [_ eid clabel] (-component state eid clabel))
   (process! [this] (-process! this) nil)
@@ -47,19 +44,6 @@
 (defn make-world
   ([] (make-world EMPTY_WORLD))
   ([state] (->AtomWorld (atom state))))
-
-
-(defn -add-component [eid f args]
-  (ensure-transaction
-   (let [state *state*
-         c (apply f (cons eid args))
-         clabel (component/component-label c)]
-     (var-set #'*state*
-              (-> state
-                  (update-in [:entities eid] conj clabel)
-                  (update-in [:components clabel] #(or % {}))
-                  (update-in [:components clabel] conj [eid c])))
-     nil)))
 
 
 (defn -add-entity []

@@ -32,16 +32,6 @@
 
 ;; Protocol delegation.
 
-
-(facts "world/add-component delegates to -add-component."
-       (let [w (make-world ..state..)]
-         (world/add-component w ..eid.. ..f..) => nil
-         (provided (-add-component ..eid.. ..f.. []) => nil))
-       (let [w (make-world ..state..)]
-         (world/add-component w ..eid.. ..f.. ..args..) => nil
-         (provided (-add-component ..eid.. ..f.. ..args..) => nil)))
-
-
 (fact "world/add-entity delegates to -add-entity."
       (world/add-entity (make-world ..state..)) => ..eid..
       (provided (-add-entity) => ..eid..))
@@ -165,38 +155,6 @@
 
 
 ;; Component operations.
-
-(fact "-add-component can only be called within a transaction."
-      (-add-component ..eid.. ..f.. ..args..) => (throws IllegalStateException))
-
-
-(fact "-add-component works with a constructor without parameters."
-      (let [eid 1
-            clabel :clecs.backend.atom_world_test.TestComponentA
-            initial-state {:components {}
-                           :entities {eid #{}
-                                      :last-index eid}}
-            expected-state {:components {clabel {eid (->TestComponentA eid)}}
-                           :entities {eid #{clabel}
-                                      :last-index eid}}]
-        (binding [*state* initial-state]
-          (-add-component eid ->TestComponentA []) => nil
-          *state* => expected-state)))
-
-
-(fact "-add-component works with a constructor with parameters."
-      (let [eid 1
-            clabel :clecs.backend.atom_world_test.TestComponentB
-            initial-state {:components {}
-                           :entities {eid #{}
-                                      :last-index eid}}
-            expected-state {:components {clabel {eid (->TestComponentB eid ..a.. ..b..)}}
-                           :entities {eid #{clabel}
-                                      :last-index eid}}]
-        (binding [*state* initial-state]
-          (-add-component eid ->TestComponentB [..a.. ..b..]) => nil
-          *state* => expected-state)))
-
 
 (fact "-remove-component can only be called within a transaction."
       (-remove-component ..eid.. ..clabel..) => (throws IllegalStateException))
