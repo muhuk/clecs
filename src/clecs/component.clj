@@ -6,4 +6,8 @@
 
 
 (defn component-type [c]
-  (keyword (.getName (type c))))
+  (let [c (cond
+           (satisfies? IComponent c) (type c)
+           (extends? IComponent c) c
+           :else (throw (IllegalArgumentException. "Not an IComponent.")))]
+    (keyword (.getName c))))
