@@ -18,6 +18,7 @@
          -query
          -remove-component
          -remove-entity
+         -set-component
          -transaction!
          -with-state)
 
@@ -27,11 +28,12 @@
   (add-component [this eid f] (world/add-component this eid f []))
   (add-component [_ eid f args] (-add-component eid f args))
   (add-entity [_] (-add-entity))
-  (component [_ eid ct] (-component state eid ct))
+  (component [_ eid clabel] (-component state eid clabel))
   (process! [this] (-process! this) nil)
   (query [_ q] (-query state q))
-  (remove-component [_ eid ct] (-remove-component eid ct))
+  (remove-component [_ eid clabel] (-remove-component eid clabel))
   (remove-entity [_ eid] (-remove-entity eid))
+  (set-component [_ c] (-set-component c))
   (transaction! [this f] (-transaction! this f)))
 
 
@@ -51,12 +53,12 @@
   (ensure-transaction
    (let [state *state*
          c (apply f (cons eid args))
-         ct (component/component-type c)]
+         clabel (component/component-label c)]
      (var-set #'*state*
               (-> state
-                  (update-in [:entities eid] conj ct)
-                  (update-in [:components ct] #(or % {}))
-                  (update-in [:components ct] conj [eid c])))
+                  (update-in [:entities eid] conj clabel)
+                  (update-in [:components clabel] #(or % {}))
+                  (update-in [:components clabel] conj [eid c])))
      nil)))
 
 
@@ -71,8 +73,8 @@
      eid)))
 
 
-(defn -component [state-atom eid ct]
-  (-with-state state-atom get-in [:components ct eid]))
+(defn -component [state-atom eid clabel]
+  (-with-state state-atom get-in [:components clabel eid]))
 
 
 (defn -process! [world]
@@ -89,12 +91,12 @@
                            (:entities %))))
 
 
-(defn -remove-component [eid ct]
+(defn -remove-component [eid clabel]
   (ensure-transaction
    (var-set #'*state*
             (-> *state*
-                (update-in [:entities eid] disj ct)
-                (update-in [:components ct] dissoc eid))))
+                (update-in [:entities eid] disj clabel)
+                (update-in [:components clabel] dissoc eid))))
   nil)
 
 
@@ -107,6 +109,18 @@
                   (update-in [:components]
                              (partial map-values #(dissoc % eid)))))))
   nil)
+
+
+(defn -set-component [c]
+  (ensure-transaction
+   (let [clabel (component/component-label c)
+         eid (component/entity-id c)]
+     (var-set #'*state*
+              (-> *state*
+                  (update-in [:entities eid] conj clabel)
+                  (update-in [:components clabel] #(or % {}))
+                  (update-in [:components clabel] conj [eid c])))
+     nil)))
 
 
 (defn -transaction! [world f]

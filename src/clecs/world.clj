@@ -9,4 +9,5 @@
   (query [this q])
   (remove-component [this eid ct])
   (remove-entity [this eid])
+  (set-component [this c])
   (transaction! [this f]))

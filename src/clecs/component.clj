@@ -5,9 +5,18 @@
   (entity-id [this]))
 
 
-(defn component-type [c]
-  (let [c (cond
-           (satisfies? IComponent c) (type c)
-           (extends? IComponent c) c
-           :else (throw (IllegalArgumentException. "Not an IComponent.")))]
-    (keyword (.getName c))))
+(defn component? [c]
+  (and (not (class? c))
+       (satisfies? IComponent c)))
+
+
+(defn component-type? [c]
+  (and (class? c)
+       (extends? IComponent c)))
+
+
+(defn component-label [c]
+  (if (or (component? c)
+          (component-type? c))
+    (keyword (.getName (if (class? c) c (type c))))
+    (throw (IllegalArgumentException. (str c " is not a component.")))))

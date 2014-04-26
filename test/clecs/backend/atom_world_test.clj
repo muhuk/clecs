@@ -50,8 +50,8 @@
 (fact "world/component delegates to -component."
       (let [world (make-world ..state..)
             state-atom (.state world)]
-        (world/component world ..eid.. ..ct..) => ..component..
-        (provided (-component state-atom ..eid.. ..ct..) => ..component..)))
+        (world/component world ..eid.. ..clabel..) => ..component..
+        (provided (-component state-atom ..eid.. ..clabel..) => ..component..)))
 
 
 (fact "world/process! delegates to -process!"
@@ -71,6 +71,11 @@
       (let [world (make-world ..state..)]
         (world/remove-entity world ..eid..) => nil
         (provided (-remove-entity ..eid..) => nil)))
+
+
+(fact "world/set-component delegates to -set-component."
+      (world/set-component (make-world ..state..)  ..c..) => nil
+      (provided (-set-component ..c..) => nil))
 
 
 (fact "world/transaction! delegates to -transaction!"
@@ -149,10 +154,10 @@
 
 
 (fact "-remove-entity removes entity's components."
-      (let [ct :clecs.backend.atom_world_test.TestComponentA
-            initial-state {:components {ct {..eid.. ..i.. ..other-eid.. ..j..}}
+      (let [clabel :clecs.backend.atom_world_test.TestComponentA
+            initial-state {:components {clabel {..eid.. ..i.. ..other-eid.. ..j..}}
                            :entities {}}
-            expected-state {:components {ct {..other-eid.. ..j..}}
+            expected-state {:components {clabel {..other-eid.. ..j..}}
                             :entities {}}]
         (binding [*state* initial-state]
           (-remove-entity ..eid..) => nil
@@ -167,12 +172,12 @@
 
 (fact "-add-component works with a constructor without parameters."
       (let [eid 1
-            ct :clecs.backend.atom_world_test.TestComponentA
+            clabel :clecs.backend.atom_world_test.TestComponentA
             initial-state {:components {}
                            :entities {eid #{}
                                       :last-index eid}}
-            expected-state {:components {ct {eid (->TestComponentA eid)}}
-                           :entities {eid #{ct}
+            expected-state {:components {clabel {eid (->TestComponentA eid)}}
+                           :entities {eid #{clabel}
                                       :last-index eid}}]
         (binding [*state* initial-state]
           (-add-component eid ->TestComponentA []) => nil
@@ -181,12 +186,12 @@
 
 (fact "-add-component works with a constructor with parameters."
       (let [eid 1
-            ct :clecs.backend.atom_world_test.TestComponentB
+            clabel :clecs.backend.atom_world_test.TestComponentB
             initial-state {:components {}
                            :entities {eid #{}
                                       :last-index eid}}
-            expected-state {:components {ct {eid (->TestComponentB eid ..a.. ..b..)}}
-                           :entities {eid #{ct}
+            expected-state {:components {clabel {eid (->TestComponentB eid ..a.. ..b..)}}
+                           :entities {eid #{clabel}
                                       :last-index eid}}]
         (binding [*state* initial-state]
           (-add-component eid ->TestComponentB [..a.. ..b..]) => nil
@@ -194,16 +199,56 @@
 
 
 (fact "-remove-component can only be called within a transaction."
-      (-remove-component ..eid.. ..ct..) => (throws IllegalStateException))
+      (-remove-component ..eid.. ..clabel..) => (throws IllegalStateException))
 
 
 (fact "-remove-component works."
-      (let [initial-state {:components {..component-type.. {..eid.. ..component..}}
-                           :entities {..eid.. #{..component-type..}}}
-            expected-state {:components {..component-type.. {}}
+      (let [initial-state {:components {..clabel.. {..eid.. ..component..}}
+                           :entities {..eid.. #{..clabel..}}}
+            expected-state {:components {..clabel.. {}}
                             :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (-remove-component ..eid.. ..component-type..) => nil
+          (-remove-component ..eid.. ..clabel..) => nil
+          *state* => expected-state)))
+
+
+(fact "-set-component can only be called within a transaction."
+      (-set-component ..c..) => (throws IllegalStateException))
+
+
+(fact "-set-component validates its parameter is a component."
+      (binding [*state* ..state..]
+        (-set-component ..c..) => (throws IllegalArgumentException)))
+
+
+(fact "-set-component adds the component if entity doesn't have one."
+      (let [eid 1
+            c (->TestComponentA eid)
+            clabel (component/component-label TestComponentA)
+            initial-state {:components {}
+                           :entities {eid #{}
+                                      :last-index eid}}
+            expected-state {:components {clabel {eid c}}
+                            :entities {eid #{clabel}
+                                       :last-index eid}}]
+        (binding [*state* initial-state]
+          (-set-component c) => nil
+          *state* => expected-state)))
+
+
+(fact "-set-component replaces existing components."
+      (let [eid 1
+            c-old (->TestComponentB eid ..a.. ..b..)
+            c-new (->TestComponentB eid ..c.. ..d..)
+            clabel (component/component-label TestComponentB)
+            initial-state {:components {clabel {eid c-old}}
+                            :entities {eid #{clabel}
+                                       :last-index eid}}
+            expected-state {:components {clabel {eid c-new}}
+                            :entities {eid #{clabel}
+                                       :last-index eid}}]
+        (binding [*state* initial-state]
+          (-set-component c-new) => nil
           *state* => expected-state)))
 
 
@@ -211,14 +256,14 @@
 
 
 (fact "-component dereferences the state outside of a transaction."
-      (let [state {:components {..ct.. {..eid.. ..component..}}}]
+      (let [state {:components {..clabel.. {..eid.. ..component..}}}]
         (bound? #'*state*) => false
-        (-component (atom state) ..eid.. ..ct..) => ..component..))
+        (-component (atom state) ..eid.. ..clabel..) => ..component..))
 
 
 (fact "-component uses bound state within a transaction."
-      (binding [*state* {:components {..ct.. {..eid.. ..component..}}}]
-        (-component ..state-atom.. ..eid.. ..ct..) => ..component..))
+      (binding [*state* {:components {..clabel.. {..eid.. ..component..}}}]
+        (-component ..state-atom.. ..eid.. ..clabel..) => ..component..))
 
 
 (facts "-query dereferences the state outside of a transaction."
