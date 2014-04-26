@@ -1,6 +1,5 @@
-(ns clecs.core)
+(ns clecs.core
+  (:require [clecs.backend.atom-world :as atom-world]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn make-world []
+  (atom-world/make-world))
