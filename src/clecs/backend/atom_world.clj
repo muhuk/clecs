@@ -24,14 +24,15 @@
 
 
 (deftype AtomWorld [state]
-  world/IWorld
-  (add-entity [_] (-add-entity))
+  world/IQueryable
   (component [_ eid clabel] (-component state eid clabel))
-  (process! [this] (-process! this) nil)
   (query [_ q] (-query state q))
+  world/ITransactor
+  (add-entity [_] (-add-entity))
   (remove-component [_ eid clabel] (-remove-component eid clabel))
   (remove-entity [_ eid] (-remove-entity eid))
   (set-component [_ c] (-set-component c))
+  world/IWorld
   (transaction! [this f] (-transaction! this f)))
 
 
@@ -60,10 +61,6 @@
 
 (defn -component [state-atom eid clabel]
   (-with-state state-atom get-in [:components clabel eid]))
-
-
-(defn -process! [world]
-  (throw (UnsupportedOperationException.)))
 
 
 (defn -query [state-atom q]

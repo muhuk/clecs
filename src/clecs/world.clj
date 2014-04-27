@@ -1,12 +1,17 @@
 (ns clecs.world)
 
 
-(defprotocol IWorld
-  (add-entity [this])
+(defprotocol IQueryable
   (component [this eid clabel])
-  (process! [this])
-  (query [this q])
+  (query [this q]))
+
+
+(defprotocol ITransactor
+  (add-entity [this])
   (remove-component [this eid clabel])
   (remove-entity [this eid])
-  (set-component [this c])
+  (set-component [this c]))
+
+
+(defprotocol IWorld
   (transaction! [this f]))

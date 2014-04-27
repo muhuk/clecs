@@ -30,24 +30,13 @@
       @(.state (make-world ..state..)) => ..state..)
 
 
-;; Protocol delegation.
-
-(fact "world/add-entity delegates to -add-entity."
-      (world/add-entity (make-world ..state..)) => ..eid..
-      (provided (-add-entity) => ..eid..))
-
+;; Protocol delegation - IQueryable.
 
 (fact "world/component delegates to -component."
       (let [world (make-world ..state..)
             state-atom (.state world)]
         (world/component world ..eid.. ..clabel..) => ..component..
         (provided (-component state-atom ..eid.. ..clabel..) => ..component..)))
-
-
-(fact "world/process! delegates to -process!"
-      (let [world (make-world ..state..)]
-        (world/process! world) => nil
-        (provided (-process! world) => ..result..)))
 
 
 (fact "world/query delegates to -query"
@@ -57,10 +46,22 @@
         (provided (-query state-atom ..q..) => nil)))
 
 
+;; Protocol delegation - ITransactor.
+
+(fact "world/add-entity delegates to -add-entity."
+      (world/add-entity (make-world ..state..)) => ..eid..
+      (provided (-add-entity) => ..eid..))
+
+
 (fact "world/remove-entity delegates to -remove-entity."
       (let [world (make-world ..state..)]
         (world/remove-entity world ..eid..) => nil
         (provided (-remove-entity ..eid..) => nil)))
+
+
+(fact "world/remove-component delegates to -remove-component."
+      (world/remove-component (make-world ..state..) ..eid.. ..component-type..) => nil
+      (provided (-remove-component ..eid.. ..component-type..) => nil))
 
 
 (fact "world/set-component delegates to -set-component."
@@ -68,15 +69,12 @@
       (provided (-set-component ..c..) => nil))
 
 
+;; Protocol delegation - IWorld.
+
 (fact "world/transaction! delegates to -transaction!"
       (let [w (make-world ..state..)]
         (world/transaction! w --f--) => ..result..
         (provided (-transaction! w --f--) => ..result..)))
-
-
-(fact "world/remove-component delegates to -remove-component."
-      (world/remove-component (make-world ..state..) ..eid.. ..component-type..) => nil
-      (provided (-remove-component ..eid.. ..component-type..) => nil))
 
 
 ;; Transactions.
