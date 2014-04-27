@@ -23,7 +23,7 @@
 
 
 (fact "a new world's entity-id counter starts by zero."
-      (get-in @(.state (make-world)) [:entities :last-index]) => 0)
+      (:last-entity-id @(.state (make-world))) => 0)
 
 
 (fact "make-world accepts a state parameter."
@@ -114,21 +114,21 @@
 
 
 (facts "-add-entity returns a new entity id."
-       (binding [*state* {:entities {:last-index 0}}]
+       (binding [*state* {:last-entity-id 0}]
          (-add-entity) => 1)
-       (binding [*state* {:entities {:last-index 41}}]
+       (binding [*state* {:last-entity-id 41}]
          (-add-entity) => 42))
 
 (fact "-add-entity adds the new entity-id to the entity index."
-      (binding [*state* {:entities {:last-index 0}}]
+      (binding [*state* {:last-entity-id 0}]
         (let [eid (-add-entity)]
           (get-in *state* [:entities eid]) => #{})))
 
 
 (fact "-add-entity updates entity counter."
-      (binding [*state* {:entities {:last-index 0}}]
+      (binding [*state* {:last-entity-id 0}]
         (-add-entity)
-        (get-in *state* [:entities :last-index]) => 1))
+        (:last-entity-id *state*) => 1))
 
 
 (fact "-remove-entity can only be called within a transaction."
@@ -137,10 +137,12 @@
 
 (fact "-remove-entity removes entity-id from entity index."
       (binding [*state* {:components {}
-                         :entities {:last-index 1 1 #{}}}]
+                         :entities {1 #{}}
+                         :last-entity-id 1}]
         (-remove-entity 1) => nil
         *state* => {:components {}
-                    :entities {:last-index 1}}))
+                    :entities {}
+                    :last-entity-id 1}))
 
 
 (fact "-remove-entity removes entity's components."
@@ -184,11 +186,9 @@
             c (->TestComponentA eid)
             clabel (component/component-label TestComponentA)
             initial-state {:components {}
-                           :entities {eid #{}
-                                      :last-index eid}}
+                           :entities {eid #{}}}
             expected-state {:components {clabel {eid c}}
-                            :entities {eid #{clabel}
-                                       :last-index eid}}]
+                            :entities {eid #{clabel}}}]
         (binding [*state* initial-state]
           (-set-component c) => nil
           *state* => expected-state)))
@@ -200,11 +200,9 @@
             c-new (->TestComponentB eid ..c.. ..d..)
             clabel (component/component-label TestComponentB)
             initial-state {:components {clabel {eid c-old}}
-                            :entities {eid #{clabel}
-                                       :last-index eid}}
+                            :entities {eid #{clabel}}}
             expected-state {:components {clabel {eid c-new}}
-                            :entities {eid #{clabel}
-                                       :last-index eid}}]
+                            :entities {eid #{clabel}}}]
         (binding [*state* initial-state]
           (-set-component c-new) => nil
           *state* => expected-state)))

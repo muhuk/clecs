@@ -5,7 +5,8 @@
 
 
 (def ^:const EMPTY_WORLD {:components {}
-                          :entities {:last-index 0}})
+                          :entities {}
+                          :last-entity-id 0})
 
 
 (def ^:dynamic *state*)
@@ -49,11 +50,11 @@
 (defn -add-entity []
   (ensure-transaction
    (let [state *state*
-         eid (inc (get-in state [:entities :last-index]))]
+         eid (inc (:last-entity-id state))]
      (var-set #'*state*
               (-> state
                   (assoc-in [:entities eid] #{})
-                  (assoc-in [:entities :last-index] eid)))
+                  (assoc :last-entity-id eid)))
      eid)))
 
 
