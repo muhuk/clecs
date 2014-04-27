@@ -53,20 +53,22 @@
       (provided (-add-entity) => ..eid..))
 
 
+(fact "world/remove-component delegates to -remove-component."
+      (let [world (make-world ..state..)]
+        (world/remove-component world ..eid.. ..component-type..) => world
+        (provided (-remove-component ..eid.. ..component-type..) => nil)))
+
+
 (fact "world/remove-entity delegates to -remove-entity."
       (let [world (make-world ..state..)]
-        (world/remove-entity world ..eid..) => nil
+        (world/remove-entity world ..eid..) => world
         (provided (-remove-entity ..eid..) => nil)))
 
 
-(fact "world/remove-component delegates to -remove-component."
-      (world/remove-component (make-world ..state..) ..eid.. ..component-type..) => nil
-      (provided (-remove-component ..eid.. ..component-type..) => nil))
-
-
 (fact "world/set-component delegates to -set-component."
-      (world/set-component (make-world ..state..)  ..c..) => nil
-      (provided (-set-component ..c..) => nil))
+      (let [world (make-world ..state..)]
+        (world/set-component world  ..c..) => world
+        (provided (-set-component ..c..) => nil)))
 
 
 ;; Protocol delegation - IWorld.

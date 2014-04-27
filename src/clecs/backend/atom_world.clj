@@ -29,9 +29,9 @@
   (query [_ q] (-query state q))
   world/ITransactor
   (add-entity [_] (-add-entity))
-  (remove-component [_ eid clabel] (-remove-component eid clabel))
-  (remove-entity [_ eid] (-remove-entity eid))
-  (set-component [_ c] (-set-component c))
+  (remove-component [this eid clabel] (-remove-component eid clabel) this)
+  (remove-entity [this eid] (-remove-entity eid) this)
+  (set-component [this c] (-set-component c) this)
   world/IWorld
   (transaction! [this f] (-transaction! this f)))
 
