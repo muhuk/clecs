@@ -225,16 +225,24 @@
 
 
 (facts "-query dereferences the state outside of a transaction."
-       (bound? #'*state*) => false
-       (-query (atom {:entities {..E1.. ..C1..
-                                 ..E2.. ..C2..}}) --q--) => [..E2..]
-       (provided (--q-- ..C1..) => false
-                 (--q-- ..C2..) => true))
+       (let [components-1 #{..C1.. ..C2..}
+             seq-1 (seq components-1)
+             components-2 #{..C2..}
+             seq-2 (seq components-2)]
+         (bound? #'*state*) => false
+         (-query (atom {:entities {..E1.. components-1
+                                   ..E2.. components-2}}) --q--) => [..E2..]
+         (provided (--q-- seq-1) => false
+                   (--q-- seq-2) => true)))
 
 
 (fact "-query uses bound state within a transaction."
-      (binding [*state* {:entities {..E1.. ..C1..
-                                    ..E2.. ..C2..}}]
-        (-query (atom ..state-atom..) --q--) => [..E2..]
-        (provided (--q-- ..C1..) => false
-                  (--q-- ..C2..) => true)))
+      (let [components-1 #{..C1.. ..C2..}
+            seq-1 (seq components-1)
+            components-2 #{..C2..}
+            seq-2 (seq components-2)]
+        (binding [*state* {:entities {..E1.. components-1
+                                      ..E2.. components-2}}]
+          (-query (atom ..state-atom..) --q--) => [..E2..]
+          (provided (--q-- seq-1) => false
+                    (--q-- seq-2) => true))))

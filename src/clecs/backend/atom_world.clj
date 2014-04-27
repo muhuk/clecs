@@ -68,7 +68,7 @@
 (defn -query [state-atom q]
   (-with-state state-atom
                #(reduce-kv (fn [coll k v]
-                             (if (q v)
+                             (if (q (seq v))
                                (conj coll k)
                                coll))
                            []
