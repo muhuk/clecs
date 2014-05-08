@@ -16,9 +16,8 @@
 
 
 (defn component-label [c]
-  (if (or (component? c)
-          (component-type? c))
-    (keyword (.getName (if (class? c) c (type c))))
+  (if (component-type? c)
+    (keyword (.getName c))
     (throw (IllegalArgumentException. (str c " is not a component.")))))
 
 

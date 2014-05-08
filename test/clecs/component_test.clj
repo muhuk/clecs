@@ -24,14 +24,8 @@
        (component-type? (->NonComponent)) => false)
 
 
-(fact "component-label accepts component types."
-      (component-label TestComponent) => :clecs.component_test.TestComponent)
-
-
-(facts "component-label throws IllegalArgumentException on types that don't extend IComponent."
+(facts "component-label accepts component types."
+       (component-label TestComponent) => :clecs.component_test.TestComponent
+       (component-label (->TestComponent ..eid..)) => (throws IllegalArgumentException)
        (component-label NonComponent) => (throws IllegalArgumentException)
        (component-label (->NonComponent)) => (throws IllegalArgumentException))
-
-
-(fact "component-label accepts component instances."
-      (component-label (->TestComponent ..eid..)) => :clecs.component_test.TestComponent)

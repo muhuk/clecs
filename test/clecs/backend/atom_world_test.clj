@@ -155,7 +155,7 @@
 ;; Component operations.
 
 (fact "-remove-component can only be called within a transaction."
-      (-remove-component ..eid.. ..clabel..) => (throws IllegalStateException))
+      (-remove-component ..eid.. ..ctype..) => (throws IllegalStateException))
 
 
 (fact "-remove-component works."
@@ -164,7 +164,8 @@
             expected-state {:components {..clabel.. {}}
                             :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (-remove-component ..eid.. ..clabel..) => nil
+          (-remove-component ..eid.. ..ctype..) => nil
+          (provided (component-label ..ctype..) => ..clabel..)
           *state* => expected-state)))
 
 
@@ -210,12 +211,14 @@
 (fact "-component dereferences the state outside of a transaction."
       (let [state {:components {..clabel.. {..eid.. ..component..}}}]
         (bound? #'*state*) => false
-        (-component (atom state) ..eid.. ..clabel..) => ..component..))
+        (-component (atom state) ..eid.. ..ctype..) => ..component..
+        (provided (component-label ..ctype..) => ..clabel..)))
 
 
 (fact "-component uses bound state within a transaction."
       (binding [*state* {:components {..clabel.. {..eid.. ..component..}}}]
-        (-component ..state-atom.. ..eid.. ..clabel..) => ..component..))
+        (-component ..state-atom.. ..eid.. ..ctype..) => ..component..
+        (provided (component-label ..ctype..) => ..clabel..)))
 
 
 (facts "-query dereferences the state outside of a transaction."

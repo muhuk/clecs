@@ -1,6 +1,6 @@
 (ns clecs.backend.atom-world
   (:require [clecs.world :as world]
-            [clecs.component :as component]
+            [clecs.component :refer [component-label entity-id]]
             [clecs.util :refer [map-values]]))
 
 
@@ -25,11 +25,11 @@
 
 (deftype AtomWorld [state]
   world/IQueryable
-  (component [_ eid clabel] (-component state eid clabel))
+  (component [_ eid ctype] (-component state eid ctype))
   (query [_ q] (-query state q))
   world/ITransactor
   (add-entity [_] (-add-entity))
-  (remove-component [this eid clabel] (-remove-component eid clabel) this)
+  (remove-component [this eid ctype] (-remove-component eid ctype) this)
   (remove-entity [this eid] (-remove-entity eid) this)
   (set-component [this c] (-set-component c) this)
   world/IWorld
@@ -59,8 +59,8 @@
      eid)))
 
 
-(defn -component [state-atom eid clabel]
-  (-with-state state-atom get-in [:components clabel eid]))
+(defn -component [state-atom eid ctype]
+  (-with-state state-atom get-in [:components (component-label ctype) eid]))
 
 
 (defn -query [state-atom q]
@@ -73,12 +73,13 @@
                            (:entities %))))
 
 
-(defn -remove-component [eid clabel]
+(defn -remove-component [eid ctype]
   (ensure-transaction
-   (var-set #'*state*
-            (-> *state*
-                (update-in [:entities eid] disj clabel)
-                (update-in [:components clabel] dissoc eid))))
+   (let [clabel (component-label ctype)]
+     (var-set #'*state*
+              (-> *state*
+                  (update-in [:entities eid] disj clabel)
+                  (update-in [:components clabel] dissoc eid)))))
   nil)
 
 
@@ -95,8 +96,8 @@
 
 (defn -set-component [c]
   (ensure-transaction
-   (let [clabel (component/component-label c)
-         eid (component/entity-id c)]
+   (let [clabel (component-label (type c))
+         eid (entity-id c)]
      (var-set #'*state*
               (-> *state*
                   (update-in [:entities eid] conj clabel)
