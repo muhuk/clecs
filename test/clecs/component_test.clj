@@ -4,9 +4,7 @@
             [clecs.component :refer :all]))
 
 
-(defrecord TestComponent [eid]
-  IComponent
-  (entity-id [_] eid))
+(defcomponent TestComponent [eid])
 
 
 (defrecord NonComponent [])
@@ -19,7 +17,7 @@
        (component? NonComponent) => false)
 
 
-(facts "component? checks if its parameter is a component type."
+(facts "component-type? checks if its parameter is a component type."
        (component-type? TestComponent) => true
        (component-type? NonComponent) => false
        (component-type? (->TestComponent ..eid..)) => false

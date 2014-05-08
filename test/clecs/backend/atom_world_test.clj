@@ -2,18 +2,14 @@
   (:require [clojure.test :refer :all]
             [midje.sweet :refer :all]
             [clecs.backend.atom-world :refer :all]
-            [clecs.component :as component]
+            [clecs.component :refer [component-label defcomponent]]
             [clecs.world :as world]))
 
 
-(defrecord TestComponentA [eid]
-  component/IComponent
-  (entity-id [_] eid))
+(defcomponent TestComponentA [eid])
 
 
-(defrecord TestComponentB [eid a b]
-  component/IComponent
-  (entity-id [_] eid))
+(defcomponent TestComponentB [eid a b])
 
 
 ;; World Initialization.
@@ -184,7 +180,7 @@
 (fact "-set-component adds the component if entity doesn't have one."
       (let [eid 1
             c (->TestComponentA eid)
-            clabel (component/component-label TestComponentA)
+            clabel (component-label TestComponentA)
             initial-state {:components {}
                            :entities {eid #{}}}
             expected-state {:components {clabel {eid c}}
@@ -198,7 +194,7 @@
       (let [eid 1
             c-old (->TestComponentB eid ..a.. ..b..)
             c-new (->TestComponentB eid ..c.. ..d..)
-            clabel (component/component-label TestComponentB)
+            clabel (component-label TestComponentB)
             initial-state {:components {clabel {eid c-old}}
                             :entities {eid #{clabel}}}
             expected-state {:components {clabel {eid c-new}}
