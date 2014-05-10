@@ -36,11 +36,14 @@
   (transaction! [this f] (-transaction! this f)))
 
 
-(defmacro ^{:private true} ensure-transaction [& body]
-  `(do
-     (when-not (bound? #'*state*)
-       (throw (IllegalStateException. "Not in a transaction.")))
-     ~@body))
+(defn -ensure-no-transaction []
+  (when (bound? #'*state*)
+    (throw (IllegalStateException. "In a transaction."))))
+
+
+(defn -ensure-transaction []
+  (when-not (bound? #'*state*)
+    (throw (IllegalStateException. "Not in a transaction."))))
 
 
 (defn make-world
@@ -49,14 +52,14 @@
 
 
 (defn -add-entity []
-  (ensure-transaction
-   (let [state *state*
-         eid (inc (:last-entity-id state))]
-     (var-set #'*state*
-              (-> state
-                  (assoc-in [:entities eid] #{})
-                  (assoc :last-entity-id eid)))
-     eid)))
+  (-ensure-transaction)
+  (let [state *state*
+        eid (inc (:last-entity-id state))]
+    (var-set #'*state*
+             (-> state
+                 (assoc-in [:entities eid] #{})
+                 (assoc :last-entity-id eid)))
+    eid))
 
 
 (defn -component [state-atom eid ctype]
@@ -74,41 +77,40 @@
 
 
 (defn -remove-component [eid ctype]
-  (ensure-transaction
-   (let [clabel (component-label ctype)]
-     (var-set #'*state*
-              (-> *state*
-                  (update-in [:entities eid] disj clabel)
-                  (update-in [:components clabel] dissoc eid)))))
+  (-ensure-transaction)
+  (let [clabel (component-label ctype)]
+    (var-set #'*state*
+             (-> *state*
+                 (update-in [:entities eid] disj clabel)
+                 (update-in [:components clabel] dissoc eid))))
   nil)
 
 
 (defn -remove-entity [eid]
-  (ensure-transaction
-   (let [state *state*]
-     (var-set #'*state*
-              (-> state
-                  (update-in [:entities] dissoc eid)
-                  (update-in [:components]
-                             (partial map-values #(dissoc % eid)))))))
+  (-ensure-transaction)
+  (let [state *state*]
+    (var-set #'*state*
+             (-> state
+                 (update-in [:entities] dissoc eid)
+                 (update-in [:components]
+                            (partial map-values #(dissoc % eid))))))
   nil)
 
 
 (defn -set-component [c]
-  (ensure-transaction
-   (let [clabel (component-label (type c))
-         eid (entity-id c)]
-     (var-set #'*state*
-              (-> *state*
-                  (update-in [:entities eid] conj clabel)
-                  (update-in [:components clabel] #(or % {}))
-                  (update-in [:components clabel] conj [eid c])))
-     nil)))
+  (-ensure-transaction)
+  (let [clabel (component-label (type c))
+        eid (entity-id c)]
+    (var-set #'*state*
+             (-> *state*
+                 (update-in [:entities eid] conj clabel)
+                 (update-in [:components clabel] #(or % {}))
+                 (update-in [:components clabel] conj [eid c])))
+    nil))
 
 
 (defn -transaction! [world f]
-  (when (bound? #'*state*)
-    (throw (IllegalStateException. "transaction! cannot be called within a transaction.")))
+  (-ensure-no-transaction)
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]
