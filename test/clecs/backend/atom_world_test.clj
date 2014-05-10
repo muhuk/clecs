@@ -15,7 +15,7 @@
 ;; World Initialization.
 
 (fact "atom world implements IWorld."
-      (type (make-world)) => (partial extends? world/IWorld))
+      (type (make-world)) => (partial extends? world/ITransactableWorld))
 
 
 (fact "a new world's entity-id counter starts by zero."
@@ -26,23 +26,7 @@
       @(.state (make-world ..state..)) => ..state..)
 
 
-;; Protocol delegation - IQueryable.
-
-(fact "world/component delegates to -component."
-      (let [world (make-world ..state..)
-            state-atom (.state world)]
-        (world/component world ..eid.. ..clabel..) => ..component..
-        (provided (-component state-atom ..eid.. ..clabel..) => ..component..)))
-
-
-(fact "world/query delegates to -query"
-      (let [world (make-world ..state..)
-            state-atom (.state world)]
-        (world/query world ..q..) => nil
-        (provided (-query state-atom ..q..) => nil)))
-
-
-;; Protocol delegation - ITransactor.
+;; Protocol delegation - IEditableWorld.
 
 (fact "world/add-entity delegates to -add-entity."
       (world/add-entity (make-world ..state..)) => ..eid..
@@ -67,7 +51,23 @@
         (provided (-set-component ..c..) => nil)))
 
 
-;; Protocol delegation - IWorld.
+;; Protocol delegation - IQueryableWorld.
+
+(fact "world/component delegates to -component."
+      (let [world (make-world ..state..)
+            state-atom (.state world)]
+        (world/component world ..eid.. ..clabel..) => ..component..
+        (provided (-component state-atom ..eid.. ..clabel..) => ..component..)))
+
+
+(fact "world/query delegates to -query"
+      (let [world (make-world ..state..)
+            state-atom (.state world)]
+        (world/query world ..q..) => nil
+        (provided (-query state-atom ..q..) => nil)))
+
+
+;; Protocol delegation - ITransactableWorld.
 
 (fact "world/transaction! delegates to -transaction!"
       (let [w (make-world ..state..)]

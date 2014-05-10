@@ -24,15 +24,15 @@
 
 
 (deftype AtomWorld [state]
-  world/IQueryable
-  (component [_ eid ctype] (-component state eid ctype))
-  (query [_ q] (-query state q))
-  world/ITransactor
+  world/IEditableWorld
   (add-entity [_] (-add-entity))
   (remove-component [this eid ctype] (-remove-component eid ctype) this)
   (remove-entity [this eid] (-remove-entity eid) this)
   (set-component [this c] (-set-component c) this)
-  world/IWorld
+  world/IQueryableWorld
+  (component [_ eid ctype] (-component state eid ctype))
+  (query [_ q] (-query state q))
+  world/ITransactableWorld
   (transaction! [this f] (-transaction! this f)))
 
 
