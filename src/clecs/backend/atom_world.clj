@@ -1,5 +1,6 @@
 (ns clecs.backend.atom-world
   (:require [clecs.world :as world]
+            [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
             [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
             [clecs.backend.atom-world.transactable :refer [-transaction!]]))
@@ -10,7 +11,7 @@
                           :last-entity-id 0})
 
 
-(deftype AtomWorld [state]
+(deftype AtomWorld [state editable-world]
   world/IQueryableWorld
   (component [_ eid ctype] (-component @state eid ctype))
   (query [_ q] (-query @state q))
@@ -20,4 +21,4 @@
 
 (defn make-world
   ([] (make-world EMPTY_WORLD))
-  ([state] (->AtomWorld (atom state))))
+  ([state] (->AtomWorld (atom state) (->AtomEditableWorld))))

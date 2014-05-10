@@ -1,13 +1,11 @@
 (ns clecs.backend.atom-world.editable
   (:require [clecs.component :refer [component-label
                                      entity-id]]
-            [clecs.backend.atom-world.state :refer [*state*
-                                                    -ensure-transaction]]
+            [clecs.backend.atom-world.transactable :refer [*state*]]
             [clecs.util :refer [map-values]]))
 
 
 (defn -add-entity []
-  (-ensure-transaction)
   (let [state *state*
         eid (inc (:last-entity-id state))]
     (var-set #'*state*
@@ -18,7 +16,6 @@
 
 
 (defn -remove-component [eid ctype]
-  (-ensure-transaction)
   (let [clabel (component-label ctype)]
     (var-set #'*state*
              (-> *state*
@@ -28,7 +25,6 @@
 
 
 (defn -remove-entity [eid]
-  (-ensure-transaction)
   (let [state *state*]
     (var-set #'*state*
              (-> state
@@ -39,7 +35,6 @@
 
 
 (defn -set-component [c]
-  (-ensure-transaction)
   (let [clabel (component-label (type c))
         eid (entity-id c)]
     (var-set #'*state*

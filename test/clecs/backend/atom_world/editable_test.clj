@@ -3,7 +3,7 @@
             [midje.sweet :refer :all]
             [clecs.backend.atom-world :refer [make-world]]
             [clecs.backend.atom-world.editable :refer :all]
-            [clecs.backend.atom-world.state :refer [*state*]]
+            [clecs.backend.atom-world.transactable :refer [*state*]]
             [clecs.component :refer [component-label defcomponent]]))
 
 
@@ -16,15 +16,12 @@
 
 ;; Entity operations.
 
-(fact "-add-entity can only be called within a transaction."
-      (-add-entity) => (throws IllegalStateException))
-
-
 (fact "-add-entity returns a new entity id."
       (binding [*state* {:last-entity-id 0}]
         (-add-entity) => 1)
       (binding [*state* {:last-entity-id 41}]
         (-add-entity) => 42))
+
 
 (fact "-add-entity adds the new entity-id to the entity index."
       (binding [*state* {:last-entity-id 0}]
@@ -36,10 +33,6 @@
       (binding [*state* {:last-entity-id 0}]
         (-add-entity)
         (:last-entity-id *state*) => 1))
-
-
-(fact "-remove-entity can only be called within a transaction."
-      (-remove-entity ..eid..) => (throws IllegalStateException))
 
 
 (fact "-remove-entity removes entity-id from entity index."
@@ -65,10 +58,6 @@
 
 ;; Component operations.
 
-(fact "-remove-component can only be called within a transaction."
-      (-remove-component ..eid.. ..ctype..) => (throws IllegalStateException))
-
-
 (fact "-remove-component works."
       (let [initial-state {:components {..clabel.. {..eid.. ..component..}}
                            :entities {..eid.. #{..clabel..}}}
@@ -78,10 +67,6 @@
           (-remove-component ..eid.. ..ctype..) => nil
           (provided (component-label ..ctype..) => ..clabel..)
           *state* => expected-state)))
-
-
-(fact "-set-component can only be called within a transaction."
-      (-set-component ..c..) => (throws IllegalStateException))
 
 
 (fact "-set-component validates its parameter is a component."

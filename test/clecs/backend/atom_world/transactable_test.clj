@@ -2,9 +2,7 @@
   (:require [clojure.test :refer :all]
             [midje.sweet :refer :all]
             [clecs.backend.atom-world :refer [make-world]]
-            [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
             [clecs.backend.atom-world.transactable :refer :all]
-            [clecs.backend.atom-world.state :refer [*state*]]
             [clecs.world :as world]))
 
 

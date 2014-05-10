@@ -1,14 +1,15 @@
-(ns clecs.backend.atom-world.transactable
-  (:require [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
-            [clecs.backend.atom-world.state :refer [*state*
-                                                    -ensure-no-transaction]]))
+(ns clecs.backend.atom-world.transactable)
+
+
+(def ^:dynamic *state*)
 
 
 (defn -transaction! [world f]
-  (-ensure-no-transaction)
+  (when (bound? #'*state*)
+    (throw (IllegalStateException. "Already in a transaction.")))
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]
-             (f (->AtomEditableWorld))
+             (f (.editable-world world))
              *state*)))
   nil)

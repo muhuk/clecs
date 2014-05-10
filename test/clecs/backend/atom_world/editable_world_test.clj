@@ -8,7 +8,7 @@
             [clecs.backend.atom-world.editable-world :refer :all]
             [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
-            [clecs.backend.atom-world.state :refer [*state*]]
+            [clecs.backend.atom-world.transactable :refer [*state*]]
             [clecs.world :as world]))
 
 

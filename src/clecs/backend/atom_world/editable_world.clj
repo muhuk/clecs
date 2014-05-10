@@ -6,7 +6,7 @@
                                                        -set-component]]
             [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
-            [clecs.backend.atom-world.state :refer [*state*]]))
+            [clecs.backend.atom-world.transactable :refer [*state*]]))
 
 
 (deftype AtomEditableWorld []
