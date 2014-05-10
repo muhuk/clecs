@@ -26,45 +26,16 @@
       @(.state (make-world ..state..)) => ..state..)
 
 
-;; Protocol delegation - IEditableWorld.
-
-(fact "world/add-entity delegates to -add-entity."
-      (world/add-entity (make-world ..state..)) => ..eid..
-      (provided (-add-entity) => ..eid..))
-
-
-(fact "world/remove-component delegates to -remove-component."
-      (let [world (make-world ..state..)]
-        (world/remove-component world ..eid.. ..component-type..) => world
-        (provided (-remove-component ..eid.. ..component-type..) => nil)))
-
-
-(fact "world/remove-entity delegates to -remove-entity."
-      (let [world (make-world ..state..)]
-        (world/remove-entity world ..eid..) => world
-        (provided (-remove-entity ..eid..) => nil)))
-
-
-(fact "world/set-component delegates to -set-component."
-      (let [world (make-world ..state..)]
-        (world/set-component world  ..c..) => world
-        (provided (-set-component ..c..) => nil)))
-
-
 ;; Protocol delegation - IQueryableWorld.
 
 (fact "world/component delegates to -component."
-      (let [world (make-world ..state..)
-            state-atom (.state world)]
-        (world/component world ..eid.. ..clabel..) => ..component..
-        (provided (-component state-atom ..eid.. ..clabel..) => ..component..)))
+      (world/component (make-world ..state..) ..eid.. ..clabel..) => ..component..
+      (provided (-component ..state.. ..eid.. ..clabel..) => ..component..))
 
 
 (fact "world/query delegates to -query"
-      (let [world (make-world ..state..)
-            state-atom (.state world)]
-        (world/query world ..q..) => nil
-        (provided (-query state-atom ..q..) => nil)))
+      (world/query (make-world ..state..) ..q..) => nil
+      (provided (-query ..state.. ..q..) => nil))
 
 
 ;; Protocol delegation - ITransactableWorld.
