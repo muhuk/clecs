@@ -24,23 +24,3 @@
 
 (fact "make-world accepts a state parameter."
       @(.state (make-world ..state..)) => ..state..)
-
-
-;; Protocol delegation - IQueryableWorld.
-
-(fact "world/component delegates to -component."
-      (world/component (make-world ..state..) ..eid.. ..clabel..) => ..component..
-      (provided (-component ..state.. ..eid.. ..clabel..) => ..component..))
-
-
-(fact "world/query delegates to -query"
-      (world/query (make-world ..state..) ..q..) => nil
-      (provided (-query ..state.. ..q..) => nil))
-
-
-;; Protocol delegation - ITransactableWorld.
-
-(fact "world/transaction! delegates to -transaction!"
-      (let [w (make-world ..state..)]
-        (world/transaction! w --f--) => ..result..
-        (provided (-transaction! w --f--) => ..result..)))

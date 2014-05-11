@@ -47,5 +47,5 @@
 
 (fact "world/query delegates to -query"
       (binding [*state* ..state..]
-        (world/query (->AtomEditableWorld) ..q..) => nil
-        (provided (-query *state* ..q..) => nil)))
+        (world/query (->AtomEditableWorld) ..q..) => ..result..
+        (provided (-query *state* ..q..) => ..result..)))

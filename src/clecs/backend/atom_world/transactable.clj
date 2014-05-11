@@ -10,6 +10,6 @@
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]
-             (f (.editable-world world))
+             (f world)
              *state*)))
   nil)

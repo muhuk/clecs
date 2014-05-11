@@ -1,12 +1,12 @@
 (ns clecs.backend.atom-world.editable-world
-  (:require [clecs.world :as world]
-            [clecs.backend.atom-world.editable :refer [-add-entity
+  (:require [clecs.backend.atom-world.editable :refer [-add-entity
                                                        -remove-component
                                                        -remove-entity
                                                        -set-component]]
             [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
-            [clecs.backend.atom-world.transactable :refer [*state*]]))
+            [clecs.backend.atom-world.transactable :refer [*state*]]
+            [clecs.world :as world]))
 
 
 (deftype AtomEditableWorld []
