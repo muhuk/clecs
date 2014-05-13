@@ -13,6 +13,14 @@
             [clecs.world :as world]))
 
 
+(def editable-world-like (implements-protocols world/IEditableWorld
+                                               world/IQueryableWorld))
+
+
+(def transactable-world-like (implements-protocols world/IQueryableWorld
+                                                   world/ITransactableWorld))
+
+
 ;; World Initialization.
 
 (fact "Atom world implements ISystemManager."
@@ -21,9 +29,7 @@
 
 (fact "Initialization function is called withing a transaction."
       (make-world --init--) => irrelevant
-      (provided (--init-- (as-checker (implements-protocols
-                                       world/IEditableWorld
-                                       world/IQueryableWorld))) => irrelevant))
+      (provided (--init-- (as-checker editable-world-like)) => irrelevant))
 
 
 ;; System Operations
@@ -47,3 +53,25 @@
       (-> (make-world --init--)
           (world/set-system! ..system-label.. ..system..)
           (world/systems)) => (seq {..system-label.. ..system..}))
+
+
+;; Processing
+
+(fact "process! returns the world."
+      (let [w (make-world --init--)]
+        (world/process! w ..dt..) => w))
+
+
+(fact "process! calls each system with the world and delta time."
+      (let [calls (atom [])
+            f-one (fn [& args] (swap! calls conj [:one-called args]))
+            f-two (fn [& args] (swap! calls conj [:two-called args]))
+            w (-> (make-world --init--)
+                  (world/set-system! ..l-one.. f-one)
+                  (world/set-system! ..l-two.. f-two))]
+        (world/process! w ..dt..) => irrelevant
+        (set (map first @calls)) => (set [:one-called :two-called])
+        (-> @calls first second first) => transactable-world-like
+        (-> @calls first second second) => ..dt..
+        (-> @calls second second first) => transactable-world-like
+        (-> @calls second second second) => ..dt..))
