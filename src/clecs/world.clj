@@ -15,10 +15,9 @@
 
 (defprotocol ISystemManager
 ;;   (process! [this dt])
-;;   (remove-system! [this slabel])
+  (remove-system! [this slabel])
   (set-system! [this slabel s])
-  (systems [this])
-)
+  (systems [this]))
 
 
 (defprotocol ITransactableWorld

@@ -11,6 +11,7 @@
 
 (deftype AtomWorld [systems-atom transactable-world]
   world/ISystemManager
+  (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
   (set-system! [this slabel s] (swap! systems-atom assoc slabel s) this)
   (systems [_] (seq @systems-atom)))
 
