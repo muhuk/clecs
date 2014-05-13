@@ -9,9 +9,10 @@
                     :last-entity-id 0})
 
 
-(deftype AtomWorld [state systems transactable-world]
+(deftype AtomWorld [systems-atom transactable-world]
   world/ISystemManager
-  (set-system! [this slabel s] (swap! systems assoc slabel s) this))
+  (set-system! [this slabel s] (swap! systems-atom assoc slabel s) this)
+  (systems [_] (seq @systems-atom)))
 
 
 (defn make-world
@@ -21,4 +22,4 @@
          editable-world (->AtomEditableWorld)
          transactable-world (->AtomTransactableWorld state editable-world)]
      (world/transaction! transactable-world f)
-     (->AtomWorld state systems transactable-world))))
+     (->AtomWorld systems transactable-world))))

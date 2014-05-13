@@ -19,10 +19,6 @@
       (make-world --init--) => (implements-protocols world/ISystemManager))
 
 
-(fact "A new world's entity-id counter starts by zero."
-      (:last-entity-id @(.state (make-world --init--))) => 0)
-
-
 (fact "Initialization function is called withing a transaction."
       (make-world --init--) => irrelevant
       (provided (--init-- (as-checker (implements-protocols
@@ -32,8 +28,14 @@
 
 ;; System Operations
 
-(fact "set-system!"
+(fact "set-system! registers a system with the system-label."
       (let [w (make-world --init--)]
-        @(.systems w) => {}
+        @(.systems-atom w) => {}
         (world/set-system! w ..system-label.. ..system..) => w
-        @(.systems w) => {..system-label.. ..system..}))
+        @(.systems-atom w) => {..system-label.. ..system..}))
+
+
+(fact "systems returns a seq of [system-label system] pairs."
+      (-> (make-world --init--)
+          (world/set-system! ..system-label.. ..system..)
+          (world/systems)) => (seq {..system-label.. ..system..}))
