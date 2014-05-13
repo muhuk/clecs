@@ -15,7 +15,7 @@
 ;; World Initialization.
 
 (fact "atom world implements IWorld."
-      (type (make-world)) => (partial extends? world/ITransactableWorld))
+      (type (make-world)) => (partial extends? world/ISystemManager))
 
 
 (fact "a new world's entity-id counter starts by zero."

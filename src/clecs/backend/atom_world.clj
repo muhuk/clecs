@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world
-  (:require [clecs.world :as world]
-            [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
-            [clecs.backend.atom-world.transactable-world :refer [->AtomTransactableWorld]]))
+  (:require [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
+            [clecs.backend.atom-world.transactable-world :refer [->AtomTransactableWorld]]
+            [clecs.world :as world]))
 
 
 (def initial_state {:components {}
@@ -10,9 +10,7 @@
 
 
 (deftype AtomWorld [state transactable-world]
-  world/ISystemManager
-  world/ITransactableWorld
-  (transaction! [this f] (world/transaction! transactable-world f)))
+  world/ISystemManager)
 
 
 (defn make-world
