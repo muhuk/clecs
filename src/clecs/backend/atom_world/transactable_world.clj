@@ -11,4 +11,4 @@
   (component [_ eid ctype] (-component @state eid ctype))
   (query [_ q] (-query @state q))
   world/ITransactableWorld
-  (transaction! [this f] (-transaction! editable-world f)))
+  (transaction! [this f] (-transaction! this f)))

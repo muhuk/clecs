@@ -9,18 +9,22 @@
             [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
             [clecs.backend.atom-world.transactable :refer [-transaction!]]
+            [clecs.test.checkers :refer :all]
             [clecs.world :as world]))
 
 
 ;; World Initialization.
 
-(fact "atom world implements IWorld."
-      (type (make-world)) => (partial extends? world/ISystemManager))
+(fact "Atom world implements ISystemManager."
+      (make-world --init--) => (implements-protocols world/ISystemManager))
 
 
-(fact "a new world's entity-id counter starts by zero."
-      (:last-entity-id @(.state (make-world))) => 0)
+(fact "A new world's entity-id counter starts by zero."
+      (:last-entity-id @(.state (make-world --init--))) => 0)
 
 
-(fact "make-world accepts a state parameter."
-      @(.state (make-world ..state..)) => ..state..)
+(fact "Initialization function is called withing a transaction."
+      (make-world --init--) => irrelevant
+      (provided (--init-- (as-checker (implements-protocols
+                                       world/IEditableWorld
+                                       world/IQueryableWorld))) => irrelevant))

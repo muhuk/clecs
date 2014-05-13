@@ -27,4 +27,4 @@
 (fact "world/transaction! delegates to -transaction!"
       (let [w (->AtomTransactableWorld ..state.. ..editable-world..)]
         (world/transaction! w --f--) => nil
-        (provided (-transaction! ..editable-world.. --f--) => nil)))
+        (provided (-transaction! w --f--) => nil)))
