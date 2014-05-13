@@ -5,8 +5,6 @@
 
 
 (defn -transaction! [world f]
-  (when (bound? #'*state*)
-    (throw (IllegalStateException. "Already in a transaction.")))
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]
