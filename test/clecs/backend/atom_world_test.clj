@@ -28,3 +28,12 @@
       (provided (--init-- (as-checker (implements-protocols
                                        world/IEditableWorld
                                        world/IQueryableWorld))) => irrelevant))
+
+
+;; System Operations
+
+(fact "set-system!"
+      (let [w (make-world --init--)]
+        @(.systems w) => {}
+        (world/set-system! w ..system-label.. ..system..) => w
+        @(.systems w) => {..system-label.. ..system..}))

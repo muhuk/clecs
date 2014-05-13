@@ -16,7 +16,7 @@
 (defprotocol ISystemManager
 ;;   (process! [this dt])
 ;;   (remove-system! [this slabel])
-;;   (set-system! [this slabel s])
+  (set-system! [this slabel s])
 ;;   (systems [this])
 )
 

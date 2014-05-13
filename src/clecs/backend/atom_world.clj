@@ -9,14 +9,16 @@
                     :last-entity-id 0})
 
 
-(deftype AtomWorld [state transactable-world]
-  world/ISystemManager)
+(deftype AtomWorld [state systems transactable-world]
+  world/ISystemManager
+  (set-system! [this slabel s] (swap! systems assoc slabel s) this))
 
 
 (defn make-world
   ([f]
    (let [state (atom initial_state)
+         systems (atom {})
          editable-world (->AtomEditableWorld)
          transactable-world (->AtomTransactableWorld state editable-world)]
      (world/transaction! transactable-world f)
-     (->AtomWorld state transactable-world))))
+     (->AtomWorld state systems transactable-world))))
