@@ -3,9 +3,42 @@
 Entity-component-system for Clojure.
 
 
+## Latest Release
+
+### Leiningen
+
+Add this to your `:dependencies` in `project.clj`:
+
+```clj
+[clecs "0.2.0"]
+```
+
+
 ## Usage
 
 To do...
+
+
+## Examples
+
+- Official demos are here: [clecs-examples](https://github.com/muhuk/clecs-examples)
+
+
+## API Documentation
+
+To do...
+
+
+## Changelog
+
+To do...
+
+
+## See Also
+
+- [Artemis](http://gamadu.com/artemis/)
+- [brute](https://github.com/markmandel/brute)
+- [entreri](https://bitbucket.org/mludwig/entreri/overview)
 
 
 ## License
