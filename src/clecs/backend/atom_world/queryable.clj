@@ -14,5 +14,5 @@
                (if (q (seq v))
                  (conj coll k)
                  coll))
-             []
+             (seq [])
              (:entities state)))
