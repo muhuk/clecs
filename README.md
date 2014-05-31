@@ -2,6 +2,8 @@
 
 Entity-component-system for Clojure.
 
+[![Build Status](https://travis-ci.org/muhuk/clecs.svg?branch=master)](https://travis-ci.org/muhuk/clecs)
+
 
 ## Latest Release
 
