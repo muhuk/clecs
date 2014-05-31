@@ -21,10 +21,10 @@
 
 
 (defn make-world
-  ([f]
+  ([initializer]
    (let [state (atom initial_state)
          systems (atom {})
          editable-world (->AtomEditableWorld)
          transactable-world (->AtomTransactableWorld state editable-world)]
-     (world/transaction! transactable-world f)
+     (world/transaction! transactable-world initializer)
      (->AtomWorld systems transactable-world))))
