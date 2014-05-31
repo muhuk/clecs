@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.transactable-world
+(ns ^:no-doc clecs.backend.atom-world.transactable-world
   (:require [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
             [clecs.backend.atom-world.transactable :refer [-transaction!]]

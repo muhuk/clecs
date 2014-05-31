@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.queryable
+(ns ^:no-doc clecs.backend.atom-world.queryable
   (:require [clecs.component :refer [component-label]]))
 
 

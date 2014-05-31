@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.transactable)
+(ns ^:no-doc clecs.backend.atom-world.transactable)
 
 
 (def ^:dynamic *state*)

@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.editable-world
+(ns ^:no-doc clecs.backend.atom-world.editable-world
   (:require [clecs.backend.atom-world.editable :refer [-add-entity
                                                        -remove-component
                                                        -remove-entity

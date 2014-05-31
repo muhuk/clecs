@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.editable
+(ns ^:no-doc clecs.backend.atom-world.editable
   (:require [clecs.component :refer [component-label
                                      entity-id]]
             [clecs.backend.atom-world.transactable :refer [*state*]]
