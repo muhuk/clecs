@@ -3,6 +3,7 @@ lein: lein2
 script:
   - lein2 midje
   - lein2 eastwood
+  - lein2 doc
 jdk:
   - openjdk6
   - openjdk7
