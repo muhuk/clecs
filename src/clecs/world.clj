@@ -63,6 +63,41 @@
       of transactions. Note that changes within
       transaction will be reflected to the queries run
       within transactions.
+
+  #### Modes of Execution
+
+  There are three modes of execution for worlds.
+  Functionality available depends on these modes.
+
+  When you first create a world, you are *outside of
+  processing*. You can add, remove and query
+  systems. You can also process the world. Processing
+  means running all the systems and possibly modift
+  its contents. The objects extend ``ISystemManager``
+  in this mode.
+
+  Systems are called with two parameters; a reference
+  to the world that is *inside processing but outside
+  of transactions* and the time since last time the
+  world is processed. You can run queries and start
+  transactions. The world that is passed into the system
+  extends ``IQueryableWorld`` and ``ITransactableWorld``.
+
+  When a transaction is started a world reference that
+  is *inside a transaction* is passed to the transaction
+  function. World modifying functions as well as queries
+  are available in this mode. The world reference that
+  is provided extends ``IQueryableWorld`` and
+  ``IEditableWorld``.
+
+  Modes of execution and relevant protocols are
+  summarized in the table below:
+
+  | Processing  | In Transaction | ISystemManager | ITransactableWorld | IQueryableWorld | IEditableWorld |
+  | :----------:|:--------------:|:--------------:|:------------------:|:---------------:|:--------------:|
+  |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |  ✘  |
+  |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |  ✘  |
+  |  ✔  |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |
   ")
 
 
