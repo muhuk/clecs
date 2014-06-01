@@ -11,8 +11,8 @@
 
 
 (def ^:no-doc initial_state {:components {}
-                    :entities {}
-                    :last-entity-id 0})
+                             :entities {}
+                             :last-entity-id 0})
 
 
 (deftype AtomWorld [systems-atom transactable-world]
