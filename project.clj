@@ -12,4 +12,5 @@
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
           :src-linenum-anchor-prefix "L"
-          :output-dir "target/doc/api"})
+          :output-dir "target/doc/api"}
+  :deploy-repositories {"releases" :clojars})
