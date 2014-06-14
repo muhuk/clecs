@@ -26,9 +26,9 @@ To do...
 - Official demos are here: [clecs-examples](https://github.com/muhuk/clecs-examples)
 
 
-## API Documentation
+## Documentation
 
-To do...
+Documentation is a work in progress. API documentation is [here](http://clecs.muhuk.com/).
 
 
 ## Changelog
