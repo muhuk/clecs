@@ -5,7 +5,7 @@
             :url "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :plugins [[codox "0.8.8"]
-            [jonase/eastwood "0.1.2"]
+            [jonase/eastwood "0.1.3"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
   :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
