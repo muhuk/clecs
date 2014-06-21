@@ -18,7 +18,7 @@
 (deftype AtomWorld [systems-atom transactable-world]
   world/ISystemManager
   (process! [this dt]
-            (doseq [s (map second (seq @systems-atom))]
+            (doseq [s (vals @systems-atom)]
               (s transactable-world dt))
             this)
   (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
