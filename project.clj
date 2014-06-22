@@ -8,9 +8,11 @@
             [jonase/eastwood "0.1.3"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
-  :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
+  :profiles {:dev {:dependencies [[midje "1.6.3"]
+                                  [org.clojure/test.check "0.5.8"]]}}
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
           :src-linenum-anchor-prefix "L"
           :output-dir "target/doc/api"}
-  :deploy-repositories {"releases" :clojars})
+  :deploy-repositories {"releases" :clojars}
+  :aliases {"quickcheck" ["run" "-m" "clecs.world.check"]})
