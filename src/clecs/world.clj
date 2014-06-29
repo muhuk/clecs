@@ -119,7 +119,7 @@
 
    ctype
    :   Component type. If you have a reference to a
-   ``component`` instance, use ``(type component)``.")
+       ``component`` instance, use ``(type component)``.")
   (remove-entity
    [this eid]
    "Delete the entity with ``eid``, all components
@@ -148,8 +148,30 @@
 
 
 (defprotocol IQueryableWorld
-  (component [this eid ctype])
-  (query [this q]))
+  (component
+   [this eid ctype]
+   "Return the component of type ``ctype`` associated with
+   ``eid``, or ``nil`` if none found.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.
+
+   ctype
+   :   Component type. If you have a reference to a
+       ``component`` instance, use ``(type component)``.")
+  (query
+   [this q]
+   "Return a sequence of entity id's using ``q`` as
+   filter criteria.
+
+   #### Parameters:
+
+   q
+   :   A function that take a sequence of component
+       labels and return ``true`` if they match the
+       criteria."))
 
 
 (defprotocol ISystemManager
