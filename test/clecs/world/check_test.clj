@@ -1,106 +1,147 @@
 (ns clecs.world.check-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clojure.test.check.clojure-test :refer [defspec]]
-            [clecs.world :as world]
-            [clecs.world.check :refer :all]
-            [clecs.world.check.control :refer [call-command-on-state]]))
+  (:require [clecs.world.check :refer :all]
+            [clojure.test :refer :all]
+            [midje.sweet :refer :all]))
 
 
-;; Midje chokes on apply as a prerequisite.
-;; See: https://github.com/marick/Midje/issues/162
+;; compare-results
 
-;; (fact "call-command-on-world returns the result on a successful call."
-;;       (call-command-on-world {:method ..method..
-;;                               :params [..a.. ..b..]} ..world..) => [:result ..result..]
-;;       (provided (find-var ..method..) => --method--
-;;                 (apply --method-- '(..world.. ..a.. ..b..)) => ..result..))
+(fact "Comparing two sets of matching results returns a matching output."
+      (compare-results ..results..
+                       ..results..) => {:match? true
+                                        :results ..results..})
 
 
-;; (fact "call-command-on-world returns a special keyword when result is the world."
-;;       (call-command-on-world {:method ..method..
-;;                               :params [..a.. ..b..]} ..world..) => [:result :clecs.world.check/world]
-;;       (provided (find-var ..method..) => --method--
-;;                 (apply --method-- '(..world.. ..a.. ..b..)) => ..world..))
+(fact "Comparing two different results returns a non-matching output."
+      (compare-results [[..command..
+                         ..actual-result..]]
+                       [[..command..
+                         ..expected-result..]]) => {:match? false
+                                                    :results [{:command ..command..
+                                                               :actual ..actual-result..
+                                                               :expected ..expected-result..}]})
 
 
-;; (fact "call-command-on-world returns the exception on a failed call."
-;;       (let [e (RuntimeException.)]
-;;         (call-command-on-world {:method ..method..
-;;                                 :params [..a.. ..b..]} ..world..) => [:exception e]
-;;         (provided  (find-var ..method..) => --method--
-;;                    (apply --method-- '(..world.. ..a.. ..b..)) =throws=> e)))
+(fact "Comparing two different results returns a non-matching output after the difference."
+      (compare-results [..same-result..
+                        [..command.. ..actual-result..]
+                        ..different-result..]
+                       [..same-result..
+                        [..command.. ..expected-result..]
+                        ..different-result..]) => {:match? false
+                                                   :results [..same-result..
+                                                             {:command ..command..
+                                                              :actual ..actual-result..
+                                                              :expected ..expected-result..}]})
 
 
-(fact "comparing an empty list of commands."
-      (compare-commands []
-                        ..world..
-                        ..initial-state..) => {:match? true
-                                               :results []
-                                               :state ..initial-state..})
+(fact "compare-results throws exception if the commands in the result doesn't match."
+      (compare-results [[..command..
+                         ..same-result..]]
+                       [[..other-command..
+                         ..same-result..]]) => (throws IllegalArgumentException))
 
 
-(fact "comparing a single command that matches."
-      (compare-commands [..cmd..]
-                        ..world..
-                        ..initial-state..) => {:match? true
-                                               :results [[..cmd.. [..result-type.. ..result..]]]
-                                               :state ..new-state..}
-      (provided (call-command-on-world ..cmd.. ..world..) => [..result-type.. ..result..]
-                (call-command-on-state ..cmd.. ..initial-state..) => [..result-type..
-                                                                      ..result..
-                                                                      ..new-state..]))
+
+;; dereference-world
+
+(fact "dereference-world returns ::world if the result is the world."
+      (dereference-world ..world.. ..world..) => :clecs.world.check/world)
 
 
-(fact "comparing a single command that doesn't match."
-      (compare-commands [..cmd..]
-                        ..world..
-                        ..initial-state..) => {:match? false
-                                               :results [[..cmd..
-                                                          {:actual [..actual-result-type.. ..actual-result..]
-                                                           :expected [..expected-result-type.. ..expected-result..]}]]
-                                               :state ..initial-state..}
-      (provided (call-command-on-world ..cmd.. ..world..) => [..actual-result-type.. ..actual-result..]
-                (call-command-on-state ..cmd.. ..initial-state..) => [..expected-result-type..
-                                                                      ..expected-result..
-                                                                      ..new-state..]))
+(fact "dereference-world returns the result if the it's not the world."
+      (dereference-world ..result.. ..world..) => ..result..)
 
 
-(fact "comparing multiple commands that all match."
-      (compare-commands [..cmd-a.. ..cmd-b.. ..cmd-c..]
-                        ..world..
-                        ..initial-state..) => {:match? true
-                                               :results [[..cmd-a.. [..result-type-a.. ..result-a..]]
-                                                         [..cmd-b.. [..result-type-b.. ..result-b..]]
-                                                         [..cmd-c.. [..result-type-c.. ..result-c..]]]
-                                               :state ..state-c..}
-      (provided (call-command-on-world ..cmd-a.. ..world..) => [..result-type-a.. ..result-a..]
-                (call-command-on-state ..cmd-a.. ..initial-state..) => [..result-type-a..
-                                                                        ..result-a..
-                                                                        ..state-a..]
-                (call-command-on-world ..cmd-b.. ..world..) => [..result-type-b.. ..result-b..]
-                (call-command-on-state ..cmd-b.. ..state-a..) => [..result-type-b..
-                                                                  ..result-b..
-                                                                  ..state-b..]
-                (call-command-on-world ..cmd-c.. ..world..) => [..result-type-c.. ..result-c..]
-                (call-command-on-state ..cmd-c.. ..state-b..) => [..result-type-c..
-                                                                  ..result-c..
-                                                                  ..state-c..]))
+
+;; report-results
+
+(fact "report-results"
+      (let [context (atom ..initial-value..)]
+        (report-results context ..results..) => ..results..
+        @context => ..results..))
 
 
-(fact "comparing multiple commands that don't match."
-      (compare-commands [..cmd-a.. ..cmd-b.. ..cmd-c..]
-                        ..world..
-                        ..initial-state..) => {:match? false
-                                               :results [[..cmd-a.. [..result-type-a.. ..result-a..]]
-                                                         [..cmd-b.. {:actual [..result-type-b1.. ..result-b1..]
-                                                                     :expected [..result-type-b2.. ..result-b2..]}]]
-                                               :state ..state-a..}
-      (provided (call-command-on-world ..cmd-a.. ..world..) => [..result-type-a.. ..result-a..]
-                (call-command-on-state ..cmd-a.. ..initial-state..) => [..result-type-a..
-                                                                        ..result-a..
-                                                                        ..state-a..]
-                (call-command-on-world ..cmd-b.. ..world..) => [..result-type-b1.. ..result-b1..]
-                (call-command-on-state ..cmd-b.. ..state-a..) => [..result-type-b2..
-                                                                  ..result-b2..
-                                                                  ..state-b..]))
+
+;; run-command
+
+(fact "running a command with sub-commands collects sub-results."
+      (let [command {:method ..method..
+                     :params ..params..
+                     :type :command}
+            context (atom ..sub-results..)]
+        (run-command ..world..
+                     command
+                     context) => {:command command
+                                  :result (->ReturnedValue ..dereferenced-result..)
+                                  :sub-results ..sub-results..}
+        (provided (wrap-params ..params..) => ..wrapped-params..
+                  (dereference-world ..result.. ..world..) => ..dereferenced-result..
+                  (apply-command ..method..
+                                 ..world..
+                                 ..wrapped-params..) => ..result..)))
+
+
+(fact "Exceptions thrown from commands are caught."
+      (let [command {:method ..method..
+                     :params ..params..
+                     :type :command}
+            context (atom ..sub-results..)
+            exception (Throwable.)]
+        (run-command ..world..
+                     command
+                     context) => {:command command
+                                  :result (->ExceptionThrown exception)
+                                  :sub-results ..sub-results..}
+        (provided (wrap-params ..params..) => ..wrapped-params..
+                  (apply-command ..method..
+                                 ..world..
+                                 ..wrapped-params..) =throws=> exception)))
+
+
+
+;; run-commands
+
+(fact "run-commands calls world initializer and then calls each command on it."
+      (run-commands {:initializer ..initializer..
+                     :commands [..a.. ..b.. ..c..]}
+                    --world-initializer--) => [..result-a..
+                                               ..result-b..
+                                               ..result-c..]
+      (provided (--world-initializer-- ..initializer..) => ..world..
+                (run-command ..world.. ..a..) => ..result-a..
+                (run-command ..world.. ..b..) => ..result-b..
+                (run-command ..world.. ..c..) => ..result-c..))
+
+
+
+;; wrap-param
+
+(fact "values are returned as is."
+      (wrap-param {:type :value, :value ..value..}) => ..value..)
+
+
+(fact "wrapping a transaction returns a function."
+      (wrap-param {:type :transaction}) => fn?)
+
+
+(fact "wrapped system is called with a world and it runs its commands."
+      (binding [*context* ..context..]
+        ((wrap-param {:type :transaction
+                      :commands [..command-a.. ..command-b..]}) ..world..) => anything
+        (provided (run-command ..world.. ..command-a..) => ..result-a..
+                  (run-command ..world.. ..command-b..) => ..result-b..
+                  (report-results ..context.. [..result-a.. ..result-b..]) => anything)))
+
+
+(fact "wraping a system returns a function."
+      (wrap-param {:type :system}) => fn?)
+
+
+(fact "wrapped system is called with a world and dt, then it runs its commands."
+      (binding [*context* ..context..]
+        ((wrap-param {:type :system
+                      :commands [..command-a.. ..command-b..]}) ..world.. ..dt..) => anything
+        (provided (run-command ..world.. ..command-a..) => ..result-a..
+                  (run-command ..world.. ..command-b..) => ..result-b..
+                  (report-results ..context.. [..result-a.. ..result-b..]) => anything)))
