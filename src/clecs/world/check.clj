@@ -17,7 +17,8 @@
 (defrecord ExceptionThrown [exception])
 
 
-(declare wrap-param-fn
+(declare run-commands
+         wrap-param-fn
          wrap-params)
 
 
@@ -44,6 +45,13 @@
                                       :actual (second actual)
                                       :expected (second expected)})}
               (throw (IllegalArgumentException. "Commands don't match.")))))))))
+
+
+(defn compare-worlds [actual-world-initializer control-world-initializer]
+  (fn [commands]
+    (let [actual (run-commands commands actual-world-initializer)
+          expected (run-commands commands control-world-initializer)]
+      (compare-results actual expected))))
 
 
 (defn dereference-world [result w]
@@ -102,9 +110,6 @@
   ;; work around dangerous default behaviour in Clojure
   (alter-var-root #'*read-eval* (constantly false))
   (pprint (tc/quick-check 10
-                          (prop/for-all [results (gen/fmap (fn [commands]
-                                                             (let [actual (run-commands commands atom-world/make-world)
-                                                                   expected (run-commands commands atom-world/make-world)]
-                                                               (compare-results actual expected)))
+                          (prop/for-all [results (gen/fmap (compare-worlds atom-world/make-world atom-world/make-world)
                                                            (make-gen-app))]
                                         :match?))))

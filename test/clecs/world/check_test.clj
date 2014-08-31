@@ -43,6 +43,21 @@
 
 
 
+;; compare-worlds
+
+(fact "compare-worlds returns a function."
+      (compare-worlds ..world-initialier..
+                      ..world-initializer-control..) => fn?)
+
+
+(fact "compare-worlds' result is called with a list of commands."
+      ((compare-worlds ..init-actual.. ..init-expected..) ..commands..) => ..results..
+      (provided (run-commands ..commands.. ..init-actual..) => ..results-actual..
+                (run-commands ..commands.. ..init-expected..) => ..results-expected..
+                (compare-results ..results-actual.. ..results-expected..) => ..results..))
+
+
+
 ;; dereference-world
 
 (fact "dereference-world returns ::world if the result is the world."
