@@ -87,6 +87,14 @@
     (doall (map (partial run-command w) commands))))
 
 
+(defn run-test [world-initializer samples]
+  (let [generator (gen/fmap (compare-worlds world-initializer
+                                            atom-world/make-world)
+                            (make-gen-app))
+        prop (prop/for-all [results generator]
+                           :match?)]
+    (tc/quick-check samples prop)))
+
 (defn wrap-param [param]
   (case (:type param)
     :system (wrap-param-fn param)
@@ -109,7 +117,4 @@
   [& args]
   ;; work around dangerous default behaviour in Clojure
   (alter-var-root #'*read-eval* (constantly false))
-  (pprint (tc/quick-check 10
-                          (prop/for-all [results (gen/fmap (compare-worlds atom-world/make-world atom-world/make-world)
-                                                           (make-gen-app))]
-                                        :match?))))
+  (pprint (run-test atom-world/make-world 10)))

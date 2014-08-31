@@ -1,6 +1,11 @@
 (ns clecs.world.check-test
-  (:require [clecs.world.check :refer :all]
+  (:require [clecs.backend.atom-world :as atom-world]
+            [clecs.world.check :refer :all]
+            [clecs.world.check.generators :refer [make-gen-app]]
             [clojure.test :refer :all]
+            [clojure.test.check :as tc]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]
             [midje.sweet :refer :all]))
 
 
@@ -127,6 +132,18 @@
                 (run-command ..world.. ..a..) => ..result-a..
                 (run-command ..world.. ..b..) => ..result-b..
                 (run-command ..world.. ..c..) => ..result-c..))
+
+
+
+;; run-test
+
+(fact "run-test."
+      (run-test ..initializer.. ..samples..) => ..result..
+      (provided (tc/quick-check ..samples.. ..prop..) => ..result..
+                (compare-worlds ..initializer.. atom-world/make-world) => ..mapper..
+                (make-gen-app) => ..gen-app..
+                (gen/fmap ..mapper.. ..gen-app..) => ..gen..
+                (prop/for-all* [..gen..] (as-checker fn?)) => ..prop..))
 
 
 
