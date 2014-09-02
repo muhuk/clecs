@@ -15,4 +15,8 @@
           :src-linenum-anchor-prefix "L"
           :output-dir "target/doc/api"}
   :deploy-repositories {"releases" :clojars}
-  :aliases {"quickcheck" ["run" "-m" "clecs.world.check"]})
+  :aliases {"quickcheck"
+            ^{:doc (str "Run quick-check to compare a backend against clecs.backend.atom-world\n"
+                        "\n"
+                        "    lein quickcheck $PATH.TO.WORLD/INITIALIZER $SAMPLES")}
+            ["run" "-m" "clecs.world.check"]})

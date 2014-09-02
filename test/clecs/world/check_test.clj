@@ -74,6 +74,23 @@
 
 
 
+;; parse-args
+
+(fact "parse-args expects at least one argument."
+      (parse-args []) => (throws AssertionError))
+
+
+(fact "parse-args resolves the initializer."
+      (first (parse-args ["clecs.backend.atom-world/make-world"])) => (find-var 'clecs.backend.atom-world/make-world))
+
+
+(facts "parse-args uses default-samples."
+       (second (parse-args ["clojure.core/identity"])) => default-samples
+       (let [samples (* default-samples 7)]
+         (second (parse-args ["clojure.core/identity" (str samples)])) => samples))
+
+
+
 ;; report-results
 
 (fact "report-results"

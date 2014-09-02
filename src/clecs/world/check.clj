@@ -3,12 +3,16 @@
             [clecs.backend.atom-world :as atom-world]
             [clecs.world.check.generators :refer [make-gen-app]]
             [clojure.pprint :refer [pprint]]
+            [clojure.string :refer [split]]
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]))
 
 
 (def ^:dynamic *context* nil)
+
+
+(def default-samples 10)
 
 
 (defrecord ReturnedValue [value])
@@ -58,6 +62,19 @@
   (if (identical? w result)
     ::world
     result))
+
+
+(defn parse-args [args]
+  (assert (not (empty? args)) "You must supply a world initializer.")
+  (let [initializer-str (first args)
+        initializer-module (first (split initializer-str #"/"))
+        initializer (do
+                      (require (symbol initializer-module))
+                      (find-var (symbol initializer-str)))
+        samples (try
+                  (Integer/parseInt (second args))
+                  (catch NumberFormatException _ default-samples))]
+    [initializer samples]))
 
 
 (defn report-results [context results]
@@ -117,4 +134,5 @@
   [& args]
   ;; work around dangerous default behaviour in Clojure
   (alter-var-root #'*read-eval* (constantly false))
-  (pprint (run-test atom-world/make-world 10)))
+  (let [[world-initializer samples] (parse-args args)]
+    (pprint (run-test world-initializer samples))))
