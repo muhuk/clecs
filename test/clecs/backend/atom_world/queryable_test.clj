@@ -1,8 +1,7 @@
 (ns clecs.backend.atom-world.queryable-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.backend.atom-world.queryable :refer :all]
-            [clecs.component :refer [component-label]]))
+  (:require [clecs.backend.atom-world.queryable :refer :all]
+            [clecs.component :refer [component-label]]
+            [midje.sweet :refer :all]))
 
 
 (fact "-component works."

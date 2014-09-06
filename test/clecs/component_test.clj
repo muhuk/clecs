@@ -1,7 +1,6 @@
 (ns clecs.component-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.component :refer :all]))
+  (:require [clecs.component :refer :all]
+            [midje.sweet :refer :all]))
 
 
 (defcomponent TestComponent [eid])

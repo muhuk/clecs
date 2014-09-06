@@ -1,6 +1,5 @@
 (ns clecs.world.check
-  (:require [clecs.world :as world]
-            [clecs.backend.atom-world :as atom-world]
+  (:require [clecs.backend.atom-world :as atom-world]
             [clecs.world.check.generators :refer [make-gen-app]]
             [clojure.pprint :refer [pprint]]
             [clojure.string :refer [split]]

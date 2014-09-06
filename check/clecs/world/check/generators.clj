@@ -1,7 +1,5 @@
 (ns clecs.world.check.generators
-  (:require [clecs.component :refer [component-label
-                                     defcomponent]]
-            [clecs.world :as world]
+  (:require [clecs.component :refer [component-label defcomponent]]
             [clojure.test.check.generators :as gen]))
 
 

@@ -1,7 +1,6 @@
 (ns clecs.util-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.util :refer :all]))
+  (:require [clecs.util :refer :all]
+            [midje.sweet :refer :all]))
 
 
 

@@ -1,6 +1,5 @@
 (ns clecs.test.checkers
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]))
+  (:require [midje.sweet :refer :all]))
 
 
 (defn implements-protocols [& protocols]

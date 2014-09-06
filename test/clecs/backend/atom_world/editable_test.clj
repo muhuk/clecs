@@ -1,10 +1,8 @@
 (ns clecs.backend.atom-world.editable-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.backend.atom-world :refer [make-world]]
-            [clecs.backend.atom-world.editable :refer :all]
+  (:require [clecs.backend.atom-world.editable :refer :all]
             [clecs.backend.atom-world.transactable :refer [*state*]]
-            [clecs.component :refer [component-label defcomponent]]))
+            [clecs.component :refer [component-label defcomponent]]
+            [midje.sweet :refer :all]))
 
 
 

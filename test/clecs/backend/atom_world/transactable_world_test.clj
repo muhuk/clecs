@@ -1,11 +1,10 @@
 (ns clecs.backend.atom-world.transactable-world-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.backend.atom-world.queryable :refer [-component
+  (:require [clecs.backend.atom-world.queryable :refer [-component
                                                         -query]]
             [clecs.backend.atom-world.transactable :refer [-transaction!]]
             [clecs.backend.atom-world.transactable-world :refer :all]
-            [clecs.world :as world]))
+            [clecs.world :as world]
+            [midje.sweet :refer :all]))
 
 
 ;; Protocol delegation - IQueryableWorld.

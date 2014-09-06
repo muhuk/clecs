@@ -1,8 +1,6 @@
 (ns clecs.backend.atom-world.transactable-test
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.backend.atom-world.transactable :refer :all]
-            [clecs.world :as world]))
+  (:require [clecs.backend.atom-world.transactable :refer :all]
+            [midje.sweet :refer :all]))
 
 
 (deftype TestWorld [state editable-world])

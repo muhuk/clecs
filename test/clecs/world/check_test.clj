@@ -2,7 +2,6 @@
   (:require [clecs.backend.atom-world :as atom-world]
             [clecs.world.check :refer :all]
             [clecs.world.check.generators :refer [make-gen-app]]
-            [clojure.test :refer :all]
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
