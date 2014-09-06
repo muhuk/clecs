@@ -8,7 +8,8 @@
             [jonase/eastwood "0.1.4"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
-  :profiles {:dev {:dependencies [[midje "1.6.3"]
+  :profiles {:dev {:source-paths ["check"]
+                   :dependencies [[midje "1.6.3"]
                                   [org.clojure/test.check "0.5.9"]]}}
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
