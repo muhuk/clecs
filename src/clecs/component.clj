@@ -8,21 +8,21 @@
 
 
 (defn component?
-  "Returns true is ``c`` is a component instance."
+  "Returns true is `c` is a component instance."
   [c]
   (and (not (class? c))
        (satisfies? IComponent c)))
 
 
 (defn component-type?
-  "Returns true is ``c`` is a component type."
+  "Returns true is `c` is a component type."
   [c]
   (and (class? c)
        (extends? IComponent c)))
 
 
 (defn component-label
-  "Returns component label for component type ``c``.
+  "Returns component label for component type `c`.
 
   #### Example:
 

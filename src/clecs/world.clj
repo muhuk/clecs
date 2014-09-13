@@ -15,8 +15,8 @@
       oriented data structures, where all information
       related to an object is stored with the object.
 
-      Clects refers to entities as ``entity-id`` or
-      ``eid``.
+      Clects refers to entities as `entity-id` or
+      `eid`.
 
   Component
   :   Components encode a single aspect about an
@@ -73,7 +73,7 @@
   processing*. You can add, remove and query
   systems. You can also process the world. Processing
   means running all the systems and possibly modift
-  its contents. The objects extend ``ISystemManager``
+  its contents. The objects extend `ISystemManager`
   in this mode.
 
   Systems are called with two parameters; a reference
@@ -81,14 +81,14 @@
   of transactions* and the time since last time the
   world is processed. You can run queries and start
   transactions. The world that is passed into the system
-  extends ``IQueryableWorld`` and ``ITransactableWorld``.
+  extends `IQueryableWorld` and `ITransactableWorld`.
 
   When a transaction is started a world reference that
   is *inside a transaction* is passed to the transaction
   function. World modifying functions as well as queries
   are available in this mode. The world reference that
-  is provided extends ``IQueryableWorld`` and
-  ``IEditableWorld``.
+  is provided extends `IQueryableWorld` and
+  `IEditableWorld`.
 
   Modes of execution and relevant protocols are
   summarized in the table below:
@@ -107,8 +107,8 @@
    "Create a new entity in the world and return its id.")
   (remove-component
    [this eid ctype]
-   "Remove the component of type ``ctype`` that is associated
-   with ``eid`` and return ``nil``.
+   "Remove the component of type `ctype` that is associated
+   with `eid` and return `nil`.
 
    This method is a no-op if there is no relevant component.
 
@@ -119,11 +119,11 @@
 
    ctype
    :   Component type. If you have a reference to a
-       ``component`` instance, use ``(type component)``.")
+       `component` instance, use `(type component)`.")
   (remove-entity
    [this eid]
-   "Delete the entity with ``eid``, all components
-   associated with it and return ``nil``.
+   "Delete the entity with `eid`, all components
+   associated with it and return `nil`.
 
    This method is a no-op if there is no relevant entity.
 
@@ -133,10 +133,10 @@
    :   Entity id.")
   (set-component
    [this c]
-   "Add component ``c`` to the world and return ``nil``.
+   "Add component `c` to the world and return `nil`.
 
-   Entity id is already associated with ``c`` as a
-   consequence of ``IComponent`` protocol. If the entity
+   Entity id is already associated with `c` as a
+   consequence of `IComponent` protocol. If the entity
    already has a component with the same type it will
    be replaced.
 
@@ -150,8 +150,8 @@
 (defprotocol IQueryableWorld
   (component
    [this eid ctype]
-   "Return the component of type ``ctype`` associated with
-   ``eid``, or ``nil`` if none found.
+   "Return the component of type `ctype` associated with
+   `eid`, or `nil` if none found.
 
    #### Parameters:
 
@@ -160,24 +160,24 @@
 
    ctype
    :   Component type. If you have a reference to a
-       ``component`` instance, use ``(type component)``.")
+       `component` instance, use `(type component)`.")
   (query
    [this q]
-   "Return a sequence of entity id's using ``q`` as
+   "Return a sequence of entity id's using `q` as
    filter criteria.
 
    #### Parameters:
 
    q
    :   A function that take a sequence of component
-       labels and return ``true`` if they match the
+       labels and return `true` if they match the
        criteria."))
 
 
 (defprotocol ISystemManager
   (process!
    [this dt]
-   "Run systems using ``dt`` as time increment.
+   "Run systems using `dt` as time increment.
 
    This is the function that will be called in
    the main loop.
@@ -191,7 +191,7 @@
        unit.")
   (remove-system!
    [this slabel]
-   "Remove system registered with ``slabel``.
+   "Remove system registered with `slabel`.
 
    #### Parameters:
 
@@ -199,9 +199,9 @@
    :   Label for the system to remove.")
   (set-system!
    [this slabel s]
-   "Register system ``s`` with label ``slabel``.
+   "Register system `s` with label `slabel`.
 
-   The system will not be run until ``process!``
+   The system will not be run until `process!`
    is called.
 
    #### Parameters:
@@ -219,7 +219,7 @@
 (defprotocol ITransactableWorld
   (transaction!
    [this f]
-   "Execute the transaction ``f``.
+   "Execute the transaction `f`.
 
    The transaction may be retried. Side effects within
    a transaction should be carefully considered.
@@ -227,5 +227,5 @@
    #### Parameters:
 
    f
-   :   A function that takes single ``ITransactableWorld``
+   :   A function that takes single `ITransactableWorld`
        parameter."))

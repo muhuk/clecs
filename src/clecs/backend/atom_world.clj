@@ -1,8 +1,8 @@
 (ns clecs.backend.atom-world
   "Reference implementation of clecs API.
 
-   ``AtomWorld`` stores it's data in-memory. It is backed by an
-   ``clojure.core/atom`` internally.
+   `AtomWorld` stores it's data in-memory. It is backed by an
+   `clojure.core/atom` internally.
 
    Currently systems run sequentially."
   (:require [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
@@ -32,7 +32,7 @@
 
 
 (defn make-world
-  "Makes a new ``AtomWorld``. Use [[clecs.core/make-world]]
+  "Makes a new `AtomWorld`. Use [[clecs.core/make-world]]
    instead of calling this directly."
   [initializer-fn]
   (let [state (atom initial_state)
