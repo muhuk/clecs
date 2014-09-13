@@ -1,4 +1,5 @@
 (ns clecs.world.check.generators
+  {:no-doc true}
   (:require [clecs.component :refer [component-label defcomponent]]
             [clojure.test.check.generators :as gen]))
 

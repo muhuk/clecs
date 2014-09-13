@@ -1,4 +1,5 @@
 (ns clecs.world.check
+  {:no-doc true}
   (:require [clecs.backend.atom-world :as atom-world]
             [clecs.world.check.generators :refer [make-gen-app]]
             [clojure.pprint :refer [pprint]]
