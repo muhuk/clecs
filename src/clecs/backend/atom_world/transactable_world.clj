@@ -1,15 +1,14 @@
 (ns clecs.backend.atom-world.transactable-world
   {:no-doc true}
-  (:require [clecs.backend.atom-world.queryable :refer [-component
-                                                        -query]]
-            [clecs.backend.atom-world.transactable :refer [-transaction!]]
+  (:require [clecs.backend.atom-world.queryable :as queryable]
+            [clecs.backend.atom-world.transactable :as transactable]
             [clecs.world :as world]))
 
 
 
 (deftype AtomTransactableWorld [state editable-world]
   world/IQueryableWorld
-  (component [_ eid ctype] (-component @state eid ctype))
-  (query [_ q] (-query @state q))
+  (component [_ eid ctype] (queryable/component @state eid ctype))
+  (query [_ q] (queryable/query @state q))
   world/ITransactableWorld
-  (transaction! [this f] (-transaction! this f)))
+  (transaction! [this f] (transactable/transaction! this f)))

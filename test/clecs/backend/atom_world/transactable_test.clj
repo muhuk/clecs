@@ -6,7 +6,7 @@
 (deftype TestWorld [state editable-world])
 
 
-(fact "-transaction! calls function with the world."
+(fact "transaction! calls function with the world."
       (let [w (->TestWorld (atom ..state..) ..editable-world..)]
-        (-transaction! w --f--) => nil
+        (transaction! w --f--) => nil
         (provided (--f-- ..editable-world..) => irrelevant)))

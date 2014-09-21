@@ -35,16 +35,6 @@
         (loop-fn query-elements pred)))))
 
 
-(defn -compile-query [q]
-  (if (query? q)
-    (compile-query* q)
-    (throw (IllegalArgumentException. "Invalid query."))))
-
-
-(defn -component [state eid ctype]
-  (get-in state [:components (component-label ctype) eid]))
-
-
 (defn- make-pred [clabels]
   (let [set-of-component-labels (set clabels)]
     (fn [query-elem]
@@ -53,7 +43,17 @@
         (set-of-component-labels query-elem)))))
 
 
-(defn -query [state q]
+(defn -compile-query [q]
+  (if (query? q)
+    (compile-query* q)
+    (throw (IllegalArgumentException. "Invalid query."))))
+
+
+(defn component [state eid ctype]
+  (get-in state [:components (component-label ctype) eid]))
+
+
+(defn query [state q]
   (let [f (-compile-query q)]
     (reduce-kv (fn [coll k v]
                  (if (f (seq v))

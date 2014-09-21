@@ -16,20 +16,20 @@
 
 (fact "-add-entity returns a new entity id."
       (binding [*state* {:last-entity-id 0}]
-        (-add-entity) => 1)
+        (add-entity) => 1)
       (binding [*state* {:last-entity-id 41}]
-        (-add-entity) => 42))
+        (add-entity) => 42))
 
 
 (fact "-add-entity adds the new entity-id to the entity index."
       (binding [*state* {:last-entity-id 0}]
-        (let [eid (-add-entity)]
+        (let [eid (add-entity)]
           (get-in *state* [:entities eid]) => #{})))
 
 
 (fact "-add-entity updates entity counter."
       (binding [*state* {:last-entity-id 0}]
-        (-add-entity)
+        (add-entity)
         (:last-entity-id *state*) => 1))
 
 
@@ -37,7 +37,7 @@
       (binding [*state* {:components {}
                          :entities {1 #{}}
                          :last-entity-id 1}]
-        (-remove-entity 1) => nil
+        (remove-entity 1) => nil
         *state* => {:components {}
                     :entities {}
                     :last-entity-id 1}))
@@ -50,7 +50,7 @@
             expected-state {:components {clabel {..other-eid.. ..j..}}
                             :entities {}}]
         (binding [*state* initial-state]
-          (-remove-entity ..eid..) => nil
+          (remove-entity ..eid..) => nil
           *state* => expected-state)))
 
 
@@ -62,14 +62,14 @@
             expected-state {:components {..clabel.. {}}
                             :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (-remove-component ..eid.. ..ctype..) => nil
+          (remove-component ..eid.. ..ctype..) => nil
           (provided (component-label ..ctype..) => ..clabel..)
           *state* => expected-state)))
 
 
 (fact "-set-component validates its parameter is a component."
       (binding [*state* ..state..]
-        (-set-component ..c..) => (throws IllegalArgumentException)))
+        (set-component ..c..) => (throws IllegalArgumentException)))
 
 
 (fact "-set-component adds the component if entity doesn't have one."
@@ -81,7 +81,7 @@
             expected-state {:components {clabel {eid c}}
                             :entities {eid #{clabel}}}]
         (binding [*state* initial-state]
-          (-set-component c) => nil
+          (set-component c) => nil
           *state* => expected-state)))
 
 
@@ -95,5 +95,5 @@
             expected-state {:components {clabel {eid c-new}}
                             :entities {eid #{clabel}}}]
         (binding [*state* initial-state]
-          (-set-component c-new) => nil
+          (set-component c-new) => nil
           *state* => expected-state)))

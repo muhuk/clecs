@@ -5,7 +5,7 @@
 (def ^:dynamic *state*)
 
 
-(defn -transaction! [world f]
+(defn transaction! [world f]
   (swap! (.state world)
          (fn [state]
            (binding [*state* state]

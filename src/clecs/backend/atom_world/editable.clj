@@ -5,7 +5,7 @@
             [clecs.util :refer [map-values]]))
 
 
-(defn -add-entity []
+(defn add-entity []
   (let [state *state*
         eid (inc (:last-entity-id state))]
     (var-set #'*state*
@@ -15,7 +15,7 @@
     eid))
 
 
-(defn -remove-component [eid ctype]
+(defn remove-component [eid ctype]
   (let [clabel (component-label ctype)]
     (var-set #'*state*
              (-> *state*
@@ -24,7 +24,7 @@
   nil)
 
 
-(defn -remove-entity [eid]
+(defn remove-entity [eid]
   (let [state *state*]
     (var-set #'*state*
              (-> state
@@ -34,7 +34,7 @@
   nil)
 
 
-(defn -set-component [c]
+(defn set-component [c]
   (let [clabel (component-label (type c))
         eid (entity-id c)]
     (var-set #'*state*
