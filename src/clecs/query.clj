@@ -64,3 +64,12 @@
 
 
 (make-query-command any)
+
+
+(defn query? [q]
+  (-> (and (-> q
+               first
+               #{:all :any})
+           (fnext q))
+      nil?
+      not))

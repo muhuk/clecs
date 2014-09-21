@@ -169,9 +169,8 @@
    #### Parameters:
 
    q
-   :   A function that take a sequence of component
-       labels and return `true` if they match the
-       criteria."))
+   :   A query object. See [[clecs.query]] for more
+       info."))
 
 
 (defprotocol ISystemManager

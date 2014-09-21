@@ -73,3 +73,18 @@
                 (component-type? ..D..) => true
                 (component-type? ..all-result..) => false
                 (all ..B.. ..C..) => ..all-result..))
+
+
+(facts "queries have :and or :or as first element."
+       (query? [:all anything]) => true
+       (query? [:any anything]) => true
+       (query? [anything anything]) => false)
+
+
+(facts "queries must have at least one component label or sub-query."
+       (query? []) => false
+       (query? [:any]) => false
+       (query? [:any anything]) => true)
+
+
+(future-fact "query elements must be either components or valid queries.")

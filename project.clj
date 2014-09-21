@@ -1,10 +1,10 @@
-(defproject clecs "0.2.3-SNAPSHOT"
+(defproject clecs "1.0.0-SNAPSHOT"
   :description "Entity-component-system for Clojure."
   :url "https://github.com/muhuk/clecs"
   :license {:name "GNU GPL v3"
             :url "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.7.0-alpha2"]]
-  :plugins [[codox "0.8.8"]
+  :plugins [[codox "0.8.10"]
             [jonase/eastwood "0.1.4"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
