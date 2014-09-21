@@ -12,7 +12,7 @@ Entity-component-system for Clojure.
 Add this to your `:dependencies` in `project.clj`:
 
 ```clj
-[clecs "0.2.1"]
+[clecs "1.0.0"]
 ```
 
 
@@ -33,7 +33,9 @@ Documentation is a work in progress. API documentation is [here](http://clecs.mu
 
 ## Changelog
 
-To do...
+### Changes Since Version 0.2.x
+
+- Replaced function based queries with data driven queries. See `clecs.query`.
 
 
 ## See Also
