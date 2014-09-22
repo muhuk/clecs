@@ -12,7 +12,7 @@ Entity-component-system for Clojure.
 Add this to your `:dependencies` in `project.clj`:
 
 ```clj
-[clecs "1.0.0"]
+[clecs "1.0.1"]
 ```
 
 
