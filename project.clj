@@ -1,4 +1,4 @@
-(defproject clecs "1.0.0-SNAPSHOT"
+(defproject clecs "1.0.2-SNAPSHOT"
   :description "Entity-component-system for Clojure."
   :url "https://github.com/muhuk/clecs"
   :license {:name "GNU GPL v3"
