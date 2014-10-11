@@ -11,9 +11,7 @@ Entity-component-system for Clojure.
 
 Add this to your `:dependencies` in `project.clj`:
 
-```clj
-[clecs "1.0.1"]
-```
+[![Clojars Project](http://clojars.org/clecs/latest-version.svg)](http://clojars.org/clecs)
 
 
 ## Usage
