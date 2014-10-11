@@ -67,9 +67,6 @@
 
 
 (defn query? [q]
-  (-> (and (-> q
-               first
-               #{:all :any})
-           (fnext q))
-      nil?
-      not))
+  (and (coll? q)
+       (not (nil? (and (#{:all :any} (first q))
+                       (fnext q))))))

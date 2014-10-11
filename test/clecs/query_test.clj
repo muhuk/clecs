@@ -76,9 +76,14 @@
 
 
 (facts "queries have :and or :or as first element."
+       (query? []) => false
+       (query? [anything]) => false
+       (query? [anything anything]) => false
+       (query? [:all]) => false
+       (query? [:any]) => false
+       (query? anything) => false
        (query? [:all anything]) => true
-       (query? [:any anything]) => true
-       (query? [anything anything]) => false)
+       (query? [:any anything]) => true)
 
 
 (facts "queries must have at least one component label or sub-query."
