@@ -35,7 +35,7 @@
 
 
 (defn set-component [c]
-  (let [clabel (component-label (type c))
+  (let [clabel (component-label c)
         eid (entity-id c)]
     (var-set #'*state*
              (-> *state*

@@ -25,6 +25,6 @@
 
 (facts "component-label accepts component types."
        (component-label TestComponent) => :clecs.component_test.TestComponent
-       (component-label (->TestComponent ..eid..)) => (throws IllegalArgumentException)
+       (component-label (->TestComponent ..eid..)) => :clecs.component_test.TestComponent
        (component-label NonComponent) => (throws IllegalArgumentException)
        (component-label (->NonComponent)) => (throws IllegalArgumentException))
