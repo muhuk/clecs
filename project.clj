@@ -16,7 +16,8 @@
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
           :src-linenum-anchor-prefix "L"
           :output-dir "target/doc/api"}
-  :deploy-repositories {"releases" :clojars}
+  :deploy-repositories {"releases" :clojars
+                        "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
             "quickcheck"
             ^{:doc (str "Run quick-check to compare a backend against clecs.backend.atom-world\n"
