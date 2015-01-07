@@ -9,7 +9,7 @@
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
   :profiles {:dev {:source-paths ["check"]
-                   :dependencies [[midje "1.6.3"]
+                   :dependencies [[midje "1.7.0-SNAPSHOT"]
                                   [org.clojure/test.check "0.6.2"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codox {:defaults {:doc/format :markdown}
