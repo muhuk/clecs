@@ -40,7 +40,9 @@ Documentation is a work in progress. API documentation is [here](http://clecs.mu
             java.lang.ClassNotFoundException: java_path.to.YourComponent
 
     To solve this problem declare components in a `:require` instead
-    of `:import`.
+    of `:import`. (Examples:
+    [muhuk/clecs-examples@a965ab1](https://github.com/muhuk/clecs-examples/commit/a965ab138b888d3137742aa290be87d9e1528bd1)
+    & [muhuk/clecs-examples@22de34f](https://github.com/muhuk/clecs-examples/commit/22de34f592ca6cf3609e0822b9fd2ce6bf30afd0))
 
 
 ### Changes Since Version 0.2.x
