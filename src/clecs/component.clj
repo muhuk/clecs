@@ -108,4 +108,5 @@
          (with-meta x# ~(assoc metadata :type :component)))
        (defn ~fn-name [~@all-params]
          (~map-fn-name (hash-map ~@(mapcat #(vector (keyword %) %) all-params))))
-       (def ~component-name (with-meta {} ~(assoc metadata :type :component-type))))))
+       (def ~component-name (with-meta {:name ~component-label}
+                                       ~(assoc metadata :type :component-type))))))
