@@ -21,7 +21,7 @@ To do...
 
 ## Examples
 
-- Official demos are here: [clecs-examples](https://github.com/muhuk/clecs-examples)
+-   Official demos are here: [clecs-examples](https://github.com/muhuk/clecs-examples)
 
 
 ## Documentation
@@ -31,6 +31,18 @@ Documentation is a work in progress. API documentation is [here](http://clecs.mu
 
 ## Changelog
 
+### Changes Since Version 1.0.x
+
+-   Components are no longer records. The same API still works but since
+    a java class is not generated anymore you are likely to get an error
+    like:
+
+            java.lang.ClassNotFoundException: java_path.to.YourComponent
+
+    To solve this problem declare components in a `:require` instead
+    of `:import`.
+
+
 ### Changes Since Version 0.2.x
 
 - Replaced function based queries with data driven queries. See `clecs.query`.
@@ -38,9 +50,9 @@ Documentation is a work in progress. API documentation is [here](http://clecs.mu
 
 ## See Also
 
-- [Artemis](http://gamadu.com/artemis/)
-- [brute](https://github.com/markmandel/brute)
-- [entreri](https://bitbucket.org/mludwig/entreri/overview)
+-   [Artemis](http://gamadu.com/artemis/)
+-   [brute](https://github.com/markmandel/brute)
+-   [entreri](https://bitbucket.org/mludwig/entreri/overview)
 
 
 ## License
