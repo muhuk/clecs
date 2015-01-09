@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0-alpha4"]]
   :plugins [[codox "0.8.10"]
             [jonase/eastwood "0.2.1"]
+            [lein-asciidoctor "0.1.12"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
   :profiles {:dev {:source-paths ["check"]
@@ -16,9 +17,15 @@
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
           :src-linenum-anchor-prefix "L"
           :output-dir "target/doc/api"}
+  :asciidoctor {:extract-css true
+                :format :html5
+                :sources "doc/*.adoc"
+                :to-dir "target/doc"
+                :toc :left}
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
+            "docs" ["do" "doc," "asciidoctor"]
             "quickcheck"
             ^{:doc (str "Run quick-check to compare a backend against clecs.backend.atom-world\n"
                         "\n"
