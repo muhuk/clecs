@@ -20,7 +20,7 @@
   :asciidoctor {:extract-css true
                 :format :html5
                 :sources "doc/*.adoc"
-                :to-dir "target/doc"
+                :to-dir "target/doc/guide"
                 :toc :left}
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}

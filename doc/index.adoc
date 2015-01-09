@@ -1,3 +1,86 @@
-# Introduction to clecs
+Clecs Documentation
+===================
+Atamert Ölçgen
+1.1.x
+:toc: left
+:numbered:
+:source-highlighter: pygments
+:pygments-style: friendly
 
-TODO: write [great documentation](http://jacobian.org/writing/great-documentation/what-to-write/)
+Entity-component-system for Clojure.
+
+
+image:https://travis-ci.org/muhuk/clecs.svg?branch=master["Build Status", link=https://travis-ci.org/muhuk/clecs]
+
+
+Latest Release
+--------------
+
+Leiningen
+~~~~~~~~~
+
+Add this to your `:dependencies` in `project.clj`:
+
+image:http://clojars.org/clecs/latest-version.svg["Clojars Project", link=http://clojars.org/clecs]
+
+
+Usage
+-----
+
+TODO: Fill this in.
+
+
+Examples
+--------
+
+- Official demos are link:https://github.com/muhuk/clecs-examples[here].
+
+
+API Documentation
+-----------------
+
+- Version link:http://clecs.muhuk.com/api/1.1.x[1.1.x]
+- Version link:http://clecs.muhuk.com/api/1.0.1[1.0.1]
+
+
+Changelog
+---------
+
+Changes Since Version 1.0.x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Components are no longer records. The same API still works but since
+a java class is not generated anymore you are likely to get an error
+like:
++
+[source, Java]
+----
+java.lang.ClassNotFoundException: java_path.to.YourComponent
+----
++
+To solve this problem declare components in a `:require` instead
+of `:import`. (Examples:
+link:https://github.com/muhuk/clecs-examples/commit/a965ab138b888d3137742aa290be87d9e1528bd1[muhuk/clecs-examples@a965ab1]
+& link:https://github.com/muhuk/clecs-examples/commit/22de34f592ca6cf3609e0822b9fd2ce6bf30afd0[muhuk/clecs-examples@22de34f])
+
+
+Changes Since Version 0.2.x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Replaced function based queries with data driven queries. See `clecs.query`.
+
+
+See Also
+--------
+
+-   link:http://gamadu.com/artemis/[Artemis]
+-   link:https://github.com/markmandel/brute[brute]
+-   link:https://bitbucket.org/mludwig/entreri/overview[entreri]
+
+
+License
+-------
+
+Copyright (C) 2014  Atamert Ölçgen
+
+This program is distributed under GNU GPL v3 license. See `LICENSE` file.
