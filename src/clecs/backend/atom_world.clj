@@ -7,7 +7,8 @@
    Currently systems run sequentially."
   (:require [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
             [clecs.backend.atom-world.transactable-world :refer [->AtomTransactableWorld]]
-            [clecs.world :as world]))
+            [clecs.world :as world]
+            [clecs.world.system :refer [ISystemManager]]))
 
 
 (def ^:no-doc initial_state {:components {}
@@ -16,7 +17,7 @@
 
 
 (deftype AtomWorld [systems-atom transactable-world]
-  world/ISystemManager
+  ISystemManager
   (process! [this dt]
             (doseq [s (vals @systems-atom)]
               (s transactable-world dt))

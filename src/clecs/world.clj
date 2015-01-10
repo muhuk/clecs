@@ -98,124 +98,36 @@
   |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |  ✘  |
   |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |  ✘  |
   |  ✔  |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |
-  ")
+  "
+  (:require [clecs.world.editable :as editable]
+            [clecs.world.queryable :as queryable]
+            [clecs.world.system :as system]))
 
 
-(defprotocol IEditableWorld
-  (add-entity
-   [this]
-   "Create a new entity in the world and return its id.")
-  (remove-component
-   [this eid ctype]
-   "Remove the component of type `ctype` that is associated
-   with `eid` and return `nil`.
 
-   This method is a no-op if there is no relevant component.
-
-   #### Parameters:
-
-   eid
-   :   Entity id.
-
-   ctype
-   :   Component type. If you have a reference to a
-       `component` instance, use `(type component)`.")
-  (remove-entity
-   [this eid]
-   "Delete the entity with `eid`, all components
-   associated with it and return `nil`.
-
-   This method is a no-op if there is no relevant entity.
-
-   #### Parameters:
-
-   eid
-   :   Entity id.")
-  (set-component
-   [this c]
-   "Add component `c` to the world and return `nil`.
-
-   Entity id is already associated with `c` as a
-   consequence of `IComponent` protocol. If the entity
-   already has a component with the same type it will
-   be replaced.
-
-   #### Parameters:
-
-   c
-   :   Component instance. Must implement
-       [[clecs.component/IComponent]]."))
+;; Functions delegating to IEditableWorld
+(defn add-entity [w] (editable/add-entity w))
+(defn remove-component [w eid ctype] (editable/remove-component w eid ctype))
+(defn remove-entity [w eid] (editable/remove-entity w eid))
+(defn set-component [w c] (editable/set-component w c))
 
 
-(defprotocol IQueryableWorld
-  (component
-   [this eid ctype]
-   "Return the component of type `ctype` associated with
-   `eid`, or `nil` if none found.
-
-   #### Parameters:
-
-   eid
-   :   Entity id.
-
-   ctype
-   :   Component type. If you have a reference to a
-       `component` instance, use `(type component)`.")
-  (query
-   [this q]
-   "Return a sequence of entity id's using `q` as
-   filter criteria.
-
-   #### Parameters:
-
-   q
-   :   A query object. See [[clecs.query]] for more
-       info."))
+;; Functions delegating to IQueryableWorld
+(defn component [w eid ctype] (queryable/component w eid ctype))
+(defn query [w q] (queryable/query w q))
 
 
-(defprotocol ISystemManager
-  (process!
-   [this dt]
-   "Run systems using `dt` as time increment.
-
-   This is the function that will be called in
-   the main loop.
-
-   #### Parameters:
-
-   dt
-   :   Time passed since process! was called last
-       time. This value is passed to the systems.
-       It is recommended to use miliseconds as
-       unit.")
-  (remove-system!
-   [this slabel]
-   "Remove system registered with `slabel`.
-
-   #### Parameters:
-
-   slabel
-   :   Label for the system to remove.")
-  (set-system!
-   [this slabel s]
-   "Register system `s` with label `slabel`.
-
-   The system will not be run until `process!`
-   is called.
-
-   #### Parameters:
-
-   slabel
-   :   A keyword to refer the system later.
-
-   s
-   :   System to register.")
-  (systems
-   [this]
-   "Return a sequence of all registered systems."))
+;; Functions delegating to ISystemManager
+(defn process! [w dt] (system/process! w dt))
+(defn remove-system! [w slabel] (system/remove-system! w slabel))
+(defn set-system! [w slabel s] (system/set-system! w slabel s))
+(defn systems [w] (system/systems w))
 
 
-(defprotocol ITransactableWorld
+(defprotocol ^{:deprecated "1.1.0"} ITransactableWorld
+  "ITransactableWorld is deprecated and will be removed in version 2.
+  In version 2 systems will run within an implicit transaction.
+  "
   (transaction!
    [this f]
    "Execute the transaction `f`.

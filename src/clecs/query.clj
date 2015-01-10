@@ -1,7 +1,7 @@
 (ns clecs.query
   "Primitives for query criteria.
 
-  `query` method of [[clecs.world/IQueryableWorld]]
+  `query` method of [[clecs.world.queryable/IQueryableWorld]]
   is used to find entities based on their components.
 
   #### Examples:
@@ -37,7 +37,7 @@
   it is considered bad design to query too many
   components at once.
 
-  See also [[clecs.world/IQueryableWorld]]."
+  See also [[clecs.world.queryable/IQueryableWorld]]."
   (:require [clecs.component :refer [component-label
                                      component-type?]]))
 
