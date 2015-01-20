@@ -62,6 +62,13 @@ To solve this problem declare components in a `:require` instead
 of `:import`. (Examples:
 link:https://github.com/muhuk/clecs-examples/commit/a965ab138b888d3137742aa290be87d9e1528bd1[muhuk/clecs-examples@a965ab1]
 & link:https://github.com/muhuk/clecs-examples/commit/22de34f592ca6cf3609e0822b9fd2ce6bf30afd0[muhuk/clecs-examples@22de34f])
+- Added suport for systems as maps. Assuming `sys-fn` is an old
+style system you can write a system as:
++
+[source, Clojure]
+----
+{:process sys-fn}
+----
 
 
 Changes Since Version 0.2.x

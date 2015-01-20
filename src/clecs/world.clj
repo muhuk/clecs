@@ -15,8 +15,11 @@
       oriented data structures, where all information
       related to an object is stored with the object.
 
-      Clects refers to entities as `entity-id` or
-      `eid`.
+      Clecs refers to entities as `entity-id` or
+      `eid`. An entity-id can be an integer or a
+      UUID or any other type depending on the
+      world implementation.
+
 
   Component
   :   Components encode a single aspect about an
@@ -29,15 +32,16 @@
       approach which enforces a static template of
       aspects for each type of entity.
 
-      See also [[clecs.component/IComponent]].
 
   System
-  :   Systems are callables that define operations
+  :   Systems are either maps (new style) or (old style)
+      callables that define operations
       over the world. Each system should ideally
       deal with a unique aspect of the application.
 
       Systems may primarily deal with a single
       component but it is not a requirement.
+
 
   Transaction
   :   A transaction is a special context that allows
@@ -51,18 +55,17 @@
       outside of transactions even when underlying data
       storage is mutable.
 
+
   Query
   :   There are two kinds of queries in clecs:
 
       1. Queries for entities associated with certain
          components.
-      1. Queries for individual components.
+      1. Queries of a certain entity for its individual
+         components.
 
-      Queries can be only be run by systems. Queries
-      can be run within transactions and also outside
-      of transactions. Note that changes within
-      transaction will be reflected to the queries run
-      within transactions.
+      Queries can be only be run by systems.
+
 
   #### Modes of Execution
 
@@ -72,7 +75,7 @@
   When you first create a world, you are *outside of
   processing*. You can add, remove and query
   systems. You can also process the world. Processing
-  means running all the systems and possibly modift
+  means running all the systems and possibly modify
   its contents. The objects extend `ISystemManager`
   in this mode.
 
