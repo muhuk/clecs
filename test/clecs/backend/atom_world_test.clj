@@ -1,8 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
-            [clecs.backend.atom-world.editable :as editable]
-            [clecs.backend.atom-world.queryable :as queryable]
-            [clecs.backend.atom-world.transactable :refer [*state*]]
+            [clecs.backend.atom-world.query :as query]
+            [clecs.component :refer [defcomponent]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [clecs.world.editable :refer [IEditableWorld]]
@@ -15,6 +14,12 @@
                                                IQueryableWorld))
 
 
+(defcomponent TestComponentA [eid])
+
+
+(defcomponent TestComponentB [eid a b])
+
+
 ;; World Initialization.
 
 (fact "Atom world implements ISystemManager."
@@ -24,6 +29,12 @@
 (fact "Initialization function is called within a transaction."
       (make-world --init--) => irrelevant
       (provided (--init-- (as-checker editable-world-like)) => irrelevant))
+
+
+(fact "transaction! calls function with an editable world and time delta."
+      (let [w (->AtomWorld nil (atom ..state..) ..editable-world..)]
+        (-transaction! w --f-- ..dt..) => nil
+        (provided (--f-- ..editable-world.. ..dt..) => irrelevant)))
 
 
 ;; System Operations
@@ -79,40 +90,112 @@
         (-> @calls second second second) => ..dt..))
 
 
-;; Protocol delegation - IEditableWorld.
+;; Editable world.
 
-(fact "world/add-entity delegates to add-entity."
-      (world/add-entity (->AtomEditableWorld)) => ..eid..
-      (provided (editable/add-entity) => ..eid..))
-
-
-(fact "world/remove-component delegates to remove-component."
-      (let [world (->AtomEditableWorld)]
-        (world/remove-component world ..eid.. ..component-type..) => world
-        (provided (editable/remove-component ..eid.. ..component-type..) => nil)))
+(fact "world/add-entity returns a new entity id."
+      (binding [*state* {:last-entity-id 0}]
+        (world/add-entity (->AtomEditableWorld)) => 1)
+      (binding [*state* {:last-entity-id 41}]
+        (world/add-entity (->AtomEditableWorld)) => 42))
 
 
-(fact "world/remove-entity delegates to remove-entity."
-      (let [world (->AtomEditableWorld)]
-        (world/remove-entity world ..eid..) => world
-        (provided (editable/remove-entity ..eid..) => nil)))
+(fact "world/add-entity adds the new entity-id to the entity index."
+      (binding [*state* {:last-entity-id 0}]
+        (let [eid (world/add-entity (->AtomEditableWorld))]
+          (get-in *state* [:entities eid]) => #{})))
 
 
-(fact "world/set-component delegates to set-component."
-      (let [world (->AtomEditableWorld)]
-        (world/set-component world  ..c..) => world
-        (provided (editable/set-component ..c..) => nil)))
+(fact "world/add-entity updates entity counter."
+      (binding [*state* {:last-entity-id 0}]
+        (world/add-entity (->AtomEditableWorld))
+        (:last-entity-id *state*) => 1))
 
 
-;; Protocol delegation - IQueryableWorld.
+(fact "world/add-entity returns different values each time it's called."
+      (let [w (->AtomEditableWorld)]
+        (binding [*state* {:entities {}
+                           :last-entity-id 0}]
+          (repeatedly 42 #(world/add-entity w)) => (comp #(= % 42) count set))))
 
-(fact "world/component delegates to component."
-      (binding [*state* ..state..]
-        (world/component (->AtomEditableWorld) ..eid.. ..clabel..) => ..component..
-        (provided (queryable/component ..state.. ..eid.. ..clabel..) => ..component..)))
+
+(fact "world/component resolves queried component."
+      (binding [*state* {:components {..ctype.. {..eid.. ..component..}}}]
+        (world/component (->AtomEditableWorld) ..eid.. ..ctype..) => ..component..))
 
 
-(fact "world/query delegates to query"
-      (binding [*state* ..state..]
-        (world/query (->AtomEditableWorld) ..q..) => ..result..
-        (provided (queryable/query *state* ..q..) => ..result..)))
+(fact "world/query returns a seq."
+      (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
+                                    ..e2.. #{..c2..}}}]
+        (world/query (->AtomEditableWorld) ..q..) => seq?
+        (provided (query/-compile-query ..q..) => (partial some #{..c1..}))))
+
+
+(fact "world/query compiles query and then calls the result with a seq of component labels."
+      (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
+                                    ..e2.. #{..c2..}
+                                    ..e3.. #{..c3..}}}]
+        (sort-by str (world/query (->AtomEditableWorld) ..q..)) => [..e1.. ..e3..]
+        (provided (query/-compile-query ..q..) => (partial some #{..c1.. ..c3..}))))
+
+
+(fact "world/remove-component works."
+      (let [w (->AtomEditableWorld)
+            initial-state {:components {..ctype.. {..eid.. ..component..}}
+                           :entities {..eid.. #{..ctype..}}}
+            expected-state {:components {..ctype.. {}}
+                            :entities {..eid.. #{}}}]
+        (binding [*state* initial-state]
+          (world/remove-component w ..eid.. ..ctype..) => w
+          *state* => expected-state)))
+
+
+(fact "world/remove-entity removes entity-id from entity index."
+      (let [w (->AtomEditableWorld)]
+        (binding [*state* {:components {}
+                           :entities {1 #{}}
+                           :last-entity-id 1}]
+          (world/remove-entity w 1) => w
+          *state* => {:components {}
+                      :entities {}
+                      :last-entity-id 1})))
+
+
+(fact "world/remove-entity removes entity's components."
+      (let [w (->AtomEditableWorld)
+            ctype :clecs.backend.atom_world_test.TestComponentA
+            initial-state {:components {ctype {..eid.. ..i.. ..other-eid.. ..j..}}
+                           :entities {}}
+            expected-state {:components {ctype {..other-eid.. ..j..}}
+                            :entities {}}]
+        (binding [*state* initial-state]
+          (world/remove-entity w ..eid..) => w
+          *state* => expected-state)))
+
+
+(fact "world/set-component adds the component if entity doesn't have one."
+      (let [w (->AtomEditableWorld)
+            eid 1
+            c (->TestComponentA eid)
+            ctype :clecs.backend.atom_world_test.TestComponentA
+            initial-state {:components {}
+                           :entities {eid #{}}}
+            expected-state {:components {ctype {eid c}}
+                            :entities {eid #{ctype}}}]
+        (binding [*state* initial-state]
+          (world/set-component w c) => w
+          *state* => expected-state)))
+
+
+(fact "world/set-component replaces existing components."
+      (let [w (->AtomEditableWorld)
+            eid 1
+            c-old (->TestComponentB eid ..a.. ..b..)
+            c-new (->TestComponentB eid ..c.. ..d..)
+            ctype :clecs.backend.atom_world_test.TestComponentB
+            initial-state {:components {ctype {eid c-old}}
+                            :entities {eid #{ctype}}}
+            expected-state {:components {ctype {eid c-new}}
+                            :entities {eid #{ctype}}}]
+        (binding [*state* initial-state]
+          (world/set-component w c-new) => w
+          *state* => expected-state)))

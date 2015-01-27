@@ -1,5 +1,5 @@
-(ns clecs.backend.atom-world.queryable-test
-  (:require [clecs.backend.atom-world.queryable :refer :all]
+(ns clecs.backend.atom-world.query-test
+  (:require [clecs.backend.atom-world.query :refer :all]
             [clecs.component :refer [component-label]]
             [midje.sweet :refer :all]))
 
@@ -50,30 +50,3 @@
        (-compile-query [:any]) => (throws IllegalArgumentException)
        (-compile-query [:all ..clabel..]) => fn?
        (-compile-query [:any ..clabel..]) => fn?)
-
-
-(fact "component works."
-      (let [state {:components {..clabel.. {..eid.. ..component..}}}]
-        (component state ..eid.. ..ctype..) => ..component..
-        (provided (component-label ..ctype..) => ..clabel..)))
-
-
-(fact "query compiles query and then calls the result with a seq of component labels."
-      (let [components-1 #{..C1.. ..C2..}
-            seq-1 (seq components-1)
-            components-2 #{..C2..}
-            seq-2 (seq components-2)
-            components-3 #{..C3..}
-            seq-3 (seq components-3)
-            state {:entities {..E1.. components-1
-                              ..E2.. components-2
-                              ..E3.. components-3}}]
-        (sort-by str (query state ..q..)) => [..E1.. ..E3..]
-        (provided (-compile-query ..q..) => (partial some #{..C1.. ..C3..}))))
-
-
-(fact "query returns a seq."
-      (query {:entities {..E1.. #{..C1.. ..C2..}
-                          ..E2.. #{..C2..}}}
-              ..q..) => seq?
-      (provided (-compile-query ..q..) => (partial some #{..C1..})))

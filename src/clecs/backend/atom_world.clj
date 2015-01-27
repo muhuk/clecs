@@ -5,13 +5,13 @@
    `clojure.core/atom` internally.
 
    Currently systems run sequentially."
-  (:require [clecs.backend.atom-world.editable :as editable]
-            [clecs.backend.atom-world.queryable :as queryable]
-            [clecs.backend.atom-world.transactable :refer [*state* transaction!]]
+  (:require [clecs.backend.atom-world.query :as query]
+            [clecs.component :refer [component-label entity-id]]
             [clecs.world :as world]
             [clecs.world.editable :refer [IEditableWorld]]
             [clecs.world.queryable :refer [IQueryableWorld]]
-            [clecs.world.system :refer [ISystemManager]]))
+            [clecs.world.system :refer [ISystemManager]]
+            [clecs.util :refer [map-values]]))
 
 
 (def ^:no-doc initial_state {:components {}
@@ -19,15 +19,57 @@
                              :last-entity-id 0})
 
 
+(def ^{:dynamic true
+       :no-doc true} *state*)
+
+
+
+(declare -transaction!)
+
+
 (deftype AtomEditableWorld []
   IEditableWorld
-  (add-entity [_] (editable/add-entity))
-  (remove-component [this eid ctype] (editable/remove-component eid ctype) this)
-  (remove-entity [this eid] (editable/remove-entity eid) this)
-  (set-component [this c] (editable/set-component c) this)
+  (add-entity [_]
+              (let [state *state*
+                    eid (inc (:last-entity-id state))]
+                (var-set #'*state*
+                         (-> state
+                             (assoc-in [:entities eid] #{})
+                             (assoc :last-entity-id eid)))
+                eid))
+  (remove-component [this eid ctype]
+                    (var-set #'*state*
+                             (-> *state*
+                                 (update-in [:entities eid] disj ctype)
+                                 (update-in [:components ctype] dissoc eid)))
+                    this)
+  (remove-entity [this eid]
+                 (let [state *state*]
+                   (var-set #'*state*
+                            (-> state
+                                (update-in [:entities] dissoc eid)
+                                (update-in [:components]
+                                           (partial map-values #(dissoc % eid))))))
+                 this)
+  (set-component [this c]
+                 (let [clabel (component-label c)
+                       eid (entity-id c)]
+                   (var-set #'*state*
+                            (-> *state*
+                                (update-in [:entities eid] conj clabel)
+                                (update-in [:components clabel] #(or % {}))
+                                (update-in [:components clabel] conj [eid c]))))
+                 this)
   IQueryableWorld
-  (component [_ eid ctype] (queryable/component *state* eid ctype))
-  (query [_ q] (queryable/query *state* q)))
+  (component [_ eid ctype] (get-in *state* [:components ctype eid]))
+  (query [_ q]
+         (let [f (query/-compile-query q)]
+           (reduce-kv (fn [coll k v]
+                        (if (f (seq v))
+                          (conj coll k)
+                          coll))
+                      (seq [])
+                      (:entities *state*)))))
 
 
 (deftype AtomWorld [systems-atom state editable-world]
@@ -36,7 +78,7 @@
             (doseq [s (->> @systems-atom
                            (vals)
                            (map :process))]
-              (transaction! this s dt))
+              (-transaction! this s dt))
             this)
   (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
   (set-system! [this slabel s]
@@ -47,11 +89,6 @@
   (systems [_] (seq @systems-atom)))
 
 
-;; Hide auto-generated constructor for
-;; AtomWorld from documentation generator.
-(alter-meta! #'->AtomWorld assoc :no-doc true)
-
-
 (defn make-world
   "Makes a new `AtomWorld`. Use [[clecs.core/make-world]]
    instead of calling this directly."
@@ -60,4 +97,19 @@
         systems (atom {})
         editable-world (->AtomEditableWorld)]
     (doto (->AtomWorld systems state editable-world)
-      (transaction! initializer-fn))))
+      (-transaction! (fn [w _] (initializer-fn w)) nil))))
+
+
+(defn ^:no-doc -transaction! [world f dt]
+  (swap! (.state world)
+         (fn [state]
+           (binding [*state* state]
+             (f (.editable-world world) dt)
+             *state*)))
+  nil)
+
+
+;; Hide internals from documentation generator.
+(doseq [v [#'->AtomWorld
+           #'->AtomEditableWorld]]
+  (alter-meta! v assoc :no-doc true))

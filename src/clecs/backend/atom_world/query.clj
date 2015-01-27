@@ -1,4 +1,4 @@
-(ns clecs.backend.atom-world.queryable
+(ns clecs.backend.atom-world.query
   {:no-doc true}
   (:require [clecs.component :refer [component-label]]
             [clecs.query :refer [query?]]))
@@ -47,17 +47,3 @@
   (if (query? q)
     (compile-query* q)
     (throw (IllegalArgumentException. "Invalid query."))))
-
-
-(defn component [state eid ctype]
-  (get-in state [:components (component-label ctype) eid]))
-
-
-(defn query [state q]
-  (let [f (-compile-query q)]
-    (reduce-kv (fn [coll k v]
-                 (if (f (seq v))
-                   (conj coll k)
-                   coll))
-               (seq [])
-               (:entities state))))
