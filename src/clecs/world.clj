@@ -80,27 +80,18 @@
   in this mode.
 
   Systems are called with two parameters; a reference
-  to the world that is *inside processing but outside
-  of transactions* and the time since last time the
-  world is processed. You can run queries and start
-  transactions. The world that is passed into the system
-  extends `IQueryableWorld` and `ITransactableWorld`.
-
-  When a transaction is started a world reference that
-  is *inside a transaction* is passed to the transaction
-  function. World modifying functions as well as queries
-  are available in this mode. The world reference that
-  is provided extends `IQueryableWorld` and
-  `IEditableWorld`.
+  to an editable world and the since last time the
+  world is processed. The world that is passed into
+  the system extends `IQueryableWorld` and
+  `IEditableWorld`. Systems run inside a transaction.
 
   Modes of execution and relevant protocols are
   summarized in the table below:
 
-  | Processing  | In Transaction | ISystemManager | ITransactableWorld | IQueryableWorld | IEditableWorld |
-  | :----------:|:--------------:|:--------------:|:------------------:|:---------------:|:--------------:|
-  |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |  ✘  |
-  |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |  ✘  |
-  |  ✔  |  ✔  |  ✘  |  ✘  |  ✔  |  ✔  |
+  | Processing  | In Transaction | ISystemManager | IQueryableWorld | IEditableWorld |
+  | :----------:|:--------------:|:--------------:|:---------------:|:--------------:|
+  |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |
+  |  ✔  |  ✔  |  ✘  |  ✔  |  ✔  |
   "
   (:require [clecs.world.editable :as editable]
             [clecs.world.queryable :as queryable]
@@ -125,21 +116,3 @@
 (defn remove-system! [w slabel] (system/remove-system! w slabel))
 (defn set-system! [w slabel s] (system/set-system! w slabel s))
 (defn systems [w] (system/systems w))
-
-
-(defprotocol ^{:deprecated "1.1.0"} ITransactableWorld
-  "ITransactableWorld is deprecated and will be removed in version 2.
-  In version 2 systems will run within an implicit transaction.
-  "
-  (transaction!
-   [this f]
-   "Execute the transaction `f`.
-
-   The transaction may be retried. Side effects within
-   a transaction should be carefully considered.
-
-   #### Parameters:
-
-   f
-   :   A function that takes single `ITransactableWorld`
-       parameter."))

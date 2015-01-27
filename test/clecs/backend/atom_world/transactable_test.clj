@@ -6,6 +6,8 @@
 (deftype TestWorld [state editable-world])
 
 
+;; TODO: Beef up tests here.
+
 (fact "transaction! calls function with the world."
       (let [w (->TestWorld (atom ..state..) ..editable-world..)]
         (transaction! w --f--) => nil

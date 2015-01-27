@@ -5,9 +5,12 @@
    `clojure.core/atom` internally.
 
    Currently systems run sequentially."
-  (:require [clecs.backend.atom-world.editable-world :refer [->AtomEditableWorld]]
-            [clecs.backend.atom-world.transactable-world :refer [->AtomTransactableWorld]]
+  (:require [clecs.backend.atom-world.editable :as editable]
+            [clecs.backend.atom-world.queryable :as queryable]
+            [clecs.backend.atom-world.transactable :refer [*state* transaction!]]
             [clecs.world :as world]
+            [clecs.world.editable :refer [IEditableWorld]]
+            [clecs.world.queryable :refer [IQueryableWorld]]
             [clecs.world.system :refer [ISystemManager]]))
 
 
@@ -16,13 +19,24 @@
                              :last-entity-id 0})
 
 
-(deftype AtomWorld [systems-atom transactable-world]
+(deftype AtomEditableWorld []
+  IEditableWorld
+  (add-entity [_] (editable/add-entity))
+  (remove-component [this eid ctype] (editable/remove-component eid ctype) this)
+  (remove-entity [this eid] (editable/remove-entity eid) this)
+  (set-component [this c] (editable/set-component c) this)
+  IQueryableWorld
+  (component [_ eid ctype] (queryable/component *state* eid ctype))
+  (query [_ q] (queryable/query *state* q)))
+
+
+(deftype AtomWorld [systems-atom state editable-world]
   ISystemManager
   (process! [this dt]
             (doseq [s (->> @systems-atom
                            (vals)
                            (map :process))]
-              (s transactable-world dt))
+              (transaction! this s dt))
             this)
   (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
   (set-system! [this slabel s]
@@ -44,7 +58,6 @@
   [initializer-fn]
   (let [state (atom initial_state)
         systems (atom {})
-        editable-world (->AtomEditableWorld)
-        transactable-world (->AtomTransactableWorld state editable-world)]
-    (world/transaction! transactable-world initializer-fn)
-    (->AtomWorld systems transactable-world)))
+        editable-world (->AtomEditableWorld)]
+    (doto (->AtomWorld systems state editable-world)
+      (transaction! initializer-fn))))

@@ -1,5 +1,8 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
+            [clecs.backend.atom-world.editable :as editable]
+            [clecs.backend.atom-world.queryable :as queryable]
+            [clecs.backend.atom-world.transactable :refer [*state*]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [clecs.world.editable :refer [IEditableWorld]]
@@ -12,17 +15,13 @@
                                                IQueryableWorld))
 
 
-(def transactable-world-like (implements-protocols IQueryableWorld
-                                                   world/ITransactableWorld))
-
-
 ;; World Initialization.
 
 (fact "Atom world implements ISystemManager."
       (make-world --init--) => (implements-protocols ISystemManager))
 
 
-(fact "Initialization function is called withing a transaction."
+(fact "Initialization function is called within a transaction."
       (make-world --init--) => irrelevant
       (provided (--init-- (as-checker editable-world-like)) => irrelevant))
 
@@ -74,7 +73,46 @@
                   (world/set-system! ..l-two.. f-two))]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
-        (-> @calls first second first) => transactable-world-like
+        (-> @calls first second first) => editable-world-like
         (-> @calls first second second) => ..dt..
-        (-> @calls second second first) => transactable-world-like
+        (-> @calls second second first) => editable-world-like
         (-> @calls second second second) => ..dt..))
+
+
+;; Protocol delegation - IEditableWorld.
+
+(fact "world/add-entity delegates to add-entity."
+      (world/add-entity (->AtomEditableWorld)) => ..eid..
+      (provided (editable/add-entity) => ..eid..))
+
+
+(fact "world/remove-component delegates to remove-component."
+      (let [world (->AtomEditableWorld)]
+        (world/remove-component world ..eid.. ..component-type..) => world
+        (provided (editable/remove-component ..eid.. ..component-type..) => nil)))
+
+
+(fact "world/remove-entity delegates to remove-entity."
+      (let [world (->AtomEditableWorld)]
+        (world/remove-entity world ..eid..) => world
+        (provided (editable/remove-entity ..eid..) => nil)))
+
+
+(fact "world/set-component delegates to set-component."
+      (let [world (->AtomEditableWorld)]
+        (world/set-component world  ..c..) => world
+        (provided (editable/set-component ..c..) => nil)))
+
+
+;; Protocol delegation - IQueryableWorld.
+
+(fact "world/component delegates to component."
+      (binding [*state* ..state..]
+        (world/component (->AtomEditableWorld) ..eid.. ..clabel..) => ..component..
+        (provided (queryable/component ..state.. ..eid.. ..clabel..) => ..component..)))
+
+
+(fact "world/query delegates to query"
+      (binding [*state* ..state..]
+        (world/query (->AtomEditableWorld) ..q..) => ..result..
+        (provided (queryable/query *state* ..q..) => ..result..)))
