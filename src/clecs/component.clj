@@ -1,67 +1,15 @@
 (ns clecs.component)
 
 
-(defprotocol ^{:deprecated "1.1.0"} IComponent
-  "~~Components must extend this protocol. Use [[defcomponent]]
-  instead of extending this directly.~~
-
-  Components are plain old clojure maps, it is no longer necessary
-  to extends this protocol or use [[defcomponent]]. IComponent will
-  be removed in version 2."
-  (entity-id [this]))
-
-
-(extend clojure.lang.APersistentMap
-  IComponent
-  {:entity-id (fn [this]
-                (-> (meta this)
-                    (:entity-id-key)
-                    (keyword)
-                    (this)))})
-
-
-(defn ^{:deprecated "1.1.0"} component?
-  "component-type? is deprecated and will be removed in version 2.
-
-  ~~Returns true is `c` is a component instance.~~
-
-  All maps with the suitable contents are components."
-  [c]
-  (-> (meta c)
-      (:type)
-      (= :component)))
-
-
-(defn ^{:deprecated "1.1.0"} component-type?
-  "component-type? is deprecated and will be removed in version 2.
-
-  ~~Returns true is `c` is a component type.~~
-
-  All maps with the suitable contents are components."
-  [c]
-  (-> (meta c)
-      (:type)
-      (= :component-type)))
-
-
-(defn ^{:deprecated "1.1.0"} component-label
-  "component-label is deprecated and will be removed in version 2.
-
-  ~~Returns component label for component type `c`.~~
-
-  Component labels are keywords.
-
-  #### Example:
-
-      (ns foo.bar)
-      (defcomponent Baz [eid])
-
-      (component-label Baz) => :foo.bar.Baz
-  "
-  [c]
-  (if-let [clabel (-> (meta c) (:component-label))]
-    clabel
-    (throw (IllegalArgumentException.))))
+;; TODO: Change IEditableWorld/set-component to accept
+;;       an explicit component-type & eid.
+;;
+;;       Then remove this.
+(defn entity-id [this]
+  (-> (meta this)
+      (:entity-id-key)
+      (keyword)
+      (this)))
 
 
 (defmacro ^{:deprecated "1.1.0"} defcomponent
@@ -98,15 +46,15 @@
   [component-name [eid-param & params :as all-params]]
   (let [map-fn-name (symbol (str "map->" component-name))
         fn-name (symbol (str "->" component-name))
-        component-label (-> (str *ns* "." component-name)
+        component-type (-> (str *ns* "." component-name)
                             (clojure.string/replace #"-" "_")
                             (keyword))
-        metadata {:component-label component-label
+        metadata {:component-type component-type
                   :entity-id-key (keyword eid-param)}]
     `(do
        (defn ~map-fn-name [x#]
          (with-meta x# ~(assoc metadata :type :component)))
        (defn ~fn-name [~@all-params]
          (~map-fn-name (hash-map ~@(mapcat #(vector (keyword %) %) all-params))))
-       (def ~component-name (with-meta {:name ~component-label}
+       (def ~component-name (with-meta {:name ~component-type}
                                        ~(assoc metadata :type :component-type))))))

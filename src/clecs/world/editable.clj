@@ -35,13 +35,11 @@
    [this c]
    "Add component `c` to the world and return `nil`.
 
-   Entity id is already associated with `c` as a
-   consequence of `IComponent` protocol. If the entity
-   already has a component with the same type it will
-   be replaced.
+   Entity id is already associated with `c`. If the
+   entity already has a component with the same type it
+   will be replaced.
 
    #### Parameters:
 
    c
-   :   Component instance. Must implement
-       [[clecs.component/IComponent]]."))
+   :   Component instance."))

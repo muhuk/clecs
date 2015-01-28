@@ -33,30 +33,50 @@ TODO: Fill this in.
 Examples
 --------
 
-- Official demos are link:https://github.com/muhuk/clecs-examples[here].
+Official demos are link:https://github.com/muhuk/clecs-examples[here].
 
 
 API Documentation
 -----------------
 
-- Version link:http://clecs.muhuk.com/api/1.1.x[1.1.x]
-- Version link:http://clecs.muhuk.com/api/1.0.1[1.0.1]
+* Version link:http://clecs.muhuk.com/api/1.1.x[1.1.x]
+* Version link:http://clecs.muhuk.com/api/1.0.1[1.0.1]
 
 
 Changelog
 ---------
 
-Changes Since Version 1.1.x
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.Changes Since Version 1.1.x
 
-- Systems run inside an implicit transaction. ITransactableWorld is
+* Systems run inside an implicit transaction. ITransactableWorld is
 removed.
 
+* Queries are constructed using component type keywords instead
+of records:
++
+[source, Clojure]
+----
+(comment
+  (defrecord SomeComponent [eid])
+  (def q (all SomeComponent)))
 
-Changes Since Version 1.0.x
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(def q (all :my.ns/SomeComponent))
+----
 
-- Components are no longer records. The same API still works but since
+* Following deprecated functions are removed:
+
+** `clecs.component/component?`
+
+** `clecs.component/component-label`
+
+** `clecs.component/component-type?`
+
+* Deprecated `IComponent` is removed.
+
+
+.Changes Since Version 1.0.x
+
+* Components are no longer records. The same API still works but since
 a java class is not generated anymore you are likely to get an error
 like:
 +
@@ -69,7 +89,8 @@ To solve this problem declare components in a `:require` instead
 of `:import`. (Examples:
 link:https://github.com/muhuk/clecs-examples/commit/a965ab138b888d3137742aa290be87d9e1528bd1[muhuk/clecs-examples@a965ab1]
 & link:https://github.com/muhuk/clecs-examples/commit/22de34f592ca6cf3609e0822b9fd2ce6bf30afd0[muhuk/clecs-examples@22de34f])
-- Added suport for systems as maps. Assuming `sys-fn` is an old
+
+* Added suport for systems as maps. Assuming `sys-fn` is an old
 style system you can write a system as:
 +
 [source, Clojure]
@@ -78,18 +99,17 @@ style system you can write a system as:
 ----
 
 
-Changes Since Version 0.2.x
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.Changes Since Version 0.2.x
 
-- Replaced function based queries with data driven queries. See `clecs.query`.
+* Replaced function based queries with data driven queries. See `clecs.query`.
 
 
 See Also
 --------
 
--   link:http://gamadu.com/artemis/[Artemis]
--   link:https://github.com/markmandel/brute[brute]
--   link:https://bitbucket.org/mludwig/entreri/overview[entreri]
+* link:http://gamadu.com/artemis/[Artemis]
+* link:https://github.com/markmandel/brute[brute]
+* link:https://bitbucket.org/mludwig/entreri/overview[entreri]
 
 
 License

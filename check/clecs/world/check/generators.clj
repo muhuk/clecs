@@ -1,6 +1,6 @@
 (ns clecs.world.check.generators
   {:no-doc true}
-  (:require [clecs.component :refer [component-label defcomponent]]
+  (:require [clecs.component :refer [defcomponent]]
             [clojure.test.check.generators :as gen]))
 
 
@@ -39,11 +39,11 @@
                                           (gen/tuple gen-eid gen/any gen/any gen/any))]))
 
 
-(def gen-clabel (gen/elements (map component-label [Component01
-                                                    Component02
-                                                    Component03
-                                                    Component04
-                                                    Component05])))
+(def gen-clabel (gen/elements (map (comp :component-type meta) [Component01
+                                                                Component02
+                                                                Component03
+                                                                Component04
+                                                                Component05])))
 
 
 (def gen-dt gen/s-pos-int)

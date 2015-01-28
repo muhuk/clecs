@@ -19,6 +19,7 @@
           :output-dir "target/doc/api"}
   :asciidoctor {:extract-css true
                 :format :html5
+                :source-highlight true
                 :sources "doc/*.adoc"
                 :to-dir "target/doc/guide"
                 :toc :left}

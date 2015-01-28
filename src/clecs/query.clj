@@ -37,8 +37,7 @@
   it is considered bad design to query too many
   components at once.
 
-  See also [[clecs.world.queryable/IQueryableWorld]]."
-  (:require [clecs.component :refer [component-label component-type?]]))
+  See also [[clecs.world.queryable/IQueryableWorld]].")
 
 
 (declare process-element)
@@ -54,8 +53,11 @@
 (defn ^:private process-element [same-keyword]
   (fn [x]
     (cond
-     (component-type? x) [(component-label x)]
+     ;; If it's a component type; pass it as is.
+     (keyword? x) [x]
+     ;; If it's a sub-query of the same type; inline.
      (= (first x) same-keyword) (rest x)
+     ;; If it's a sub-query of another type; pass it as is.
      :else [x])))
 
 
