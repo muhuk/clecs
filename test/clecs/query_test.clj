@@ -1,6 +1,5 @@
 (ns clecs.query-test
-  (:require [clecs.component :refer [component-label
-                                     component-type?]]
+  (:require [clecs.component :refer [component-label component-type?]]
             [clecs.query :refer :all]
             [midje.sweet :refer :all]))
 

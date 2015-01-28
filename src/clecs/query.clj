@@ -38,8 +38,7 @@
   components at once.
 
   See also [[clecs.world.queryable/IQueryableWorld]]."
-  (:require [clecs.component :refer [component-label
-                                     component-type?]]))
+  (:require [clecs.component :refer [component-label component-type?]]))
 
 
 (declare process-element)

@@ -7,11 +7,10 @@
    Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
             [clecs.component :refer [component-label entity-id]]
-            [clecs.world :as world]
+            [clecs.util :refer [map-values]]
             [clecs.world.editable :refer [IEditableWorld]]
             [clecs.world.queryable :refer [IQueryableWorld]]
-            [clecs.world.system :refer [ISystemManager]]
-            [clecs.util :refer [map-values]]))
+            [clecs.world.system :refer [ISystemManager]]))
 
 
 (def ^:no-doc initial_state {:components {}

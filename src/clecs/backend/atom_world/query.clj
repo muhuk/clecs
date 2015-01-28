@@ -1,7 +1,6 @@
 (ns clecs.backend.atom-world.query
   {:no-doc true}
-  (:require [clecs.component :refer [component-label]]
-            [clecs.query :refer [query?]]))
+  (:require [clecs.query :refer [query?]]))
 
 
 (declare make-pred)

@@ -1,6 +1,5 @@
 (ns clecs.backend.atom-world.query-test
   (:require [clecs.backend.atom-world.query :refer :all]
-            [clecs.component :refer [component-label]]
             [midje.sweet :refer :all]))
 
 
