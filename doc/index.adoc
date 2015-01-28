@@ -46,6 +46,13 @@ API Documentation
 Changelog
 ---------
 
+Changes Since Version 1.1.x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Systems run inside an implicit transaction. ITransactableWorld is
+removed.
+
+
 Changes Since Version 1.0.x
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
