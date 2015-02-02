@@ -9,9 +9,7 @@
             [lein-asciidoctor "0.1.12"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
-  :profiles {:dev {:source-paths ["check"]
-                   :dependencies [[midje "1.6.3"]
-                                  [org.clojure/test.check "0.6.2"]]}
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
@@ -26,9 +24,4 @@
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
-            "docs" ["do" "doc," "asciidoctor"]
-            "quickcheck"
-            ^{:doc (str "Run quick-check to compare a backend against clecs.backend.atom-world\n"
-                        "\n"
-                        "    lein quickcheck $PATH.TO.WORLD/INITIALIZER $SAMPLES")}
-            ["run" "-m" "clecs.world.check"]})
+            "docs" ["do" "doc," "asciidoctor"]})
