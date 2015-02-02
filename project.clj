@@ -24,4 +24,4 @@
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
-            "docs" ["do" "doc," "asciidoctor"]})
+            "docs" ["do" "doc," "asciidoctor," "cloverage"]})

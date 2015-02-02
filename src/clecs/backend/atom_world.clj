@@ -21,7 +21,6 @@
        :no-doc true} *state*)
 
 
-
 (declare -transaction!)
 
 
@@ -68,30 +67,24 @@
                       (:entities *state*)))))
 
 
-(deftype AtomWorld [systems-atom state editable-world]
+(deftype AtomWorld [systems state editable-world]
   ISystemManager
   (process! [this dt]
-            (doseq [s (->> @systems-atom
-                           (vals)
-                           (map :process))]
+            (doseq [s (map :process (vals systems))]
               (-transaction! this s dt))
-            this)
-  (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
-  (set-system! [this slabel s]
-               (swap! systems-atom assoc slabel s)
-               this)
-  (systems [_] (seq @systems-atom)))
+            this))
 
 
-(defn make-world
-  "Makes a new `AtomWorld`. Use [[clecs.core/make-world]]
-   instead of calling this directly."
-  [initializer-fn]
-  (let [state (atom initial_state)
-        systems (atom {})
-        editable-world (->AtomEditableWorld)]
-    (doto (->AtomWorld systems state editable-world)
-      (-transaction! (fn [w _] (initializer-fn w)) nil))))
+;; TODO: Do something with the components passed.
+(defn atom-world [component-defs
+                  initial-transaction
+                  systems]
+  (doto (->AtomWorld (->> systems
+                          (map (juxt :name identity))
+                          (into {}))
+                     (atom initial_state)
+                     (->AtomEditableWorld))
+    (-transaction! (fn [w _] (initial-transaction w)) nil)))
 
 
 (defn ^:no-doc -transaction! [world f dt]

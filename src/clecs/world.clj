@@ -113,6 +113,3 @@
 
 ;; Functions delegating to ISystemManager
 (defn process! [w dt] (system/process! w dt))
-(defn remove-system! [w slabel] (system/remove-system! w slabel))
-(defn set-system! [w slabel s] (system/set-system! w slabel s))
-(defn systems [w] (system/systems w))

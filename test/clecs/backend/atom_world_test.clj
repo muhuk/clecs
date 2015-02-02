@@ -22,12 +22,13 @@
 
 ;; World Initialization.
 
+
 (fact "Atom world implements ISystemManager."
-      (make-world --init--) => (implements-protocols ISystemManager))
+      (atom-world ..components.. --init-- ..systems..) => (implements-protocols ISystemManager))
 
 
 (fact "Initialization function is called within a transaction."
-      (make-world --init--) => irrelevant
+      (atom-world ..components.. --init-- ..systems..) => irrelevant
       (provided (--init-- (as-checker editable-world-like)) => irrelevant))
 
 
@@ -37,43 +38,20 @@
         (provided (--f-- ..editable-world.. ..dt..) => irrelevant)))
 
 
-;; System Operations
-
-(fact "remove-system! unregisters the system with the system-label."
-      (let [w (-> (make-world --init--)
-                  (world/set-system! ..system-label.. {:process ..system..}))]
-        (world/systems w) => (seq {..system-label.. {:process ..system..}})
-        (world/remove-system! w ..system-label..) => w
-        (world/systems w) => (seq {})))
-
-
-(fact "set-system! registers a system with the system-label."
-      (let [w (make-world --init--)]
-        (world/systems w) => (seq {})
-        (world/set-system! w ..system-label.. {:process ..system..}) => w
-        (world/systems w) => (seq {..system-label.. {:process ..system..}})))
-
-
-(fact "systems returns a seq of [system-label system] pairs."
-      (-> (make-world --init--)
-          (world/set-system! ..system-label.. {:process ..system..})
-          (world/systems)) => (seq {..system-label.. {:process ..system..}}))
-
-
 ;; Processing
 
 (fact "process! returns the world."
-      (let [w (make-world --init--)]
+      (let [w (atom-world ..components.. --init-- ..systems..)]
         (world/process! w ..dt..) => w))
 
 
 (fact "process! calls each system with the world and delta time."
       (let [calls (atom [])
-            s-one {:process (fn [& args] (swap! calls conj [:one-called args]))}
-            s-two {:process (fn [& args] (swap! calls conj [:two-called args]))}
-            w (-> (make-world --init--)
-                  (world/set-system! ..l-one.. s-one)
-                  (world/set-system! ..l-two.. s-two))]
+            s-one {:name :s-one
+                   :process (fn [& args] (swap! calls conj [:one-called args]))}
+            s-two {:name :s-two
+                   :process (fn [& args] (swap! calls conj [:two-called args]))}
+            w (atom-world ..components.. --init-- [s-one s-two])]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
         (-> @calls first second first) => editable-world-like
