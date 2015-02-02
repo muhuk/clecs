@@ -18,8 +18,7 @@
    :   Entity id.
 
    ctype
-   :   Component type. If you have a reference to a
-       `component` instance, use `(type component)`.")
+   :   Component type.")
   (remove-entity
    [this eid]
    "Delete the entity with `eid`, all components
@@ -32,14 +31,17 @@
    eid
    :   Entity id.")
   (set-component
-   [this c]
-   "Add component `c` to the world and return `nil`.
-
-   Entity id is already associated with `c`. If the
-   entity already has a component with the same type it
-   will be replaced.
+   [this eid ctype cdata]
+   "Set `eid`'s `ctype` component as `cdata` and return
+   `nil`.
 
    #### Parameters:
 
-   c
-   :   Component instance."))
+   eid
+   :   Entity id.
+
+   ctype
+   :   Component type.
+
+   cdata
+   :   Component data as a map."))

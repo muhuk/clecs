@@ -1,17 +1,6 @@
 (ns clecs.component)
 
 
-;; TODO: Change IEditableWorld/set-component to accept
-;;       an explicit component-type & eid.
-;;
-;;       Then remove this.
-(defn entity-id [this]
-  (-> (meta this)
-      (:entity-id-key)
-      (keyword)
-      (this)))
-
-
 (defmacro ^{:deprecated "1.1.0"} defcomponent
   "Creates a component type.
 

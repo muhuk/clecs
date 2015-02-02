@@ -103,7 +103,7 @@
 (defn add-entity [w] (editable/add-entity w))
 (defn remove-component [w eid ctype] (editable/remove-component w eid ctype))
 (defn remove-entity [w eid] (editable/remove-entity w eid))
-(defn set-component [w c] (editable/set-component w c))
+(defn set-component [w eid ctype cdata] (editable/set-component w eid ctype cdata))
 
 
 ;; Functions delegating to IQueryableWorld

@@ -39,11 +39,11 @@
                                           (gen/tuple gen-eid gen/any gen/any gen/any))]))
 
 
-(def gen-clabel (gen/elements (map (comp :component-type meta) [Component01
-                                                                Component02
-                                                                Component03
-                                                                Component04
-                                                                Component05])))
+(def gen-ctype (gen/elements [:clecs.world.check.generators/Component01
+                              :clecs.world.check.generators/Component02
+                              :clecs.world.check.generators/Component03
+                              :clecs.world.check.generators/Component04
+                              :clecs.world.check.generators/Component05]))
 
 
 (def gen-dt gen/s-pos-int)
@@ -112,7 +112,7 @@
 (def gen-cmd-remove-component (gen/hash-map :type (gen/return :command)
                                             :method (gen/return `world/remove-component)
                                             :params (gen/tuple (make-value gen-eid)
-                                                               (make-value gen-clabel))))
+                                                               (make-value gen-ctype))))
 
 
 (def gen-cmd-remove-entity (gen/hash-map :type (gen/return :command)
@@ -130,7 +130,7 @@
 (def gen-cmd-component (gen/hash-map :type (gen/return :command)
                                      :method (gen/return `world/component)
                                      :params (gen/tuple (make-value gen-eid)
-                                                        (make-value gen-clabel))))
+                                                        (make-value gen-ctype))))
 
 
 (def gen-cmd-query (gen/hash-map :type (gen/return :command)

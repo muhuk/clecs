@@ -6,7 +6,6 @@
 
    Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [entity-id]]
             [clecs.util :refer [map-values]]
             [clecs.world.editable :refer [IEditableWorld]]
             [clecs.world.queryable :refer [IQueryableWorld]]
@@ -50,14 +49,12 @@
                                 (update-in [:components]
                                            (partial map-values #(dissoc % eid))))))
                  this)
-  (set-component [this c]
-                 (let [clabel ((comp :component-type meta) c)
-                       eid (entity-id c)]
-                   (var-set #'*state*
-                            (-> *state*
-                                (update-in [:entities eid] conj clabel)
-                                (update-in [:components clabel] #(or % {}))
-                                (update-in [:components clabel] conj [eid c]))))
+  (set-component [this eid ctype cdata]
+                 (var-set #'*state*
+                          (-> *state*
+                              (update-in [:entities eid] conj ctype)
+                              (update-in [:components ctype] #(or % {}))
+                              (update-in [:components ctype] conj [eid cdata])))
                  this)
   IQueryableWorld
   (component [_ eid ctype] (get-in *state* [:components ctype eid]))

@@ -51,15 +51,30 @@ Changelog
 * Systems run inside an implicit transaction. ITransactableWorld is
 removed.
 
+* `world/set-component` accepts entity-id and component type explicitly.
++
+[source, Clojure]
+----
+;; Old way:
+(comment
+  (def c (->SomeComponent eid x y))
+  (world/set-component w c))
+
+;; New way:
+(world/set-component w eid :my.ns/SomeComponent {:x x :y y})
+----
+
 * Queries are constructed using component type keywords instead
 of records:
 +
 [source, Clojure]
 ----
+;; Old way:
 (comment
   (defrecord SomeComponent [eid])
   (def q (all SomeComponent)))
 
+;; New way:
 (def q (all :my.ns/SomeComponent))
 ----
 

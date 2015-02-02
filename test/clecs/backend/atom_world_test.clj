@@ -175,27 +175,27 @@
 (fact "world/set-component adds the component if entity doesn't have one."
       (let [w (->AtomEditableWorld)
             eid 1
-            c (->TestComponentA eid)
+            cdata {}
             ctype :clecs.backend.atom_world_test.TestComponentA
             initial-state {:components {}
                            :entities {eid #{}}}
-            expected-state {:components {ctype {eid c}}
+            expected-state {:components {ctype {eid cdata}}
                             :entities {eid #{ctype}}}]
         (binding [*state* initial-state]
-          (world/set-component w c) => w
+          (world/set-component w eid ctype cdata) => w
           *state* => expected-state)))
 
 
 (fact "world/set-component replaces existing components."
       (let [w (->AtomEditableWorld)
             eid 1
-            c-old (->TestComponentB eid ..a.. ..b..)
-            c-new (->TestComponentB eid ..c.. ..d..)
+            c-old {:a ..a.. :b ..b..}
+            c-new {:a ..c.. :b ..d..}
             ctype :clecs.backend.atom_world_test.TestComponentB
             initial-state {:components {ctype {eid c-old}}
                             :entities {eid #{ctype}}}
             expected-state {:components {ctype {eid c-new}}
                             :entities {eid #{ctype}}}]
         (binding [*state* initial-state]
-          (world/set-component w c-new) => w
+          (world/set-component w eid ctype c-new) => w
           *state* => expected-state)))
