@@ -78,10 +78,8 @@
             this)
   (remove-system! [this slabel] (swap! systems-atom dissoc slabel) this)
   (set-system! [this slabel s]
-               (let [s* (cond (fn? s) {:process s}
-                              (map? s) s
-                              :default (throw (RuntimeException. "Invalid system.")))]
-                 (swap! systems-atom assoc slabel s*) this))
+               (swap! systems-atom assoc slabel s)
+               this)
   (systems [_] (seq @systems-atom)))
 
 

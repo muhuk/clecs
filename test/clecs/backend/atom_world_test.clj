@@ -54,14 +54,6 @@
         (world/systems w) => (seq {..system-label.. {:process ..system..}})))
 
 
-(fact "set-system! registers a function system by wrapping it into a map."
-      (let [w (make-world --init--)
-            sys-fn (fn [_ _] nil)]
-        (world/systems w) => nil
-        (world/set-system! w ..system-label.. sys-fn) => w
-        (world/systems w) => (seq {..system-label.. {:process sys-fn}})))
-
-
 (fact "systems returns a seq of [system-label system] pairs."
       (-> (make-world --init--)
           (world/set-system! ..system-label.. {:process ..system..})
@@ -77,11 +69,11 @@
 
 (fact "process! calls each system with the world and delta time."
       (let [calls (atom [])
-            f-one (fn [& args] (swap! calls conj [:one-called args]))
-            f-two (fn [& args] (swap! calls conj [:two-called args]))
+            s-one {:process (fn [& args] (swap! calls conj [:one-called args]))}
+            s-two {:process (fn [& args] (swap! calls conj [:two-called args]))}
             w (-> (make-world --init--)
-                  (world/set-system! ..l-one.. f-one)
-                  (world/set-system! ..l-two.. f-two))]
+                  (world/set-system! ..l-one.. s-one)
+                  (world/set-system! ..l-two.. s-two))]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
         (-> @calls first second first) => editable-world-like
