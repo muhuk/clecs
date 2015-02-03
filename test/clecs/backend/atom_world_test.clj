@@ -20,8 +20,8 @@
 ;; World Initialization.
 
 
-(fact "Atom world implements ISystemManager."
-      (atom-world ..components.. --init-- ..systems..) => (implements-protocols world/ISystemManager))
+(fact "Atom world implements IWorld."
+      (atom-world ..components.. --init-- ..systems..) => (implements-protocols world/IWorld))
 
 
 (fact "Initialization function is called within a transaction."

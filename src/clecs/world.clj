@@ -76,8 +76,7 @@
   processing*. You can add, remove and query
   systems. You can also process the world. Processing
   means running all the systems and possibly modify
-  its contents. The objects extend `ISystemManager`
-  in this mode.
+  its contents. The objects extend `IWorld` in this mode.
 
   Systems are called with two parameters; a reference
   to an editable world and the since last time the
@@ -88,8 +87,8 @@
   Modes of execution and relevant protocols are
   summarized in the table below:
 
-  | Processing  | In Transaction | ISystemManager | IQueryableWorld | IEditableWorld |
-  | :----------:|:--------------:|:--------------:|:---------------:|:--------------:|
+  | Processing  | In Transaction | IWorld | IQueryableWorld | IEditableWorld |
+  | :----------:|:--------------:|:------:|:---------------:|:--------------:|
   |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |
   |  ✔  |  ✔  |  ✘  |  ✔  |  ✔  |
   ")
@@ -167,8 +166,7 @@
        info."))
 
 
-;; TODO Rename this as IWorld
-(defprotocol ISystemManager
+(defprotocol IWorld
   (process!
    [this dt]
    "Run systems using `dt` as time increment.
