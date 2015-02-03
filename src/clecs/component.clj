@@ -1,6 +1,14 @@
 (ns clecs.component)
 
 
+(declare make-validator)
+
+
+(defmacro component [ctype cdata]
+  `{:ctype ~ctype
+    :valid? ~(make-validator cdata)})
+
+
 (defmacro ^{:deprecated "1.1.0"} defcomponent
   "Creates a component type.
 
@@ -47,3 +55,12 @@
          (~map-fn-name (hash-map ~@(mapcat #(vector (keyword %) %) all-params))))
        (def ~component-name (with-meta {:name ~component-type}
                                        ~(assoc metadata :type :component-type))))))
+
+
+(defn- make-validator [cdata]
+  `(fn [c#]
+     (= (count c#) ~(count cdata))))
+
+
+(defn valid? [c cdata]
+  ((:valid? c) cdata))

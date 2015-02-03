@@ -167,7 +167,5 @@
           (world/set-component w eid ctype c-new) => w
           *state* => expected-state)))
 
-(future-fact "world/set-component validates component keys.")
 
-
-(future-fact "world/set-component validates types of values in data.")
+(future-fact "world/set-component validates components.")
