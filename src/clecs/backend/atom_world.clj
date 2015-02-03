@@ -73,7 +73,6 @@
             this))
 
 
-;; TODO: Do something with the components passed.
 (defn atom-world [component-defs
                   initial-transaction
                   systems]
