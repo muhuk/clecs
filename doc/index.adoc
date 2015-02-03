@@ -110,6 +110,8 @@ of records:
 
 ** `clecs.component/component-type?`
 
+** `clecs.component/defcomponent`
+
 * Removed support for systems as functions.
 
 * Deprecated `IComponent` is removed.

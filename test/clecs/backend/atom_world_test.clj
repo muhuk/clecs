@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [defcomponent]]
+            [clecs.component :refer [component]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -11,10 +11,10 @@
                                                world/IQueryableWorld))
 
 
-(defcomponent TestComponentA [eid])
+(component ::TestComponentA {})
 
 
-(defcomponent TestComponentB [eid a b])
+(component ::TestComponentB {:a nil :b nil})
 
 
 ;; World Initialization.
@@ -129,7 +129,7 @@
 
 (fact "world/remove-entity removes entity's components."
       (let [w (->AtomEditableWorld)
-            ctype :clecs.backend.atom_world_test.TestComponentA
+            ctype ::TestComponentA
             initial-state {:components {ctype {..eid.. ..i.. ..other-eid.. ..j..}}
                            :entities {}}
             expected-state {:components {ctype {..other-eid.. ..j..}}
@@ -143,7 +143,7 @@
       (let [w (->AtomEditableWorld)
             eid 1
             cdata {}
-            ctype :clecs.backend.atom_world_test.TestComponentA
+            ctype ::TestComponentA
             initial-state {:components {}
                            :entities {eid #{}}}
             expected-state {:components {ctype {eid cdata}}
@@ -158,7 +158,7 @@
             eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
-            ctype :clecs.backend.atom_world_test.TestComponentB
+            ctype ::TestComponentB
             initial-state {:components {ctype {eid c-old}}
                             :entities {eid #{ctype}}}
             expected-state {:components {ctype {eid c-new}}
