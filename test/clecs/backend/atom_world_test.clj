@@ -4,14 +4,11 @@
             [clecs.component :refer [defcomponent]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
-            [clecs.world.editable :refer [IEditableWorld]]
-            [clecs.world.queryable :refer [IQueryableWorld]]
-            [clecs.world.system :refer [ISystemManager]]
             [midje.sweet :refer :all]))
 
 
-(def editable-world-like (implements-protocols IEditableWorld
-                                               IQueryableWorld))
+(def editable-world-like (implements-protocols world/IEditableWorld
+                                               world/IQueryableWorld))
 
 
 (defcomponent TestComponentA [eid])
@@ -24,7 +21,7 @@
 
 
 (fact "Atom world implements ISystemManager."
-      (atom-world ..components.. --init-- ..systems..) => (implements-protocols ISystemManager))
+      (atom-world ..components.. --init-- ..systems..) => (implements-protocols world/ISystemManager))
 
 
 (fact "Initialization function is called within a transaction."

@@ -92,24 +92,94 @@
   | :----------:|:--------------:|:--------------:|:---------------:|:--------------:|
   |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |
   |  ✔  |  ✔  |  ✘  |  ✔  |  ✔  |
-  "
-  (:require [clecs.world.editable :as editable]
-            [clecs.world.queryable :as queryable]
-            [clecs.world.system :as system]))
+  ")
 
 
+(defprotocol IEditableWorld
+  (add-entity
+   [this]
+   "Create a new entity in the world and return its id.")
+  (remove-component
+   [this eid ctype]
+   "Remove the component of type `ctype` that is associated
+   with `eid` and return `nil`.
 
-;; Functions delegating to IEditableWorld
-(defn add-entity [w] (editable/add-entity w))
-(defn remove-component [w eid ctype] (editable/remove-component w eid ctype))
-(defn remove-entity [w eid] (editable/remove-entity w eid))
-(defn set-component [w eid ctype cdata] (editable/set-component w eid ctype cdata))
+   This method is a no-op if there is no relevant component.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.
+
+   ctype
+   :   Component type.")
+  (remove-entity
+   [this eid]
+   "Delete the entity with `eid`, all components
+   associated with it and return `nil`.
+
+   This method is a no-op if there is no relevant entity.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.")
+  (set-component
+   [this eid ctype cdata]
+   "Set `eid`'s `ctype` component as `cdata` and return
+   `nil`.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.
+
+   ctype
+   :   Component type.
+
+   cdata
+   :   Component data as a map."))
 
 
-;; Functions delegating to IQueryableWorld
-(defn component [w eid ctype] (queryable/component w eid ctype))
-(defn query [w q] (queryable/query w q))
+(defprotocol IQueryableWorld
+  (component
+   [this eid ctype]
+   "Return the component of type `ctype` associated with
+   `eid`, or `nil` if none found.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.
+
+   ctype
+   :   Component type. If you have a reference to a
+       `component` instance, use `(type component)`.")
+  (query
+   [this q]
+   "Return a sequence of entity id's using `q` as
+   filter criteria.
+
+   #### Parameters:
+
+   q
+   :   A query object. See [[clecs.query]] for more
+       info."))
 
 
-;; Functions delegating to ISystemManager
-(defn process! [w dt] (system/process! w dt))
+;; TODO Rename this as IWorld
+(defprotocol ISystemManager
+  (process!
+   [this dt]
+   "Run systems using `dt` as time increment.
+
+   This is the function that will be called in
+   the main loop.
+
+   #### Parameters:
+
+   dt
+   :   Time passed since process! was called last
+       time. This value is passed to the systems.
+       It is recommended to use miliseconds as
+       unit."))
