@@ -11,12 +11,6 @@
                                                world/IQueryableWorld))
 
 
-(component ::TestComponentA {})
-
-
-(component ::TestComponentB {:a nil :b nil})
-
-
 ;; World Initialization.
 
 
@@ -61,25 +55,25 @@
 
 (fact "world/add-entity returns a new entity id."
       (binding [*state* {:last-entity-id 0}]
-        (world/add-entity (->AtomEditableWorld)) => 1)
+        (world/add-entity (->AtomEditableWorld nil)) => 1)
       (binding [*state* {:last-entity-id 41}]
-        (world/add-entity (->AtomEditableWorld)) => 42))
+        (world/add-entity (->AtomEditableWorld nil)) => 42))
 
 
 (fact "world/add-entity adds the new entity-id to the entity index."
       (binding [*state* {:last-entity-id 0}]
-        (let [eid (world/add-entity (->AtomEditableWorld))]
+        (let [eid (world/add-entity (->AtomEditableWorld nil))]
           (get-in *state* [:entities eid]) => #{})))
 
 
 (fact "world/add-entity updates entity counter."
       (binding [*state* {:last-entity-id 0}]
-        (world/add-entity (->AtomEditableWorld))
+        (world/add-entity (->AtomEditableWorld nil))
         (:last-entity-id *state*) => 1))
 
 
 (fact "world/add-entity returns different values each time it's called."
-      (let [w (->AtomEditableWorld)]
+      (let [w (->AtomEditableWorld nil)]
         (binding [*state* {:entities {}
                            :last-entity-id 0}]
           (repeatedly 42 #(world/add-entity w)) => (comp #(= % 42) count set))))
@@ -87,13 +81,13 @@
 
 (fact "world/component resolves queried component."
       (binding [*state* {:components {..ctype.. {..eid.. ..component..}}}]
-        (world/component (->AtomEditableWorld) ..eid.. ..ctype..) => ..component..))
+        (world/component (->AtomEditableWorld nil) ..eid.. ..ctype..) => ..component..))
 
 
 (fact "world/query returns a seq."
       (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
                                     ..e2.. #{..c2..}}}]
-        (world/query (->AtomEditableWorld) ..q..) => seq?
+        (world/query (->AtomEditableWorld nil) ..q..) => seq?
         (provided (query/-compile-query ..q..) => (partial some #{..c1..}))))
 
 
@@ -101,12 +95,12 @@
       (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
                                     ..e2.. #{..c2..}
                                     ..e3.. #{..c3..}}}]
-        (sort-by str (world/query (->AtomEditableWorld) ..q..)) => [..e1.. ..e3..]
+        (sort-by str (world/query (->AtomEditableWorld nil) ..q..)) => [..e1.. ..e3..]
         (provided (query/-compile-query ..q..) => (partial some #{..c1.. ..c3..}))))
 
 
 (fact "world/remove-component works."
-      (let [w (->AtomEditableWorld)
+      (let [w (->AtomEditableWorld nil)
             initial-state {:components {..ctype.. {..eid.. ..component..}}
                            :entities {..eid.. #{..ctype..}}}
             expected-state {:components {..ctype.. {}}
@@ -117,7 +111,7 @@
 
 
 (fact "world/remove-entity removes entity-id from entity index."
-      (let [w (->AtomEditableWorld)]
+      (let [w (->AtomEditableWorld nil)]
         (binding [*state* {:components {}
                            :entities {1 #{}}
                            :last-entity-id 1}]
@@ -128,8 +122,8 @@
 
 
 (fact "world/remove-entity removes entity's components."
-      (let [w (->AtomEditableWorld)
-            ctype ::TestComponentA
+      (let [ctype ::TestComponentA
+            w (->AtomEditableWorld [(component ctype {})])
             initial-state {:components {ctype {..eid.. ..i.. ..other-eid.. ..j..}}
                            :entities {}}
             expected-state {:components {ctype {..other-eid.. ..j..}}
@@ -140,10 +134,10 @@
 
 
 (fact "world/set-component adds the component if entity doesn't have one."
-      (let [w (->AtomEditableWorld)
-            eid 1
+      (let [eid 1
             cdata {}
             ctype ::TestComponentA
+            w (->AtomEditableWorld [(component ctype {})])
             initial-state {:components {}
                            :entities {eid #{}}}
             expected-state {:components {ctype {eid cdata}}
@@ -154,11 +148,11 @@
 
 
 (fact "world/set-component replaces existing components."
-      (let [w (->AtomEditableWorld)
-            eid 1
+      (let [eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
             ctype ::TestComponentB
+            w (->AtomEditableWorld [(component ctype {:a nil :b nil})])
             initial-state {:components {ctype {eid c-old}}
                             :entities {eid #{ctype}}}
             expected-state {:components {ctype {eid c-new}}

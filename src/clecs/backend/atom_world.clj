@@ -22,7 +22,7 @@
 (declare -transaction!)
 
 
-(deftype AtomEditableWorld []
+(deftype AtomEditableWorld [components]
   IEditableWorld
   (add-entity [_]
               (let [state *state*
@@ -73,14 +73,14 @@
             this))
 
 
-(defn atom-world [component-defs
+(defn atom-world [components
                   initial-transaction
                   systems]
   (doto (->AtomWorld (->> systems
                           (map (juxt :name identity))
                           (into {}))
                      (atom initial_state)
-                     (->AtomEditableWorld))
+                     (->AtomEditableWorld components))
     (-transaction! (fn [w _] (initial-transaction w)) nil)))
 
 
