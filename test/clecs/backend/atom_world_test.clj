@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [component valid?]]
+            [clecs.component :refer [valid?]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -123,7 +123,7 @@
 
 (fact "world/remove-entity removes entity's components."
       (let [ctype ::TestComponentA
-            w (->AtomEditableWorld [(component ctype {})])
+            w (->AtomEditableWorld nil)
             initial-state {:components {ctype {..eid.. ..i.. ..other-eid.. ..j..}}
                            :entities {}}
             expected-state {:components {ctype {..other-eid.. ..j..}}
@@ -136,13 +136,14 @@
 (fact "world/set-component adds the component if entity doesn't have one."
       (let [eid 1
             cdata {}
-            w (->AtomEditableWorld {::TestComponentA (component ::TestComponentA {})})
+            w (->AtomEditableWorld {::TestComponentA ..c..})
             initial-state {:components {}
                            :entities {eid #{}}}
             expected-state {:components {::TestComponentA {eid cdata}}
                             :entities {eid #{::TestComponentA}}}]
         (binding [*state* initial-state]
           (world/set-component w eid ::TestComponentA cdata) => w
+          (provided (valid? anything anything) => true)
           *state* => expected-state)))
 
 
@@ -150,13 +151,14 @@
       (let [eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
-            w (->AtomEditableWorld {::TestComponentB (component ::TestComponentB {:a nil :b nil})})
+            w (->AtomEditableWorld {::TestComponentB ..c..})
             initial-state {:components {::TestComponentB {eid c-old}}
                             :entities {eid #{::TestComponentB}}}
             expected-state {:components {::TestComponentB {eid c-new}}
                             :entities {eid #{::TestComponentB}}}]
         (binding [*state* initial-state]
           (world/set-component w eid ::TestComponentB c-new) => w
+          (provided (valid? anything anything) => true)
           *state* => expected-state)))
 
 
