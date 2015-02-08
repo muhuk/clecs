@@ -162,6 +162,9 @@
           *state* => expected-state)))
 
 
+(future-fact "world/set-component validates component names.")
+
+
 (fact "world/set-component validates components."
       (let [w (->AtomEditableWorld {::TestComponentA ..c..})
             initial-state {:components {}
