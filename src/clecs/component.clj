@@ -4,14 +4,14 @@
 (declare make-validator)
 
 
-(defmacro component [ctype cdata]
+(defmacro component [ctype cdef]
   `{:ctype ~ctype
-    :valid? ~(make-validator cdata)})
+    :valid? ~(make-validator cdef)})
 
 
-(defn- make-validator [cdata]
+(defn- make-validator [cdef]
   `(fn [c#]
-     (= (count c#) ~(count cdata))))
+     (= (count c#) ~(count cdef))))
 
 
 (defn valid? [c cdata]

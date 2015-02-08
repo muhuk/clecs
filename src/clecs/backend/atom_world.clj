@@ -6,6 +6,7 @@
 
    Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
+            [clecs.component :refer [valid?]]
             [clecs.util :refer [map-values]]
             [clecs.world :refer [IEditableWorld IQueryableWorld IWorld]]))
 
@@ -47,12 +48,15 @@
                                            (partial map-values #(dissoc % eid))))))
                  this)
   (set-component [this eid ctype cdata]
-                 (var-set #'*state*
-                          (-> *state*
-                              (update-in [:entities eid] conj ctype)
-                              (update-in [:components ctype] #(or % {}))
-                              (update-in [:components ctype] conj [eid cdata])))
-                 this)
+                 (if (valid? (first (filterv #(= (:ctype %) ctype) components)) cdata)
+                   (do
+                     (var-set #'*state*
+                              (-> *state*
+                                  (update-in [:entities eid] conj ctype)
+                                  (update-in [:components ctype] #(or % {}))
+                                  (update-in [:components ctype] conj [eid cdata])))
+                     this)
+                   (throw (RuntimeException. "Invalid component data."))))
   IQueryableWorld
   (component [_ eid ctype] (get-in *state* [:components ctype eid]))
   (query [_ q]

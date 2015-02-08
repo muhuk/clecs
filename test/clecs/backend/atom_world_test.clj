@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [component]]
+            [clecs.component :refer [component valid?]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -162,4 +162,12 @@
           *state* => expected-state)))
 
 
-(future-fact "world/set-component validates components.")
+(fact "world/set-component validates components."
+      (let [ctype ::TestComponentA
+            c (component ctype nil)
+            w (->AtomEditableWorld [c])
+            initial-state {:components {}
+                           :entities {..eid.. #{}}}]
+        (binding [*state* initial-state]
+          (world/set-component w ..eid.. ctype ..cdata..) => w
+          (provided (valid? c ..cdata..) => anything))))
