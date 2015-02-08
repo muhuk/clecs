@@ -48,7 +48,7 @@
                                            (partial map-values #(dissoc % eid))))))
                  this)
   (set-component [this eid ctype cdata]
-                 (if (valid? (first (filterv #(= (:ctype %) ctype) components)) cdata)
+                 (if (valid? (components ctype) cdata)
                    (do
                      (var-set #'*state*
                               (-> *state*
@@ -80,12 +80,16 @@
 (defn atom-world [components
                   initial-transaction
                   systems]
-  (doto (->AtomWorld (->> systems
-                          (map (juxt :name identity))
-                          (into {}))
-                     (atom initial_state)
-                     (->AtomEditableWorld components))
-    (-transaction! (fn [w _] (initial-transaction w)) nil)))
+  (let [systems-map (->> systems
+                         (map (juxt :name identity))
+                         (into {}))
+        components-map (->> components
+                         (map (juxt :ctype identity))
+                         (into {}))]
+    (doto (->AtomWorld systems-map
+                       (atom initial_state)
+                       (->AtomEditableWorld components-map))
+      (-transaction! (fn [w _] (initial-transaction w)) nil))))
 
 
 (defn ^:no-doc -transaction! [world f dt]

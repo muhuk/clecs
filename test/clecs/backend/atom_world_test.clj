@@ -136,14 +136,13 @@
 (fact "world/set-component adds the component if entity doesn't have one."
       (let [eid 1
             cdata {}
-            ctype ::TestComponentA
-            w (->AtomEditableWorld [(component ctype {})])
+            w (->AtomEditableWorld {::TestComponentA (component ::TestComponentA {})})
             initial-state {:components {}
                            :entities {eid #{}}}
-            expected-state {:components {ctype {eid cdata}}
-                            :entities {eid #{ctype}}}]
+            expected-state {:components {::TestComponentA {eid cdata}}
+                            :entities {eid #{::TestComponentA}}}]
         (binding [*state* initial-state]
-          (world/set-component w eid ctype cdata) => w
+          (world/set-component w eid ::TestComponentA cdata) => w
           *state* => expected-state)))
 
 
@@ -151,23 +150,20 @@
       (let [eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
-            ctype ::TestComponentB
-            w (->AtomEditableWorld [(component ctype {:a nil :b nil})])
-            initial-state {:components {ctype {eid c-old}}
-                            :entities {eid #{ctype}}}
-            expected-state {:components {ctype {eid c-new}}
-                            :entities {eid #{ctype}}}]
+            w (->AtomEditableWorld {::TestComponentB (component ::TestComponentB {:a nil :b nil})})
+            initial-state {:components {::TestComponentB {eid c-old}}
+                            :entities {eid #{::TestComponentB}}}
+            expected-state {:components {::TestComponentB {eid c-new}}
+                            :entities {eid #{::TestComponentB}}}]
         (binding [*state* initial-state]
-          (world/set-component w eid ctype c-new) => w
+          (world/set-component w eid ::TestComponentB c-new) => w
           *state* => expected-state)))
 
 
 (fact "world/set-component validates components."
-      (let [ctype ::TestComponentA
-            c (component ctype nil)
-            w (->AtomEditableWorld [c])
+      (let [w (->AtomEditableWorld {::TestComponentA ..c..})
             initial-state {:components {}
                            :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (world/set-component w ..eid.. ctype ..cdata..) => w
-          (provided (valid? c ..cdata..) => anything))))
+          (world/set-component w ..eid.. ::TestComponentA ..cdata..) => w
+          (provided (valid? ..c.. ..cdata..) => anything))))
