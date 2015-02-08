@@ -4,8 +4,8 @@
 (declare make-validator)
 
 
-(defmacro component [ctype cdef]
-  `{:ctype ~ctype
+(defmacro component [cname cdef]
+  `{:cname ~cname
     :valid? ~(make-validator cdef)})
 
 

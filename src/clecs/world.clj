@@ -99,8 +99,8 @@
    [this]
    "Create a new entity in the world and return its id.")
   (remove-component
-   [this eid ctype]
-   "Remove the component of type `ctype` that is associated
+   [this eid cname]
+   "Remove the component of type `cname` that is associated
    with `eid` and return `nil`.
 
    This method is a no-op if there is no relevant component.
@@ -110,7 +110,7 @@
    eid
    :   Entity id.
 
-   ctype
+   cname
    :   Component type.")
   (remove-entity
    [this eid]
@@ -124,8 +124,8 @@
    eid
    :   Entity id.")
   (set-component
-   [this eid ctype cdata]
-   "Set `eid`'s `ctype` component as `cdata` and return
+   [this eid cname cdata]
+   "Set `eid`'s `cname` component as `cdata` and return
    `nil`.
 
    #### Parameters:
@@ -133,7 +133,7 @@
    eid
    :   Entity id.
 
-   ctype
+   cname
    :   Component type.
 
    cdata
@@ -142,8 +142,8 @@
 
 (defprotocol IQueryableWorld
   (component
-   [this eid ctype]
-   "Return the component of type `ctype` associated with
+   [this eid cname]
+   "Return the component of type `cname` associated with
    `eid`, or `nil` if none found.
 
    #### Parameters:
@@ -151,7 +151,7 @@
    eid
    :   Entity id.
 
-   ctype
+   cname
    :   Component type. If you have a reference to a
        `component` instance, use `(type component)`.")
   (query

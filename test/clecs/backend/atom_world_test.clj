@@ -80,8 +80,8 @@
 
 
 (fact "world/component resolves queried component."
-      (binding [*state* {:components {..ctype.. {..eid.. ..component..}}}]
-        (world/component (->AtomEditableWorld nil) ..eid.. ..ctype..) => ..component..))
+      (binding [*state* {:components {..cname.. {..eid.. ..component..}}}]
+        (world/component (->AtomEditableWorld nil) ..eid.. ..cname..) => ..component..))
 
 
 (fact "world/query returns a seq."
@@ -101,12 +101,12 @@
 
 (fact "world/remove-component works."
       (let [w (->AtomEditableWorld nil)
-            initial-state {:components {..ctype.. {..eid.. ..component..}}
-                           :entities {..eid.. #{..ctype..}}}
-            expected-state {:components {..ctype.. {}}
+            initial-state {:components {..cname.. {..eid.. ..component..}}
+                           :entities {..eid.. #{..cname..}}}
+            expected-state {:components {..cname.. {}}
                             :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (world/remove-component w ..eid.. ..ctype..) => w
+          (world/remove-component w ..eid.. ..cname..) => w
           *state* => expected-state)))
 
 
@@ -122,11 +122,11 @@
 
 
 (fact "world/remove-entity removes entity's components."
-      (let [ctype ::TestComponentA
+      (let [cname ::TestComponentA
             w (->AtomEditableWorld nil)
-            initial-state {:components {ctype {..eid.. ..i.. ..other-eid.. ..j..}}
+            initial-state {:components {cname {..eid.. ..i.. ..other-eid.. ..j..}}
                            :entities {}}
-            expected-state {:components {ctype {..other-eid.. ..j..}}
+            expected-state {:components {cname {..other-eid.. ..j..}}
                             :entities {}}]
         (binding [*state* initial-state]
           (world/remove-entity w ..eid..) => w

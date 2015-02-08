@@ -33,11 +33,11 @@
                              (assoc-in [:entities eid] #{})
                              (assoc :last-entity-id eid)))
                 eid))
-  (remove-component [this eid ctype]
+  (remove-component [this eid cname]
                     (var-set #'*state*
                              (-> *state*
-                                 (update-in [:entities eid] disj ctype)
-                                 (update-in [:components ctype] dissoc eid)))
+                                 (update-in [:entities eid] disj cname)
+                                 (update-in [:components cname] dissoc eid)))
                     this)
   (remove-entity [this eid]
                  (let [state *state*]
@@ -47,18 +47,18 @@
                                 (update-in [:components]
                                            (partial map-values #(dissoc % eid))))))
                  this)
-  (set-component [this eid ctype cdata]
-                 (if (valid? (components ctype) cdata)
+  (set-component [this eid cname cdata]
+                 (if (valid? (components cname) cdata)
                    (do
                      (var-set #'*state*
                               (-> *state*
-                                  (update-in [:entities eid] conj ctype)
-                                  (update-in [:components ctype] #(or % {}))
-                                  (update-in [:components ctype] conj [eid cdata])))
+                                  (update-in [:entities eid] conj cname)
+                                  (update-in [:components cname] #(or % {}))
+                                  (update-in [:components cname] conj [eid cdata])))
                      this)
                    (throw (RuntimeException. "Invalid component data."))))
   IQueryableWorld
-  (component [_ eid ctype] (get-in *state* [:components ctype eid]))
+  (component [_ eid cname] (get-in *state* [:components cname eid]))
   (query [_ q]
          (let [f (query/-compile-query q)]
            (reduce-kv (fn [coll k v]
@@ -84,7 +84,7 @@
                          (map (juxt :name identity))
                          (into {}))
         components-map (->> components
-                         (map (juxt :ctype identity))
+                         (map (juxt :cname identity))
                          (into {}))]
     (doto (->AtomWorld systems-map
                        (atom initial_state)

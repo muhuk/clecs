@@ -47,5 +47,5 @@
        (-compile-query [:not-a-query-node]) => (throws IllegalArgumentException)
        (-compile-query [:all]) => (throws IllegalArgumentException)
        (-compile-query [:any]) => (throws IllegalArgumentException)
-       (-compile-query [:all ..ctype..]) => fn?
-       (-compile-query [:any ..ctype..]) => fn?)
+       (-compile-query [:all ..component-name..]) => fn?
+       (-compile-query [:any ..component-name..]) => fn?)

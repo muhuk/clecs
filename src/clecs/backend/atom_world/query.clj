@@ -7,8 +7,8 @@
 
 
 (defn- all-loop [qelems pred]
-  (loop [[ctype-or-sub-query & rest-of-query] qelems]
-    (if (pred ctype-or-sub-query)
+  (loop [[cname-or-sub-query & rest-of-query] qelems]
+    (if (pred cname-or-sub-query)
       (if (empty? rest-of-query)
         true
         (recur rest-of-query))
@@ -16,8 +16,8 @@
 
 
 (defn- any-loop [qelems pred]
-  (loop [[ctype-or-sub-query & rest-of-query] qelems]
-    (if (pred ctype-or-sub-query)
+  (loop [[cname-or-sub-query & rest-of-query] qelems]
+    (if (pred cname-or-sub-query)
       true
       (if (empty? rest-of-query)
         false
@@ -29,17 +29,17 @@
         loop-fn (case query-type
                   :all all-loop
                   :any any-loop)]
-    (fn [ctypes]
-      (let [pred (make-pred ctypes)]
+    (fn [component-names]
+      (let [pred (make-pred component-names)]
         (loop-fn query-elements pred)))))
 
 
-(defn- make-pred [ctypes]
-  (let [set-of-component-types (set ctypes)]
+(defn- make-pred [component-names]
+  (let [set-of-component-names (set component-names)]
     (fn [query-elem]
       (if (query? query-elem)
-        ((compile-query* query-elem) ctypes)
-        (set-of-component-types query-elem)))))
+        ((compile-query* query-elem) component-names)
+        (set-of-component-names query-elem)))))
 
 
 (defn -compile-query [q]
