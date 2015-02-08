@@ -4,26 +4,25 @@
 
 
 (fact "A component with no parameters always validate."
-      (valid? (component :Foo {}) {}) => true)
+      (validate (component :Foo {}) {}) => nil)
 
 
 (fact "Number of parameters are validated."
-      (valid? (component :Foo {:a nil :b nil}) {}) => false
-      (valid? (component :Foo
-                         {:a nil :b nil})
-              {:a anything}) => false
-      (valid? (component :Foo
-                         {:a nil :b nil})
-              {:a anything
-               :b anything}) => true
-      (valid? (component :Foo
-                         {:a nil :b nil})
-              {:a anything
-               :b anything
-               :c anything}) => false)
+      (let [c (component :Foo {:a nil :b nil})]
+        (validate c {}) => (throws RuntimeException)
+        (validate c {:a anything}) => (throws RuntimeException)
+        (validate c {:a anything :b anything}) => nil
+        (validate c {:a anything
+                     :b anything
+                     :c anything}) => (throws RuntimeException)))
 
 
-(future-fact "Parameter keys are validated.")
+(fact "Parameter keys are validated."
+      (let [c (component :Foo {:a nil :b nil})]
+        (validate c {:a anything :b anything}) => nil
+        (validate c {:c anything :b anything}) => (throws RuntimeException)
+        (validate c {:a anything :d anything}) => (throws RuntimeException)
+        (validate c {:c anything :d anything}) => (throws RuntimeException)))
 
 
 (future-fact "Parameter values are validated.")

@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [valid?]]
+            [clecs.component :refer [validate]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -143,7 +143,7 @@
                             :entities {eid #{::TestComponentA}}}]
         (binding [*state* initial-state]
           (world/set-component w eid ::TestComponentA cdata) => w
-          (provided (valid? anything anything) => true)
+          (provided (validate anything anything) => nil)
           *state* => expected-state)))
 
 
@@ -158,7 +158,7 @@
                             :entities {eid #{::TestComponentB}}}]
         (binding [*state* initial-state]
           (world/set-component w eid ::TestComponentB c-new) => w
-          (provided (valid? anything anything) => true)
+          (provided (validate anything anything) => nil)
           *state* => expected-state)))
 
 
@@ -171,4 +171,4 @@
                            :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
           (world/set-component w ..eid.. ::TestComponentA ..cdata..) => w
-          (provided (valid? ..c.. ..cdata..) => anything))))
+          (provided (validate ..c.. ..cdata..) => anything))))
