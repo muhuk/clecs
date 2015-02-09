@@ -162,7 +162,12 @@
           *state* => expected-state)))
 
 
-(future-fact "world/set-component validates component names.")
+(fact "world/set-component validates component names."
+      (world/set-component (->AtomEditableWorld nil)
+                           ..eid..
+                           ::TestComponentB
+                           {:a ..a.. :b ..b..}) => (throws RuntimeException
+                                                           #"Unknown"))
 
 
 (fact "world/set-component validates components."
