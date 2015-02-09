@@ -8,21 +8,41 @@
 
 
 (fact "Number of parameters are validated."
-      (let [c (component :Foo {:a nil :b nil})]
-        (validate c {}) => (throws RuntimeException)
-        (validate c {:a anything}) => (throws RuntimeException)
-        (validate c {:a anything :b anything}) => nil
+      (let [c (component :Foo {:a Int :b Str})]
+        (validate c {}) => (throws RuntimeException #"parameters")
+        (validate c {:a anything}) => (throws RuntimeException #"parameters")
+        (validate c {:a anything
+                     :b anything}) =not=> (throws RuntimeException #"parameters")
         (validate c {:a anything
                      :b anything
-                     :c anything}) => (throws RuntimeException)))
+                     :c anything}) => (throws RuntimeException #"parameters")))
 
 
 (fact "Parameter keys are validated."
-      (let [c (component :Foo {:a nil :b nil})]
-        (validate c {:a anything :b anything}) => nil
-        (validate c {:c anything :b anything}) => (throws RuntimeException)
-        (validate c {:a anything :d anything}) => (throws RuntimeException)
-        (validate c {:c anything :d anything}) => (throws RuntimeException)))
+      (let [c (component :Bar {:a Str :b Bool})]
+        (validate c {:a anything :b anything}) =not=> (throws RuntimeException #"parameters")
+        (validate c {:c anything :b anything}) => (throws RuntimeException #"parameters")
+        (validate c {:a anything :d anything}) => (throws RuntimeException #"parameters")
+        (validate c {:c anything :d anything}) => (throws RuntimeException #"parameters")))
 
 
-(future-fact "Parameter values are validated.")
+(facts "Parameter values are validated."
+       (fact "Booleans are validated."
+             (let [c (component :Baz {:x Bool})]
+               (validate c {:x true}) => nil
+               (validate c {:x false}) => nil
+               (validate c {:x 3}) => (throws RuntimeException #"not a valid")
+               (validate c {:x "Fubar"}) => (throws RuntimeException #"not a valid")))
+
+       (fact "Integers are validated."
+             (let [c (component :Baz {:x Int})]
+               (validate c {:x 3}) => nil
+               (validate c {:x true}) => (throws RuntimeException #"not a valid")
+               (validate c {:x false}) => (throws RuntimeException #"not a valid")
+               (validate c {:x "Fubar"}) => (throws RuntimeException #"not a valid")))
+       (fact "Strings are validated."
+             (let [c (component :Baz {:x Str})]
+               (validate c {:x "Fubar"}) => nil
+               (validate c {:x true}) => (throws RuntimeException #"not a valid")
+               (validate c {:x false}) => (throws RuntimeException #"not a valid")
+               (validate c {:x 3}) => (throws RuntimeException #"not a valid"))))

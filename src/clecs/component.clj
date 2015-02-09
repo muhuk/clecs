@@ -5,7 +5,21 @@
 (declare make-validator)
 
 
+(def Bool {:name 'Bool
+           :validate #(or (true? %) (false? %))})
+(def Int {:name 'Int
+          :validate integer?})
+(def Str {:name 'Str
+          :validate string?})
+(def parameter-types {'Bool Bool
+                      'Int Int
+                      'Str Str})
+
+
 (defmacro component [cname cdef]
+  (doseq [parameter-type (set (vals cdef))]
+    (when-not (contains? parameter-types parameter-type)
+      (throw (RuntimeException. (str "Unknown parameter type '" parameter-type "'")))))
   `{:cname ~cname
     :validate ~(make-validator cname cdef)})
 
@@ -14,17 +28,23 @@
   (let [parameter-count (count cdef)
         parameter-names (keys cdef)
         wrong-parameters-error (str cname
-                                    " takes "
+                                    " takes ["
                                     (join ", " parameter-names)
-                                    " parameters, you have passed ")]
+                                    "] parameters, you have passed [")]
     `(fn [~'cdata]
        (when-not (and (= (count ~'cdata) ~parameter-count)
                       ~@(map (fn [param-name] `(contains? ~'cdata ~param-name))
                              parameter-names))
          (throw (RuntimeException. (str ~wrong-parameters-error
                                         (join ", " (keys ~'cdata))
-                                        "."))))
-
+                                        "]"))))
+       ~@(for [[parameter-name parameter-type] cdef
+               :let [error-message (str parameter-name
+                                        " is not a valid "
+                                        parameter-type)
+                     validator-fn (:validate (parameter-types parameter-type))]]
+           `(when-not (~validator-fn (~'cdata ~parameter-name))
+              (throw (RuntimeException. ~error-message))))
        nil)))
 
 
