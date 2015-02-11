@@ -85,6 +85,8 @@ Following functions are removed from this protocol:
 (world/set-component w eid :my.ns/SomeComponent {:x x :y y})
 ----
 
+* `world/set-component` validates its input.
+
 * Queries are constructed using component type keywords instead
 of records:
 +
