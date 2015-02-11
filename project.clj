@@ -19,9 +19,12 @@
                 :format :html5
                 :source-highlight true
                 :sources "doc/*.adoc"
-                :to-dir "target/doc/guide"
+                :to-dir "target/doc/user_guide"
                 :toc :left}
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
-            "docs" ["do" "doc," "asciidoctor," "cloverage"]})
+            "docs" ["do"
+                    "doc,"
+                    "asciidoctor,"
+                    "cloverage" "-o" "target/doc/coverage"]})
