@@ -12,9 +12,9 @@ Entity-component-system for Clojure.
 
 Documentation is a work in progress.
 
--   [Documentation Home](http://clecs.muhuk.com/index.html).
--   [API documentation](http://clecs.muhuk.com/api/latest).
--   [Changelog](http://clecs.muhuk.com/index.html#_changelog).
+-   [Documentation Home](http://clecs.muhuk.com/latest/user_guide/index.html).
+-   [API documentation](http://clecs.muhuk.com/latest/api/index.html).
+-   [Changelog](http://clecs.muhuk.com/latest/user_guide/index.html#_changelog).
 
 
 ## License
