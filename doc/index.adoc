@@ -39,8 +39,7 @@ Official demos are link:https://github.com/muhuk/clecs-examples[here].
 API Documentation
 -----------------
 
-* Version link:http://clecs.muhuk.com/api/1.1.x[1.1.x]
-* Version link:http://clecs.muhuk.com/api/1.0.1[1.0.1]
+API documentation is link:http://clecs.muhuk.com/2.0.x/api/[here].
 
 
 Changelog
@@ -145,6 +144,12 @@ style system you can write a system as:
 .Changes Since Version 0.2.x
 
 * Replaced function based queries with data driven queries. See `clecs.query`.
+
+
+Previous Versions
+-----------------
+
+* link:http://clecs.muhuk.com/1.1.x/user_guide/[v1.1.x]
 
 
 See Also
