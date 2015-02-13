@@ -47,8 +47,22 @@ Changelog
 
 .Changes Since Version 1.1.x
 
-* Systems run inside an implicit transaction. ITransactableWorld is
+* Systems run inside an implicit transaction. `ITransactableWorld` is
 removed.
++
+[source, Clojure]
+----
+;; A systems process used to call transaction!
+;; to get an editable world:
+(comment
+  (fn [w dt]
+    (transaction! w (fn [w] (set-component! w ...))))
+
+;; Now process receives an editable world and
+;; the entire function might be re-tried:
+(fn [w dt]
+  (set-component! w ...))
+----
 
 * Components and systems are registered with worlds during
 initialization.
