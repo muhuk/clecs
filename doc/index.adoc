@@ -72,8 +72,13 @@ initialization.
 +
 [source, Clojure]
 ----
-;; TODO: Improve this example.
-(atom-world components initial-transaction systems)
+(let [components [(component ...)
+                  (component ...)
+                  (component ...)
+                  ...]
+      initial-transaction (fn [w] ...)
+      systems [...]]
+  (atom-world components initial-transaction systems))
 ----
 
 ** `ISystemManager` is renamed as `IWorld`.
