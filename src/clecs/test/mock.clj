@@ -18,10 +18,10 @@
 (defn mock-editable-world []
   (reify
     IEditableWorld
-    (add-entity [_] (mock-add-entity))
-    (remove-component [_ eid cname] (mock-remove-component eid cname))
-    (remove-entity [_ eid] (mock-remove-entity eid))
-    (set-component [_ eid cname cdata] (mock-set-component eid cname cdata))
+    (add-entity [this] (mock-add-entity))
+    (remove-component [this eid cname] (mock-remove-component this eid cname))
+    (remove-entity [this eid] (mock-remove-entity this eid))
+    (set-component [this eid cname cdata] (mock-set-component this eid cname cdata))
     IQueryableWorld
-    (component [_ eid cname] (mock-component eid cname))
-    (query [_ q] (mock-query q))))
+    (component [this eid cname] (mock-component this eid cname))
+    (query [this q] (mock-query this q))))
