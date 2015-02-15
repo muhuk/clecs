@@ -18,7 +18,7 @@
 (defn mock-editable-world []
   (reify
     IEditableWorld
-    (add-entity [this] (mock-add-entity))
+    (add-entity [this] (mock-add-entity this))
     (remove-component [this eid cname] (mock-remove-component this eid cname))
     (remove-entity [this eid] (mock-remove-entity this eid))
     (set-component [this eid cname cdata] (mock-set-component this eid cname cdata))
