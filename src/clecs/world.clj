@@ -20,7 +20,6 @@
       UUID or any other type depending on the
       world implementation.
 
-
   Component
   :   Components encode a single aspect about an
       entity. Entities can have any number of
@@ -32,7 +31,6 @@
       approach which enforces a static template of
       aspects for each type of entity.
 
-
   System
   :   Systems are either maps (new style) or (old style)
       callables that define operations
@@ -41,7 +39,6 @@
 
       Systems may primarily deal with a single
       component but it is not a requirement.
-
 
   Query
   :   There are two kinds of queries in clecs:
@@ -52,36 +49,15 @@
          components.
 
       Queries can be only be run by systems.
-
-
-  #### Modes of Execution
-
-  There are three modes of execution for worlds.
-  Functionality available depends on these modes.
-
-  When you first create a world, you are *outside of
-  processing*. You can add, remove and query
-  systems. You can also process the world. Processing
-  means running all the systems and possibly modify
-  its contents. The objects extend `IWorld` in this mode.
-
-  Systems are called with two parameters; a reference
-  to an editable world and the since last time the
-  world is processed. The world that is passed into
-  the system extends `IQueryableWorld` and
-  `IEditableWorld`. Systems run inside a transaction.
-
-  Modes of execution and relevant protocols are
-  summarized in the table below:
-
-  | Processing  | In Transaction | IWorld | IQueryableWorld | IEditableWorld |
-  | :----------:|:--------------:|:------:|:---------------:|:--------------:|
-  |  ✘  |  ✘  |  ✔  |  ✘  |  ✘  |
-  |  ✔  |  ✔  |  ✘  |  ✔  |  ✔  |
   ")
 
 
 (defprotocol IEditableWorld
+  (-set-component
+   [this eid cname cdata]
+   "Sets a component without validating.
+
+   Use [[set-component]] instead of directly calling this.")
   (add-entity
    [this]
    "Create a new entity in the world and return its id.")
@@ -109,22 +85,7 @@
    #### Parameters:
 
    eid
-   :   Entity id.")
-  (set-component
-   [this eid cname cdata]
-   "Set `eid`'s `cname` component as `cdata` and return
-   `nil`.
-
-   #### Parameters:
-
-   eid
-   :   Entity id.
-
-   cname
-   :   Component type.
-
-   cdata
-   :   Component data as a map."))
+   :   Entity id."))
 
 
 (defprotocol IQueryableWorld
@@ -168,3 +129,25 @@
        time. This value is passed to the systems.
        It is recommended to use miliseconds as
        unit."))
+
+
+(defn set-component
+   "Set `eid`'s `cname` component as `cdata` and return
+   `nil`.
+
+   #### Parameters:
+
+   world
+   :   World.
+
+   eid
+   :   Entity id.
+
+   cname
+   :   Component type.
+
+   cdata
+   :   Component data as a map."
+  [world eid cname cdata]
+  (-set-component world eid cname cdata)
+  nil)

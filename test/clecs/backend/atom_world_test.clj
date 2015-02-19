@@ -133,7 +133,7 @@
           *state* => expected-state)))
 
 
-(fact "world/set-component adds the component if entity doesn't have one."
+(fact "world/-set-component adds the component if entity doesn't have one."
       (let [eid 1
             cdata {}
             w (->AtomEditableWorld {::TestComponentA ..c..})
@@ -142,12 +142,12 @@
             expected-state {:components {::TestComponentA {eid cdata}}
                             :entities {eid #{::TestComponentA}}}]
         (binding [*state* initial-state]
-          (world/set-component w eid ::TestComponentA cdata) => w
+          (world/-set-component w eid ::TestComponentA cdata) => w
           (provided (validate anything anything) => nil)
           *state* => expected-state)))
 
 
-(fact "world/set-component replaces existing components."
+(fact "world/-set-component replaces existing components."
       (let [eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
@@ -157,23 +157,23 @@
             expected-state {:components {::TestComponentB {eid c-new}}
                             :entities {eid #{::TestComponentB}}}]
         (binding [*state* initial-state]
-          (world/set-component w eid ::TestComponentB c-new) => w
+          (world/-set-component w eid ::TestComponentB c-new) => w
           (provided (validate anything anything) => nil)
           *state* => expected-state)))
 
 
-(fact "world/set-component validates component names."
-      (world/set-component (->AtomEditableWorld nil)
+(fact "world/-set-component validates component names."
+      (world/-set-component (->AtomEditableWorld nil)
                            ..eid..
                            ::TestComponentB
                            {:a ..a.. :b ..b..}) => (throws RuntimeException
                                                            #"Unknown"))
 
 
-(fact "world/set-component validates components."
+(fact "world/-set-component validates components."
       (let [w (->AtomEditableWorld {::TestComponentA ..c..})
             initial-state {:components {}
                            :entities {..eid.. #{}}}]
         (binding [*state* initial-state]
-          (world/set-component w ..eid.. ::TestComponentA ..cdata..) => w
+          (world/-set-component w ..eid.. ::TestComponentA ..cdata..) => w
           (provided (validate ..c.. ..cdata..) => anything))))

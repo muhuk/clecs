@@ -47,7 +47,7 @@
                                 (update-in [:components]
                                            (partial map-values #(dissoc % eid))))))
                  this)
-  (set-component [this eid cname cdata]
+  (-set-component [this eid cname cdata]
                  (when-not (contains? components cname)
                    (throw (RuntimeException. (str "Unknown component " cname))))
                  (validate (components cname) cdata)

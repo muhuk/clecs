@@ -7,21 +7,21 @@
      (throw (RuntimeException. ~(str n " is called directly.")))))
 
 
-(def-mock-fn mock-add-entity)
-(def-mock-fn mock-component)
-(def-mock-fn mock-query)
-(def-mock-fn mock-remove-component)
-(def-mock-fn mock-remove-entity)
-(def-mock-fn mock-set-component)
+(def-mock-fn add-entity)
+(def-mock-fn component)
+(def-mock-fn query)
+(def-mock-fn remove-component)
+(def-mock-fn remove-entity)
+(def-mock-fn -set-component)
 
 
 (defn mock-editable-world []
   (reify
     IEditableWorld
-    (add-entity [this] (mock-add-entity this))
-    (remove-component [this eid cname] (mock-remove-component this eid cname))
-    (remove-entity [this eid] (mock-remove-entity this eid))
-    (set-component [this eid cname cdata] (mock-set-component this eid cname cdata))
+    (-set-component [this eid cname cdata] (-set-component this eid cname cdata))
+    (add-entity [this] (add-entity this))
+    (remove-component [this eid cname] (remove-component this eid cname))
+    (remove-entity [this eid] (remove-entity this eid))
     IQueryableWorld
-    (component [this eid cname] (mock-component this eid cname))
-    (query [this q] (mock-query this q))))
+    (component [this eid cname] (component this eid cname))
+    (query [this q] (query this q))))
