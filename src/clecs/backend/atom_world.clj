@@ -1,12 +1,11 @@
 (ns clecs.backend.atom-world
   "Reference implementation of clecs API.
 
-   `AtomWorld` stores it's data in-memory. It is backed by an
-   `clojure.core/atom` internally.
+  `AtomWorld` stores it's data in-memory. It is backed by an
+  `clojure.core/atom` internally.
 
-   Currently systems run sequentially."
+  Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [validate]]
             [clecs.util :refer [map-values]]
             [clecs.world :refer [IEditableWorld IQueryableWorld IWorld]]))
 
@@ -48,15 +47,12 @@
                                            (partial map-values #(dissoc % eid))))))
                  this)
   (-set-component [this eid cname cdata]
-                 (when-not (contains? components cname)
-                   (throw (RuntimeException. (str "Unknown component " cname))))
-                 (validate (components cname) cdata)
-                 (var-set #'*state*
-                          (-> *state*
-                              (update-in [:entities eid] conj cname)
-                              (update-in [:components cname] #(or % {}))
-                              (update-in [:components cname] conj [eid cdata])))
-                 this)
+                  (var-set #'*state*
+                           (-> *state*
+                               (update-in [:entities eid] conj cname)
+                               (update-in [:components cname] #(or % {}))
+                               (update-in [:components cname] conj [eid cdata])))
+                  this)
   IQueryableWorld
   (-component [_ cname] (components cname))
   (component [_ eid cname] (get-in *state* [:components cname eid]))
@@ -85,8 +81,8 @@
                          (map (juxt :name identity))
                          (into {}))
         components-map (->> components
-                         (map (juxt :cname identity))
-                         (into {}))]
+                            (map (juxt :cname identity))
+                            (into {}))]
     (doto (->AtomWorld systems-map
                        (atom initial_state)
                        (->AtomEditableWorld components-map))

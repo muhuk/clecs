@@ -1,7 +1,6 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
-            [clecs.component :refer [validate]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -73,7 +72,6 @@
                             :entities {eid #{::TestComponentA}}}]
         (binding [*state* initial-state]
           (world/-set-component w eid ::TestComponentA cdata) => w
-          (provided (validate anything anything) => nil)
           *state* => expected-state)))
 
 
@@ -88,25 +86,7 @@
                             :entities {eid #{::TestComponentB}}}]
         (binding [*state* initial-state]
           (world/-set-component w eid ::TestComponentB c-new) => w
-          (provided (validate anything anything) => nil)
           *state* => expected-state)))
-
-
-(fact "world/-set-component validates component names."
-      (world/-set-component (->AtomEditableWorld nil)
-                           ..eid..
-                           ::TestComponentB
-                           {:a ..a.. :b ..b..}) => (throws RuntimeException
-                                                           #"Unknown"))
-
-
-(fact "world/-set-component validates components."
-      (let [w (->AtomEditableWorld {::TestComponentA ..c..})
-            initial-state {:components {}
-                           :entities {..eid.. #{}}}]
-        (binding [*state* initial-state]
-          (world/-set-component w ..eid.. ::TestComponentA ..cdata..) => w
-          (provided (validate ..c.. ..cdata..) => anything))))
 
 
 (fact "world/add-entity returns a new entity id."

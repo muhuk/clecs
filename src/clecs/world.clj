@@ -49,7 +49,8 @@
          components.
 
       Queries can be only be run by systems.
-  ")
+  "
+  (:require [clecs.component :refer [validate]]))
 
 
 (defprotocol IEditableWorld
@@ -153,5 +154,9 @@
    cdata
    :   Component data as a map."
   [world eid cname cdata]
-  (-set-component world eid cname cdata)
-  nil)
+  (if-some [c (-component world cname)]
+           (do
+             (validate c cdata)
+             (-set-component world eid cname cdata)
+             nil)
+           (throw (RuntimeException. (str "Unknown component " cname)))))
