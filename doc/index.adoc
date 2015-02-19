@@ -47,8 +47,7 @@ Changelog
 
 .Changes Since Version 1.1.x
 
-* Systems run inside an implicit transaction. `ITransactableWorld` is
-removed.
+* `ITransactableWorld` and transaction concept are removed.
 +
 [source, Clojure]
 ----
@@ -58,8 +57,8 @@ removed.
   (fn [w dt]
     (transaction! w (fn [w] (set-component! w ...))))
 
-;; Now process receives an editable world and
-;; the entire function might be re-tried:
+;; Now process receives an editable world and can modify
+;; the world directly:
 (fn [w dt]
   (set-component! w ...))
 ----

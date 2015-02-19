@@ -43,19 +43,6 @@
       component but it is not a requirement.
 
 
-  Transaction
-  :   A transaction is a special context that allows
-      modifications to the world. When a transaction
-      is committed all operations are applied at once.
-      If a transaction fails none of the operations
-      take effect and the world doesn't change.
-      Changes to the world are only visible within the
-      transaction context during a transaction.
-      Therefore worlds can be considered to be immutable
-      outside of transactions even when underlying data
-      storage is mutable.
-
-
   Query
   :   There are two kinds of queries in clecs:
 
