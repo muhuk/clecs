@@ -53,6 +53,62 @@
 
 ;; Editable world.
 
+(fact "world/-component returns the component definition."
+      (let [w (->AtomEditableWorld {::TestComponentA ..c..})]
+        (world/-component w ::TestComponentA) => ..c..))
+
+
+(fact "world/-component returns nil if cnam is not recognized."
+      (let [w (->AtomEditableWorld {::TestComponentA ..c..})]
+        (world/-component w ::TestComponentC) => nil))
+
+
+(fact "world/-set-component adds the component if entity doesn't have one."
+      (let [eid 1
+            cdata {}
+            w (->AtomEditableWorld {::TestComponentA ..c..})
+            initial-state {:components {}
+                           :entities {eid #{}}}
+            expected-state {:components {::TestComponentA {eid cdata}}
+                            :entities {eid #{::TestComponentA}}}]
+        (binding [*state* initial-state]
+          (world/-set-component w eid ::TestComponentA cdata) => w
+          (provided (validate anything anything) => nil)
+          *state* => expected-state)))
+
+
+(fact "world/-set-component replaces existing components."
+      (let [eid 1
+            c-old {:a ..a.. :b ..b..}
+            c-new {:a ..c.. :b ..d..}
+            w (->AtomEditableWorld {::TestComponentB ..c..})
+            initial-state {:components {::TestComponentB {eid c-old}}
+                            :entities {eid #{::TestComponentB}}}
+            expected-state {:components {::TestComponentB {eid c-new}}
+                            :entities {eid #{::TestComponentB}}}]
+        (binding [*state* initial-state]
+          (world/-set-component w eid ::TestComponentB c-new) => w
+          (provided (validate anything anything) => nil)
+          *state* => expected-state)))
+
+
+(fact "world/-set-component validates component names."
+      (world/-set-component (->AtomEditableWorld nil)
+                           ..eid..
+                           ::TestComponentB
+                           {:a ..a.. :b ..b..}) => (throws RuntimeException
+                                                           #"Unknown"))
+
+
+(fact "world/-set-component validates components."
+      (let [w (->AtomEditableWorld {::TestComponentA ..c..})
+            initial-state {:components {}
+                           :entities {..eid.. #{}}}]
+        (binding [*state* initial-state]
+          (world/-set-component w ..eid.. ::TestComponentA ..cdata..) => w
+          (provided (validate ..c.. ..cdata..) => anything))))
+
+
 (fact "world/add-entity returns a new entity id."
       (binding [*state* {:last-entity-id 0}]
         (world/add-entity (->AtomEditableWorld nil)) => 1)
@@ -131,49 +187,3 @@
         (binding [*state* initial-state]
           (world/remove-entity w ..eid..) => w
           *state* => expected-state)))
-
-
-(fact "world/-set-component adds the component if entity doesn't have one."
-      (let [eid 1
-            cdata {}
-            w (->AtomEditableWorld {::TestComponentA ..c..})
-            initial-state {:components {}
-                           :entities {eid #{}}}
-            expected-state {:components {::TestComponentA {eid cdata}}
-                            :entities {eid #{::TestComponentA}}}]
-        (binding [*state* initial-state]
-          (world/-set-component w eid ::TestComponentA cdata) => w
-          (provided (validate anything anything) => nil)
-          *state* => expected-state)))
-
-
-(fact "world/-set-component replaces existing components."
-      (let [eid 1
-            c-old {:a ..a.. :b ..b..}
-            c-new {:a ..c.. :b ..d..}
-            w (->AtomEditableWorld {::TestComponentB ..c..})
-            initial-state {:components {::TestComponentB {eid c-old}}
-                            :entities {eid #{::TestComponentB}}}
-            expected-state {:components {::TestComponentB {eid c-new}}
-                            :entities {eid #{::TestComponentB}}}]
-        (binding [*state* initial-state]
-          (world/-set-component w eid ::TestComponentB c-new) => w
-          (provided (validate anything anything) => nil)
-          *state* => expected-state)))
-
-
-(fact "world/-set-component validates component names."
-      (world/-set-component (->AtomEditableWorld nil)
-                           ..eid..
-                           ::TestComponentB
-                           {:a ..a.. :b ..b..}) => (throws RuntimeException
-                                                           #"Unknown"))
-
-
-(fact "world/-set-component validates components."
-      (let [w (->AtomEditableWorld {::TestComponentA ..c..})
-            initial-state {:components {}
-                           :entities {..eid.. #{}}}]
-        (binding [*state* initial-state]
-          (world/-set-component w ..eid.. ::TestComponentA ..cdata..) => w
-          (provided (validate ..c.. ..cdata..) => anything))))

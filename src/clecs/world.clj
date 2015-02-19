@@ -89,6 +89,10 @@
 
 
 (defprotocol IQueryableWorld
+  (-component
+   [this cname]
+   "Return component definition for `cname` or `nil`
+   if none found.")
   (component
    [this eid cname]
    "Return the component of type `cname` associated with

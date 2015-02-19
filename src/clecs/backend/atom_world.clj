@@ -58,6 +58,7 @@
                               (update-in [:components cname] conj [eid cdata])))
                  this)
   IQueryableWorld
+  (-component [_ cname] (components cname))
   (component [_ eid cname] (get-in *state* [:components cname eid]))
   (query [_ q]
          (let [f (query/-compile-query q)]
