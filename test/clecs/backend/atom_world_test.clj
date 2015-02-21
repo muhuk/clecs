@@ -17,15 +17,9 @@
       (world/-world atom-world-factory nil) => (implements-protocols world/IWorld))
 
 
-(fact "transaction! calls function with an editable world and time delta."
-      (let [w (->AtomWorld nil (atom ..state..) ..editable-world..)]
-        (-transaction! w --f-- ..dt..) => nil
-        (provided (--f-- ..editable-world.. ..dt..) => irrelevant)))
-
-
 ;; Processing
 
-(fact "world/-run runs given functions on world, returns world."
+(fact "world/-run runs arbitrary code with an editable world, returns world."
       (let [w (world/-world atom-world-factory nil)]
         (world/-run w --f-- ..dt..) => w
         (provided (--f-- editable-world-like ..dt..) => anything)))

@@ -7,7 +7,8 @@
   Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
             [clecs.util :refer [map-values]]
-            [clecs.world :refer [IEditableWorld
+            [clecs.world :refer [-run
+                                 IEditableWorld
                                  IQueryableWorld
                                  IWorld
                                  IWorldFactory]]))
@@ -20,9 +21,6 @@
 
 (def ^{:dynamic true
        :no-doc true} *state*)
-
-
-(declare -transaction!)
 
 
 (deftype AtomEditableWorld [components]
@@ -72,15 +70,29 @@
 (deftype AtomWorld [systems state editable-world]
   IWorld
   (-run [this f dt]
-        (-transaction! this f dt)
+        (swap! (.state this)
+               (fn [state]
+                 (binding [*state* state]
+                   (f (.editable-world this) dt)
+                   *state*)))
         this)
   (process! [this dt]
             (doseq [s (map :process (vals systems))]
-              (-transaction! this s dt))
+              (-run this s dt))
             this))
 
 
 (def atom-world-factory
+  "\n#### Examples:
+
+    (clecs.world/world atom-world-factory
+                       {:components [(component ...)
+                                     (component ...)
+                                     (component ...)
+                                     ...]
+                        :initializer (fn [w] ...)
+                        :systems [...]})
+  "
   (reify
     IWorldFactory
     (-world [_ params]
@@ -97,15 +109,6 @@
                                      (atom initial_state)
                                      (->AtomEditableWorld components-map))]
               world))))
-
-
-(defn ^:no-doc -transaction! [world f dt]
-  (swap! (.state world)
-         (fn [state]
-           (binding [*state* state]
-             (f (.editable-world world) dt)
-             *state*)))
-  nil)
 
 
 ;; Hide internals from documentation generator.
