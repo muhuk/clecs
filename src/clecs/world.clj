@@ -58,7 +58,19 @@
    [this eid cname cdata]
    "Sets a component without validating.
 
-   Use [[set-component]] instead of directly calling this.")
+   Use [[set-component]] instead of calling this directly.
+
+   #### Parameters:
+
+   eid
+   :   Entity id.
+
+   cname
+   :   Component name.
+
+   cdata
+   :   Component data as a map.
+   ")
   (add-entity
    [this]
    "Create a new entity in the world and return its id.")
@@ -75,7 +87,8 @@
    :   Entity id.
 
    cname
-   :   Component type.")
+   :   Component name.
+   ")
   (remove-entity
    [this eid]
    "Delete the entity with `eid`, all components
@@ -86,14 +99,23 @@
    #### Parameters:
 
    eid
-   :   Entity id."))
+   :   Entity id.
+   "))
 
 
 (defprotocol IQueryableWorld
   (-component
    [this cname]
    "Return component definition for `cname` or `nil`
-   if none found.")
+   if none found.
+
+   Use [[component]] to query a component for an entity.
+
+   #### Parameters:
+
+   cname
+   :   Component name.
+   ")
   (component
    [this eid cname]
    "Return the component of type `cname` associated with
@@ -105,8 +127,8 @@
    :   Entity id.
 
    cname
-   :   Component type. If you have a reference to a
-       `component` instance, use `(type component)`.")
+   :   Component name.
+   ")
   (query
    [this q]
    "Return a sequence of entity id's using `q` as
@@ -116,13 +138,23 @@
 
    q
    :   A query object. See [[clecs.query]] for more
-       info."))
+       info.
+   "))
 
 
 (defprotocol IWorld
   (-run
    [this f dt]
-   "Run `f` passing it an editable world and `dt`. Return world.")
+   "Run `f` passing it an editable world and `dt`. Return world.
+
+   Use [[process!]] instead of calling `-run` directly.
+
+   #### Parameters:
+
+   f
+   :   A function that takes an editable world and
+       a time increment as parameters.
+   ")
   (process!
    [this dt]
    "Run systems using `dt` as time increment.
@@ -136,7 +168,8 @@
    :   Time passed since process! was called last
        time. This value is passed to the systems.
        It is recommended to use miliseconds as
-       unit."))
+       unit.
+   "))
 
 
 (defprotocol IWorldFactory
@@ -144,26 +177,33 @@
    [this params]
    "Creates a world.
 
+   #### Parameters:
+
+   params
+   :   A map of world parameters. `params` must
+   at least have a `:components` & `:systems`
+   keys.
+
    Use [[world]] instead of calling this directly."))
 
 
 (defn set-component
-   "Set `eid`'s `cname` component as `cdata` and return
-   `nil`.
+  "Set `eid`'s `cname` component as `cdata` and return
+  `nil`.
 
-   #### Parameters:
+  #### Parameters:
 
-   world
-   :   World.
+  world
+  :   World.
 
-   eid
-   :   Entity id.
+  eid
+  :   Entity id.
 
-   cname
-   :   Component type.
+  cname
+  :   Component type.
 
-   cdata
-   :   Component data as a map."
+  cdata
+  :   Component data as a map."
   [world eid cname cdata]
   (if-some [c (-component world cname)]
            (do
@@ -173,14 +213,23 @@
            (throw (RuntimeException. (str "Unknown component " cname)))))
 
 
-(defn world [world-factory
-             {components :components
-              initializer :initializer
-              systems :systems
-              :as params}]
-  ;; TODO validate systems & components here.
-  (let [cleaned-params (dissoc params :initializer)
+(defn world
+  "Creates a world.
+
+  #### Parameters:
+
+  params
+  :   A map of world parameters. `params` must
+      at least have a `:components` & `:systems`
+      keys.
+  "
+  [world-factory params]
+  (let [{components :components
+         initializer :initializer
+         systems :systems} params
+        cleaned-params (dissoc params :initializer)
         w (-world world-factory cleaned-params)]
+    ;; TODO validate systems & components here.
     (if initializer
       (-run w (fn [w _] (initializer w)) nil)
       w)))
