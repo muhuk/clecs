@@ -71,6 +71,9 @@
 
 (deftype AtomWorld [systems state editable-world]
   IWorld
+  (-run [this f dt]
+        (-transaction! this f dt)
+        this)
   (process! [this dt]
             (doseq [s (map :process (vals systems))]
               (-transaction! this s dt))
@@ -93,8 +96,6 @@
                   world (->AtomWorld systems-map
                                      (atom initial_state)
                                      (->AtomEditableWorld components-map))]
-              (when initializer
-                (-transaction! world (fn [w _] (initializer w)) nil))
               world))))
 
 

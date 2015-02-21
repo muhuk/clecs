@@ -21,6 +21,12 @@
                   (mock/-set-component w ..eid.. ..cname.. ..cdata..) => anything)))
 
 
-(fact "world creates a new world."
-      (world mock/mock-world-factory ..params..) => ..world..
-      (provided (mock/-world mock/mock-world-factory ..params..) => ..world..))
+(fact "world creates a new world and runs initializer."
+      (let [initializer-called-with (atom nil)
+            w (reify
+                IWorld
+                (-run [this f dt] (f ..editable-world.. dt) this))
+            initializer (fn [w] (reset! initializer-called-with w))]
+        (world mock/mock-world-factory {:initializer initializer}) => w
+        (provided (mock/-world mock/mock-world-factory {}) => w)
+        @initializer-called-with => ..editable-world..))

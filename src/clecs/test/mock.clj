@@ -1,5 +1,8 @@
 (ns clecs.test.mock
-  (:require [clecs.world :refer [IEditableWorld IQueryableWorld IWorldFactory]]))
+  (:require [clecs.world :refer [IEditableWorld
+                                 IQueryableWorld
+                                 IWorld
+                                 IWorldFactory]]))
 
 
 (defmacro ^:private def-mock-fn [n]
@@ -8,10 +11,12 @@
 
 
 (def-mock-fn -component)
+(def-mock-fn -run)
 (def-mock-fn -set-component)
 (def-mock-fn -world)
 (def-mock-fn add-entity)
 (def-mock-fn component)
+(def-mock-fn process!)
 (def-mock-fn query)
 (def-mock-fn remove-component)
 (def-mock-fn remove-entity)
@@ -28,6 +33,13 @@
     (-component [this cname] (-component this cname))
     (component [this eid cname] (component this eid cname))
     (query [this q] (query this q))))
+
+
+(defn mock-world []
+  (reify
+    IWorld
+    (-run [this f dt] (-run this f dt))
+    (process! [this dt] (process! this dt))))
 
 
 (def mock-world-factory

@@ -120,6 +120,9 @@
 
 
 (defprotocol IWorld
+  (-run
+   [this f dt]
+   "Run `f` passing it an editable world and `dt`. Return world.")
   (process!
    [this dt]
    "Run systems using `dt` as time increment.
@@ -172,7 +175,12 @@
 
 (defn world [world-factory
              {components :components
+              initializer :initializer
               systems :systems
               :as params}]
   ;; TODO validate systems & components here.
-  (-world world-factory params))
+  (let [cleaned-params (dissoc params :initializer)
+        w (-world world-factory cleaned-params)]
+    (if initializer
+      (-run w (fn [w _] (initializer w)) nil)
+      w)))

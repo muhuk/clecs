@@ -17,12 +17,6 @@
       (world/-world atom-world-factory nil) => (implements-protocols world/IWorld))
 
 
-;; TODO: Move this responsibility to world/world
-(fact "Initialization function is called."
-      (world/-world atom-world-factory {:initializer --init--}) => irrelevant
-      (provided (--init-- (as-checker editable-world-like)) => irrelevant))
-
-
 (fact "transaction! calls function with an editable world and time delta."
       (let [w (->AtomWorld nil (atom ..state..) ..editable-world..)]
         (-transaction! w --f-- ..dt..) => nil
@@ -30,6 +24,12 @@
 
 
 ;; Processing
+
+(fact "world/-run runs given functions on world, returns world."
+      (let [w (world/-world atom-world-factory nil)]
+        (world/-run w --f-- ..dt..) => w
+        (provided (--f-- editable-world-like ..dt..) => anything)))
+
 
 (fact "process! returns the world."
       (let [w (world/-world atom-world-factory nil)]
