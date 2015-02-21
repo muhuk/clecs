@@ -136,6 +136,14 @@
        unit."))
 
 
+(defprotocol IWorldFactory
+  (-world
+   [this params]
+   "Creates a world.
+
+   Use [[world]] instead of calling this directly."))
+
+
 (defn set-component
    "Set `eid`'s `cname` component as `cdata` and return
    `nil`.
@@ -160,3 +168,11 @@
              (-set-component world eid cname cdata)
              nil)
            (throw (RuntimeException. (str "Unknown component " cname)))))
+
+
+(defn world [world-factory
+             {components :components
+              systems :systems
+              :as params}]
+  ;; TODO validate systems & components here.
+  (-world world-factory params))

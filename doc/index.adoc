@@ -64,20 +64,21 @@ Changelog
 ----
 
 * Components and systems are registered with worlds during
-initialization.
+initialization. Use `clecs.world/world` to create a new world.
 
 ** `clecs.backend.atom-world/make-world` is removed. Use
-`atom-world` instead:
+`clecs.world/world` with
+`clecs.world.backend.atom-world/atom-world-factory` instead:
 +
 [source, Clojure]
 ----
-(let [components [(component ...)
-                  (component ...)
-                  (component ...)
-                  ...]
-      initial-transaction (fn [w] ...)
-      systems [...]]
-  (atom-world components initial-transaction systems))
+(world atom-world-factory
+       {:components [(component ...)
+                     (component ...)
+                     (component ...)
+                     ...]
+        :initializer (fn [w] ...)
+        :systems [...]})
 ----
 
 ** `ISystemManager` is renamed as `IWorld`.

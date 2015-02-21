@@ -14,11 +14,12 @@
 
 
 (fact "Atom world implements IWorld."
-      (atom-world ..components.. --init-- ..systems..) => (implements-protocols world/IWorld))
+      (world/-world atom-world-factory nil) => (implements-protocols world/IWorld))
 
 
-(fact "Initialization function is called within a transaction."
-      (atom-world ..components.. --init-- ..systems..) => irrelevant
+;; TODO: Move this responsibility to world/world
+(fact "Initialization function is called."
+      (world/-world atom-world-factory {:initializer --init--}) => irrelevant
       (provided (--init-- (as-checker editable-world-like)) => irrelevant))
 
 
@@ -31,7 +32,7 @@
 ;; Processing
 
 (fact "process! returns the world."
-      (let [w (atom-world ..components.. --init-- ..systems..)]
+      (let [w (world/-world atom-world-factory nil)]
         (world/process! w ..dt..) => w))
 
 
@@ -41,7 +42,7 @@
                    :process (fn [& args] (swap! calls conj [:one-called args]))}
             s-two {:name :s-two
                    :process (fn [& args] (swap! calls conj [:two-called args]))}
-            w (atom-world ..components.. --init-- [s-one s-two])]
+            w (world/-world atom-world-factory {:systems [s-one s-two]})]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
         (-> @calls first second first) => editable-world-like

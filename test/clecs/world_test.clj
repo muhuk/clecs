@@ -19,3 +19,8 @@
         (provided (mock/-component w ..cname..) => ..c..
                   (validate ..c.. ..cdata..) => nil
                   (mock/-set-component w ..eid.. ..cname.. ..cdata..) => anything)))
+
+
+(fact "world creates a new world."
+      (world mock/mock-world-factory ..params..) => ..world..
+      (provided (mock/-world mock/mock-world-factory ..params..) => ..world..))

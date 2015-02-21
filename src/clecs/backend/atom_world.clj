@@ -7,7 +7,10 @@
   Currently systems run sequentially."
   (:require [clecs.backend.atom-world.query :as query]
             [clecs.util :refer [map-values]]
-            [clecs.world :refer [IEditableWorld IQueryableWorld IWorld]]))
+            [clecs.world :refer [IEditableWorld
+                                 IQueryableWorld
+                                 IWorld
+                                 IWorldFactory]]))
 
 
 (def ^:no-doc initial_state {:components {}
@@ -74,19 +77,25 @@
             this))
 
 
-(defn atom-world [components
-                  initial-transaction
-                  systems]
-  (let [systems-map (->> systems
-                         (map (juxt :name identity))
-                         (into {}))
-        components-map (->> components
-                            (map (juxt :cname identity))
-                            (into {}))]
-    (doto (->AtomWorld systems-map
-                       (atom initial_state)
-                       (->AtomEditableWorld components-map))
-      (-transaction! (fn [w _] (initial-transaction w)) nil))))
+(def atom-world-factory
+  (reify
+    IWorldFactory
+    (-world [_ params]
+            (let [{components :components
+                   initializer :initializer
+                   systems :systems} params
+                  systems-map (->> systems
+                                   (map (juxt :name identity))
+                                   (into {}))
+                  components-map (->> components
+                                      (map (juxt :cname identity))
+                                      (into {}))
+                  world (->AtomWorld systems-map
+                                     (atom initial_state)
+                                     (->AtomEditableWorld components-map))]
+              (when initializer
+                (-transaction! world (fn [w _] (initializer w)) nil))
+              world))))
 
 
 (defn ^:no-doc -transaction! [world f dt]
