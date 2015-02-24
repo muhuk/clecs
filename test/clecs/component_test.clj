@@ -7,6 +7,9 @@
       (validate (component :Foo {}) {}) => nil)
 
 
+(future-fact "Component names must be keywords.")
+
+
 (fact "Number of parameters are validated."
       (let [c (component :Foo {:a Int :b Str})]
         (validate c {}) => (throws RuntimeException #"parameters")

@@ -11,12 +11,37 @@
           :validate integer?})
 (def Str {:name 'Str
           :validate string?})
-(def parameter-types {'Bool Bool
-                      'Int Int
-                      'Str Str})
+(def ^:private parameter-types {'Bool Bool
+                                'Int Int
+                                'Str Str})
 
 
-(defmacro component [cname cdef]
+(defmacro component
+  "Creates a component definition.
+
+  #### Parameters:
+
+  cname
+  :   A keyword to be used to refer to this component
+      later.
+
+  cdef
+  :   A map of component parameter names to their types.
+
+  #### Examples:
+
+      ;; A marker component.
+      (component Renderable nil)
+
+      ;; Components can have any number of parameters.
+      (component HitPoints {hp Int})
+      (component Point {x Int y Int})
+      (component Player {name Str
+                         team Int
+                         alive Bool})
+
+  See also [[clecs.world/world]]."
+  [cname cdef]
   (doseq [parameter-type (set (vals cdef))]
     (when-not (contains? parameter-types parameter-type)
       (throw (RuntimeException. (str "Unknown parameter type '" parameter-type "'")))))
@@ -48,5 +73,18 @@
        nil)))
 
 
-(defn validate [c cdata]
+(defn validate
+  "Validate component data against a component definition.
+
+  Throws `RuntimeException` if validation fails.
+
+  #### Parameters:
+
+  c
+  :   Component definition to validate against.
+
+  cdata
+  :   A map containing component data.
+  "
+  [c cdata]
   ((:validate c) cdata))
