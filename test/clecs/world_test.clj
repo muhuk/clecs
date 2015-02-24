@@ -1,9 +1,24 @@
 (ns clecs.world-test
   (:require [clecs.world :refer :all]
-            [clecs.component :refer [validate]]
+            [clecs.component :refer [component validate] :rename {component c}]
+            [clecs.system :refer [system]]
             [clecs.test.checkers :refer :all]
             [midje.sweet :refer :all]
             [clecs.test.mock :as mock]))
+
+
+(fact "-validate-world throws exception if components or systems are empty."
+      (-validate-world [] [..system..]) => (throws RuntimeException
+                                                   "You must provide at least one component.")
+      (-validate-world [..component..] []) => (throws RuntimeException
+                                                      "You must provide at least one system."))
+
+
+(future-fact "-validate-world rejects components no system is using."
+             (-validate-world [(c :Foo nil)] []) => (throws RuntimeException))
+
+
+(future-fact "-validate-world rejects systems associated with unknown components.")
 
 
 (fact "set-component validates component names."
@@ -21,12 +36,16 @@
                   (mock/-set-component w ..eid.. ..cname.. ..cdata..) => anything)))
 
 
-(fact "world creates a new world and runs initializer."
+(fact "world validates its parameters, creates a new world and runs initializer."
       (let [initializer-called-with (atom nil)
             w (reify
                 IWorld
                 (-run [this f dt] (f ..editable-world.. dt) this))
             initializer (fn [w] (reset! initializer-called-with w))]
-        (world mock/mock-world-factory {:initializer initializer}) => w
-        (provided (mock/-world mock/mock-world-factory {}) => w)
+        (world mock/mock-world-factory {:components ..components..
+                                        :initializer initializer
+                                        :systems ..systems..}) => w
+        (provided (-validate-world ..components.. ..systems..) => nil
+                  (mock/-world mock/mock-world-factory {:components ..components..
+                                                        :systems ..systems..}) => w)
         @initializer-called-with => ..editable-world..))

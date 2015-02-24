@@ -223,13 +223,20 @@
       at least have a `:components` & `:systems`
       keys.
   "
-  [world-factory params]
-  (let [{components :components
-         initializer :initializer
-         systems :systems} params
-        cleaned-params (dissoc params :initializer)
+  [world-factory {components :components
+                  initializer :initializer
+                  systems :systems :as params}]
+  (-validate-world components systems)
+  (let [cleaned-params (dissoc params :initializer)
         w (-world world-factory cleaned-params)]
-    ;; TODO validate systems & components here.
     (if initializer
       (-run w (fn [w _] (initializer w)) nil)
       w)))
+
+
+(defn ^:no-doc -validate-world [components systems]
+  (cond
+   (empty? components) (throw (RuntimeException.
+                               "You must provide at least one component."))
+   (empty? systems) (throw (RuntimeException.
+                            "You must provide at least one system."))))
