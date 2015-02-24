@@ -1,4 +1,29 @@
 (ns clecs.test.mock
+  "Mock worlds that delegate their operations to functions.
+
+  Because protocol method can't be mocked using `with-redefs`
+  etc. systems and world backends are difficult to unit test.
+  Paying one level of indirection, protocols can be mocked
+  using functions defined in this module.
+
+  #### Examples:
+
+      (def foo-system [w dt]
+        (doseq [eid (world/query w (all :FooComponent
+                                        (any :BarComponent
+                                             :BazComponent)))]
+          (world/remove-component w eid :FooComponent)))
+
+      (fact \"foo-system does stuff.\"
+            (let [w (mock/mock-editable-world)
+                  q (all :FooComponent
+                         (any :BarComponent
+                              :BazComponent))]
+              (foo-system w anything) => anything
+              (provided (mock/query w q) => [..e1.. ..e2..]
+                        (mock/remove-component w ..e1.. :FooComponent) => nil
+                        (mock/remove-component w ..e2.. :FooComponent) => nil)))
+  "
   (:require [clecs.world :refer [IEditableWorld
                                  IQueryableWorld
                                  IWorld
