@@ -5,17 +5,6 @@
 (declare make-validator)
 
 
-(def Bool {:name 'Bool
-           :validate #(or (true? %) (false? %))})
-(def Int {:name 'Int
-          :validate integer?})
-(def Str {:name 'Str
-          :validate string?})
-(def ^:private parameter-types {'Bool Bool
-                                'Int Int
-                                'Str Str})
-
-
 (defmacro component
   "Creates a component definition.
 
@@ -34,17 +23,14 @@
       (component Renderable nil)
 
       ;; Components can have any number of parameters.
-      (component HitPoints {hp Int})
-      (component Point {x Int y Int})
-      (component Player {name Str
-                         team Int
-                         alive Bool})
+      (component HitPoints {hp Integer})
+      (component Point {x Int y Integer})
+      (component Player {name String
+                         team Integer
+                         alive Boolean})
 
   See also [[clecs.world/world]]."
   [cname cdef]
-  (doseq [parameter-type (set (vals cdef))]
-    (when-not (contains? parameter-types parameter-type)
-      (throw (RuntimeException. (str "Unknown parameter type '" parameter-type "'")))))
   `{:cname ~cname
     :validate ~(make-validator cname cdef)})
 
@@ -66,9 +52,8 @@
        ~@(for [[parameter-name parameter-type] cdef
                :let [error-message (str parameter-name
                                         " is not a valid "
-                                        parameter-type)
-                     validator-fn (:validate (parameter-types parameter-type))]]
-           `(when-not (~validator-fn (~'cdata ~parameter-name))
+                                        parameter-type)]]
+           `(when-not (validate-param ~parameter-type (~'cdata ~parameter-name))
               (throw (RuntimeException. ~error-message))))
        nil)))
 
@@ -88,3 +73,20 @@
   "
   [c cdata]
   ((:validate c) cdata))
+
+
+(defmulti validate-param
+  "Validates a parameter.
+
+  #### Parameters:
+
+  parameter-type
+  :   Parameter type to validate against.
+
+  parameter-value
+  :   Parameter value to validate.
+  "
+  (fn [parameter-type _] parameter-type))
+(defmethod validate-param Boolean [_ v] (or (true? v) (false? v)))
+(defmethod validate-param Integer [_ v] (integer? v))
+(defmethod validate-param String [_ v] (string? v))
