@@ -8,7 +8,36 @@
          validate-process)
 
 
-(defn system [s]
+(defn system
+  "Create a system.
+
+  Takes a map with the following elements:
+
+  :name
+  :   A keyword to refer to this system later.
+
+  :process
+  :   Namespaced symbol of the system's
+      function.
+      If `:process-fn` is provided, :process
+      can be omitted. However the system
+      won't be serializable in this case.
+
+  :process-fn
+  :   System's function itself.
+      `:process-fn` will be resolved automatically
+      if `:process` is provided.
+
+  :reads
+  :   Components this system will read.
+
+  :writes
+  :   Components this system will read and write.
+
+  Components not specified in either `:reads` or
+  `:writes` won't be accessible to the system.
+  "
+  [s]
   (-> s
       (validate-name)
       (validate-process)
