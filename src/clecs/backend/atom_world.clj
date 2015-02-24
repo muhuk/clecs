@@ -83,15 +83,18 @@
 
 
 (def atom-world-factory
-  "\n#### Examples:
+  "
+  #### Examples:
 
-    (clecs.world/world atom-world-factory
-                       {:components [(component ...)
-                                     (component ...)
-                                     (component ...)
-                                     ...]
-                        :initializer (fn [w] ...)
-                        :systems [...]})
+      (clecs.world/world atom-world-factory
+                         {:components [(component ...)
+                                       (component ...)
+                                       (component ...)
+                                       ...]
+                          :initializer (fn [w] ...)
+                          :systems [(system ...)
+                                    (system ...)
+                                    ...]})
   "
   (reify
     IWorldFactory

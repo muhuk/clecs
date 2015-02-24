@@ -78,7 +78,9 @@ initialization. Use `clecs.world/world` to create a new world.
                      (component ...)
                      ...]
         :initializer (fn [w] ...)
-        :systems [...]})
+        :systems [(system ...)
+                  (system ...)
+                  ...]})
 ----
 
 ** `ISystemManager` is renamed as `IWorld`.
