@@ -53,6 +53,9 @@
   (:require [clecs.component :refer [validate]]))
 
 
+(declare -validate-world)
+
+
 (defprotocol IEditableWorld
   (-set-component
    [this eid cname cdata]
