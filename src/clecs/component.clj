@@ -5,6 +5,12 @@
 (declare make-validator)
 
 
+(deftype ComponentDefinition [component-name params validate]
+  clojure.lang.Named
+  (getName [_] (name component-name))
+  (getNamespace [_] (namespace component-name)))
+
+
 (defmacro component
   "Creates a component definition.
 
@@ -30,9 +36,10 @@
                          alive Boolean})
 
   See also [[clecs.world/world]]."
-  [cname cdef]
-  `{:cname ~cname
-    :validate ~(make-validator cname cdef)})
+  [component-name params]
+  `(->ComponentDefinition ~component-name
+                          ~params
+                          ~(make-validator component-name params)))
 
 
 (defn- make-validator [cname cdef]
@@ -72,7 +79,7 @@
   :   A map containing component data.
   "
   [c cdata]
-  ((:validate c) cdata))
+  ((.validate c) cdata))
 
 
 (defmulti validate-param
