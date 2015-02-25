@@ -250,6 +250,13 @@
                                               (union (:reads %) (:writes %)))
                                      systems))
         components-used (apply union (vals system-components))]
-    (when-let [unused-components (difference component-names components-used)]
-      (throw (RuntimeException. (str "These components are not used by any system: "
-                                     unused-components))))))
+    (let [unused-components (difference component-names components-used)]
+      (when (seq unused-components)
+        (throw (RuntimeException. (str "These components are not used by any system: "
+                                       unused-components)))))
+    (doseq [[s cs] system-components]
+      (let [unknown-components (difference cs component-names)]
+        (when (seq unknown-components)
+          (throw (RuntimeException. (str s
+                                         " is using unknown components: "
+                                         unknown-components))))))))

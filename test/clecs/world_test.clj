@@ -24,7 +24,17 @@
                                                                #":Bar"))
 
 
-(future-fact "-validate-world rejects systems associated with unknown components.")
+(fact "-validate-world rejects systems associated with unknown components."
+      (-validate-world [(c :Foo nil)]
+                       [(system {:name :FooSystem
+                                 :process-fn identity
+                                 :reads #{:Foo}})
+                        (system {:name :BarSystem
+                                 :process-fn identity
+                                 :reads #{:Bar}})]) => (throws RuntimeException
+                                                               #":BarSystem"
+                                                               #"is using unknown components"
+                                                               #":Bar"))
 
 
 (fact "set-component validates component names."
