@@ -50,7 +50,8 @@
 
       Queries can be only be run by systems.
   "
-  (:require [clecs.component :refer [validate]]))
+  (:require [clecs.component :refer [validate]]
+            [clojure.set :refer [difference union]]))
 
 
 (declare -validate-world)
@@ -242,4 +243,13 @@
    (empty? components) (throw (RuntimeException.
                                "You must provide at least one component."))
    (empty? systems) (throw (RuntimeException.
-                            "You must provide at least one system."))))
+                            "You must provide at least one system.")))
+  (let [component-names (set (map :name components))
+        system-components (into {}
+                                (map #(vector (:name %)
+                                              (union (:reads %) (:writes %)))
+                                     systems))
+        components-used (apply union (vals system-components))]
+    (when-let [unused-components (difference component-names components-used)]
+      (throw (RuntimeException. (str "These components are not used by any system: "
+                                     unused-components))))))

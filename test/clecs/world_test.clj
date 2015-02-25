@@ -14,8 +14,14 @@
                                                       "You must provide at least one system."))
 
 
-(future-fact "-validate-world rejects components no system is using."
-             (-validate-world [(c :Foo nil)] []) => (throws RuntimeException))
+(fact "-validate-world rejects components no system is using."
+      (-validate-world [(c :Foo nil)
+                        (c :Bar nil)]
+                       [(system {:name :FooSystem
+                                 :process-fn identity
+                                 :reads #{:Foo}})]) => (throws RuntimeException
+                                                               #"These components are not used by any system: "
+                                                               #":Bar"))
 
 
 (future-fact "-validate-world rejects systems associated with unknown components.")

@@ -1,11 +1,18 @@
 (ns clecs.system
+  (:refer-clojure :exclude [name])
   (:require [clojure.set :refer [difference]]
             [clojure.string :as s]))
+(ns-unmap *ns* 'System)
 
 
 (declare validate-components
          validate-name
          validate-process)
+
+
+(defrecord System [name process process-fn reads writes]
+  clojure.lang.IFn
+  (invoke [_ w dt] (process-fn w dt)))
 
 
 (defn system
@@ -41,7 +48,8 @@
   (-> s
       (validate-name)
       (validate-process)
-      (validate-components)))
+      (validate-components)
+      (map->System)))
 
 
 (defn- assoc-process-fn [s]

@@ -1,14 +1,12 @@
 (ns clecs.component
+  (:refer-clojure :exclude [name])
   (:require [clojure.string :refer [join]]))
 
 
 (declare make-validator)
 
 
-(deftype ComponentDefinition [component-name params validate]
-  clojure.lang.Named
-  (getName [_] (name component-name))
-  (getNamespace [_] (namespace component-name)))
+(defrecord Component [name params validate])
 
 
 (defmacro component
@@ -36,10 +34,10 @@
                          alive Boolean})
 
   See also [[clecs.world/world]]."
-  [component-name params]
-  `(->ComponentDefinition ~component-name
-                          ~params
-                          ~(make-validator component-name params)))
+  [name params]
+  `(->Component ~name
+                ~params
+                ~(make-validator name params)))
 
 
 (defn- make-validator [cname cdef]

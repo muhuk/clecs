@@ -77,7 +77,7 @@
                    *state*)))
         this)
   (process! [this dt]
-            (doseq [s (map :process (vals systems))]
+            (doseq [s (vals systems)]
               (-run this s dt))
             this))
 

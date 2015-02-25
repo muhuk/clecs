@@ -1,6 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.backend.atom-world.query :as query]
+            [clecs.system :refer [system]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
             [midje.sweet :refer :all]))
@@ -32,10 +33,12 @@
 
 (fact "process! calls each system with the world and delta time."
       (let [calls (atom [])
-            s-one {:name :s-one
-                   :process (fn [& args] (swap! calls conj [:one-called args]))}
-            s-two {:name :s-two
-                   :process (fn [& args] (swap! calls conj [:two-called args]))}
+            s-one (system {:name :s-one
+                           :process-fn (fn [& args] (swap! calls conj [:one-called args]))
+                           :reads #{:Foo}})
+            s-two (system {:name :s-two
+                           :process-fn (fn [& args] (swap! calls conj [:two-called args]))
+                           :reads #{:Foo}})
             w (world/-world atom-world-factory {:systems [s-one s-two]})]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
