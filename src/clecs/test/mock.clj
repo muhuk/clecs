@@ -63,7 +63,7 @@
 (defn mock-world []
   (reify
     IWorld
-    (-run [this f dt] (-run this f dt))
+    (-run [this reads writes f dt] (-run this reads writes f dt))
     (process! [this dt] (process! this dt))))
 
 

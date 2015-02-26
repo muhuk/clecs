@@ -56,7 +56,7 @@
       (let [initializer-called-with (atom nil)
             w (reify
                 IWorld
-                (-run [this f dt] (f ..editable-world.. dt) this))
+                (-run [this components components f dt] (f ..editable-world.. dt) this))
             initializer (fn [w] (reset! initializer-called-with w))]
         (world mock/mock-world-factory {:components ..components..
                                         :initializer initializer

@@ -11,7 +11,8 @@
                                  IEditableWorld
                                  IQueryableWorld
                                  IWorld
-                                 IWorldFactory]]))
+                                 IWorldFactory]]
+            [clojure.set :refer [union]]))
 
 
 (def ^:no-doc initial_state {:components {}
@@ -23,7 +24,7 @@
        :no-doc true} *state*)
 
 
-(deftype AtomEditableWorld [components]
+(deftype AtomEditableWorld [readables writables]
   IEditableWorld
   (add-entity [_]
               (let [state *state*
@@ -34,6 +35,8 @@
                              (assoc :last-entity-id eid)))
                 eid))
   (remove-component [this eid cname]
+                    (when-not (contains? writables cname)
+                      (throw (RuntimeException. (str "Unknown component " cname))))
                     (var-set #'*state*
                              (-> *state*
                                  (update-in [:entities eid] disj cname)
@@ -55,8 +58,11 @@
                                (update-in [:components cname] conj [eid cdata])))
                   this)
   IQueryableWorld
-  (-component [_ cname] (components cname))
-  (component [_ eid cname] (get-in *state* [:components cname eid]))
+  (-component [_ cname] (writables cname))
+  (component [_ eid cname]
+             (when-not (contains? readables cname)
+               (throw (RuntimeException. (str "Unknown component " cname))))
+             (get-in *state* [:components cname eid]))
   (query [_ q]
          (let [f (query/-compile-query q)]
            (reduce-kv (fn [coll k v]
@@ -69,16 +75,19 @@
 
 (deftype AtomWorld [components systems state]
   IWorld
-  (-run [this f dt]
+  (-run [this readables writables f dt]
         (swap! (.state this)
                (fn [state]
                  (binding [*state* state]
-                   (f (->AtomEditableWorld components) dt)
+                   (f (->AtomEditableWorld readables writables) dt)
                    *state*)))
         this)
   (process! [this dt]
-            (doseq [s (vals systems)]
-              (-run this s dt))
+            (doseq [s (vals systems)
+                    :let [readables (select-keys components (union (:reads s)
+                                                                   (:writes s)))
+                          writables (select-keys components (:writes s))]]
+              (-run this readables writables s dt))
             this))
 
 
@@ -106,7 +115,7 @@
                                    (map (juxt :name identity))
                                    (into {}))
                   components-map (->> components
-                                      (map (juxt :cname identity))
+                                      (map (juxt :name identity))
                                       (into {}))
                   world (->AtomWorld components-map
                                      systems-map

@@ -148,16 +148,25 @@
 
 (defprotocol IWorld
   (-run
-   [this f dt]
+   [this reads writes f dt]
    "Run `f` passing it an editable world and `dt`. Return world.
 
    Use [[process!]] instead of calling `-run` directly.
 
    #### Parameters:
 
+   reads
+   :   Components that are readable for `f`.
+
+   writes
+   :   Components that are readable & writable for `f`.
+
    f
    :   A function that takes an editable world and
        a time increment as parameters.
+
+   dt
+   :   Time passed since this function is last run.
    ")
   (process!
    [this dt]
@@ -234,7 +243,11 @@
   (let [cleaned-params (dissoc params :initializer)
         w (-world world-factory cleaned-params)]
     (if initializer
-      (-run w (fn [w _] (initializer w)) nil)
+      (-run w
+            components
+            components
+            (fn [w _] (initializer w))
+            nil)
       w)))
 
 
