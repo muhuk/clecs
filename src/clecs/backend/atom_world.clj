@@ -67,13 +67,13 @@
                       (:entities *state*)))))
 
 
-(deftype AtomWorld [systems state editable-world]
+(deftype AtomWorld [components systems state]
   IWorld
   (-run [this f dt]
         (swap! (.state this)
                (fn [state]
                  (binding [*state* state]
-                   (f (.editable-world this) dt)
+                   (f (->AtomEditableWorld components) dt)
                    *state*)))
         this)
   (process! [this dt]
@@ -108,9 +108,9 @@
                   components-map (->> components
                                       (map (juxt :cname identity))
                                       (into {}))
-                  world (->AtomWorld systems-map
-                                     (atom initial_state)
-                                     (->AtomEditableWorld components-map))]
+                  world (->AtomWorld components-map
+                                     systems-map
+                                     (atom initial_state))]
               world))))
 
 
