@@ -145,7 +145,7 @@
 
 (fact "world/component resolves queried component."
       (binding [*state* {:components {::TestComponentA {..eid.. ..component..}}}]
-        (let [w (->AtomEditableWorld #{::TestComponentA ..c..} nil)]
+        (let [w (->AtomEditableWorld {::TestComponentA ..c..} nil)]
           (world/component w ..eid.. ::TestComponentA) => ..component..)))
 
 
