@@ -56,12 +56,22 @@
       (let [initializer-called-with (atom nil)
             w (reify
                 IWorld
-                (-run [this components components f dt] (f ..editable-world.. dt) this))
-            initializer (fn [w] (reset! initializer-called-with w))]
-        (world mock/mock-world-factory {:components ..components..
+                (-run [this _ _ f dt] (f ..editable-world.. dt) this))
+            initializer (fn [w] (reset! initializer-called-with w))
+            components [{:name :c1}
+                        {:name :c2}
+                        {:name :c3}]
+            systems [{:name :s1}
+                     {:name :s2}
+                     {:name :s3}]]
+        (world mock/mock-world-factory {:components components
                                         :initializer initializer
-                                        :systems ..systems..}) => w
-        (provided (-validate-world ..components.. ..systems..) => nil
-                  (mock/-world mock/mock-world-factory {:components ..components..
-                                                        :systems ..systems..}) => w)
+                                        :systems systems}) => w
+        (provided (-validate-world components systems) => nil
+                  (mock/-world mock/mock-world-factory {:components {:c1 {:name :c1}
+                                                                     :c2 {:name :c2}
+                                                                     :c3 {:name :c3}}
+                                                        :systems {:s1 {:name :s1}
+                                                                  :s2 {:name :s2}
+                                                                  :s3 {:name :s3}}}) => w)
         @initializer-called-with => ..editable-world..))

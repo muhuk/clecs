@@ -109,16 +109,9 @@
     IWorldFactory
     (-world [_ params]
             (let [{components :components
-                   initializer :initializer
                    systems :systems} params
-                  systems-map (->> systems
-                                   (map (juxt :name identity))
-                                   (into {}))
-                  components-map (->> components
-                                      (map (juxt :name identity))
-                                      (into {}))
-                  world (->AtomWorld components-map
-                                     systems-map
+                  world (->AtomWorld components
+                                     systems
                                      (atom initial_state))]
               world))))
 

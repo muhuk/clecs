@@ -240,12 +240,21 @@
                   initializer :initializer
                   systems :systems :as params}]
   (-validate-world components systems)
-  (let [cleaned-params (dissoc params :initializer)
+  (let [systems-map (->> systems
+                         (map (juxt :name identity))
+                         (into {}))
+        components-map (->> components
+                            (map (juxt :name identity))
+                            (into {}))
+        cleaned-params (-> params
+                           (dissoc :initializer)
+                           (assoc :systems systems-map)
+                           (assoc :components components-map))
         w (-world world-factory cleaned-params)]
     (if initializer
       (-run w
-            components
-            components
+            components-map
+            components-map
             (fn [w _] (initializer w))
             nil)
       w)))
