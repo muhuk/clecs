@@ -162,7 +162,7 @@
 
 
 (fact "world/component rejects unknown components."
-      (let [w (->AtomEditableWorld #{::TestComponentA ..c..} nil)]
+      (let [w (->AtomEditableWorld {::TestComponentA ..c..} nil)]
         (world/component w ..eid.. ::TestComponentB) => (throws RuntimeException
                                                                 #"Unknown component"
                                                                 #"TestComponentB")))
