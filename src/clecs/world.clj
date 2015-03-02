@@ -187,15 +187,22 @@
 
 (defprotocol IWorldFactory
   (-world
-   [this params]
+   [this components systems extra-config]
    "Creates a world.
 
    #### Parameters:
 
-   params
-   :   A map of world parameters. `params` must
-   at least have a `:components` & `:systems`
-   keys.
+   components
+   :   A map of component names to components.
+
+   systems
+   :   A map of system names to systems.
+
+   extra-config
+   :   A map containing other elements passed
+       to [[world]]. Some backends may require
+       certains parameters other than components
+       and systems.
 
    Use [[world]] instead of calling this directly."))
 
@@ -246,11 +253,14 @@
         components-map (->> components
                             (map (juxt :name identity))
                             (into {}))
-        cleaned-params (-> params
-                           (dissoc :initializer)
-                           (assoc :systems systems-map)
-                           (assoc :components components-map))
-        w (-world world-factory cleaned-params)]
+        extra-config (dissoc params
+                             :components
+                             :initializer
+                             :systems)
+        w (-world world-factory
+                  components-map
+                  systems-map
+                  extra-config)]
     (if initializer
       (-run w
             components-map

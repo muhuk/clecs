@@ -107,13 +107,9 @@
   "
   (reify
     IWorldFactory
-    (-world [_ params]
-            (let [{components :components
-                   systems :systems} params
-                  world (->AtomWorld components
-                                     systems
-                                     (atom initial_state))]
-              world))))
+    (-world [_ components systems _] (->AtomWorld components
+                                                  systems
+                                                  (atom initial_state)))))
 
 
 ;; Hide internals from documentation generator.

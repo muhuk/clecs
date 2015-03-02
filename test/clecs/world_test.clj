@@ -68,10 +68,12 @@
                                         :initializer initializer
                                         :systems systems}) => w
         (provided (-validate-world components systems) => nil
-                  (mock/-world mock/mock-world-factory {:components {:c1 {:name :c1}
-                                                                     :c2 {:name :c2}
-                                                                     :c3 {:name :c3}}
-                                                        :systems {:s1 {:name :s1}
-                                                                  :s2 {:name :s2}
-                                                                  :s3 {:name :s3}}}) => w)
+                  (mock/-world mock/mock-world-factory
+                               {:c1 {:name :c1}
+                                :c2 {:name :c2}
+                                :c3 {:name :c3}}
+                               {:s1 {:name :s1}
+                                :s2 {:name :s2}
+                                :s3 {:name :s3}}
+                               {}) => w)
         @initializer-called-with => ..editable-world..))

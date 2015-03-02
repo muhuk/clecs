@@ -16,31 +16,42 @@
 
 
 (fact "Atom world implements IWorld."
-      (world/-world atom-world-factory nil) => (implements-protocols world/IWorld))
+      (world/-world atom-world-factory
+                    nil
+                    nil
+                    nil) => (implements-protocols world/IWorld))
 
 
 ;; Processing
 
 (fact "world/-run runs arbitrary code with an editable world, returns world."
-      (let [w (world/-world atom-world-factory nil)]
+      (let [w (world/-world atom-world-factory nil nil nil)]
         (world/-run w ..reads.. ..writes.. --f-- ..dt..) => w
         (provided (--f-- editable-world-like ..dt..) => anything)))
 
 
 (fact "process! returns the world."
-      (let [w (world/-world atom-world-factory nil)]
+      (let [w (world/-world atom-world-factory nil nil nil)]
         (world/process! w ..dt..) => w))
 
 
 (fact "process! calls each system with the world and delta time."
       (let [calls (atom [])
             s-one (system {:name :s-one
-                           :process-fn (fn [& args] (swap! calls conj [:one-called args]))
+                           :process-fn (fn [& args] (swap! calls
+                                                           conj
+                                                           [:one-called args]))
                            :reads #{:Foo}})
             s-two (system {:name :s-two
-                           :process-fn (fn [& args] (swap! calls conj [:two-called args]))
+                           :process-fn (fn [& args] (swap! calls
+                                                           conj
+                                                           [:two-called args]))
                            :reads #{:Foo}})
-            w (world/-world atom-world-factory {:systems [s-one s-two]})]
+            w (world/-world atom-world-factory
+                            nil
+                            {:s-one s-one
+                             :s-two s-two}
+                            nil)]
         (world/process! w ..dt..) => irrelevant
         (set (map first @calls)) => (set [:one-called :two-called])
         (-> @calls first second first) => editable-world-like
@@ -50,27 +61,28 @@
 
 
 (fact "process! calls -run with components filtered by system."
-      (let [foo (component :Foo nil)
-            bar (component :Bar nil)
-            baz (component :Baz nil)
-            systems[(system {:name :s1
-                             :process-fn (fn [w dt] (--s1-- w dt))
-                             :reads #{:Bar}
-                             :writes #{:Foo}})
-                    (system {:name :s2
-                             :process-fn (fn [w dt] (--s2-- w dt))
-                             :reads #{:Baz}
-                             :writes #{:Bar}})]
+      (let [components {:Foo (component :Foo nil)
+                        :Bar (component :Bar nil)
+                        :Baz (component :Baz nil)}
+            systems {:s1 (system {:name :s1
+                                  :process-fn (fn [w dt] (--s1-- w dt))
+                                  :reads #{:Bar}
+                                  :writes #{:Foo}})
+                     :2 (system {:name :s2
+                                 :process-fn (fn [w dt] (--s2-- w dt))
+                                 :reads #{:Baz}
+                                 :writes #{:Bar}})}
             w (world/-world atom-world-factory
-                            {:systems systems
-                             :components [foo bar baz]})]
+                            components
+                            systems
+                            nil)]
         (world/process! w ..dt..) => irrelevant
-        (provided (->AtomEditableWorld {:Foo foo
-                                        :Bar bar}
-                                       {:Foo foo}) => ..editable-1..
-                  (->AtomEditableWorld {:Bar bar
-                                        :Baz baz}
-                                       {:Bar bar}) => ..editable-2..
+        (provided (->AtomEditableWorld {:Foo (:Foo components)
+                                        :Bar (:Bar components)}
+                                       {:Foo (:Foo components)}) => ..editable-1..
+                  (->AtomEditableWorld {:Bar (:Bar components)
+                                        :Baz (:Baz components)}
+                                       {:Bar (:Bar components)}) => ..editable-2..
                   (--s1-- ..editable-1.. ..dt..) => irrelevant
                   (--s2-- ..editable-2.. ..dt..) => irrelevant)))
 

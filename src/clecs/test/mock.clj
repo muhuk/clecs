@@ -70,4 +70,7 @@
 (def mock-world-factory
   (reify
     IWorldFactory
-    (-world [this params] (-world this params))))
+    (-world [this components systems extra-config] (-world this
+                                                           components
+                                                           systems
+                                                           extra-config))))
