@@ -6,8 +6,11 @@
 
 (facts "About map-values"
        (let [coll {:a 2 :b 3 :c 5}]
+         (fact "Map values with nil."
+               (map-values ..f.. nil) => nil)
+
          (fact "Map values with an empty collection."
-               (map-values identity {}) => {})
+               (map-values ..f.. {}) => {})
 
 
          (fact "Map values using identity."
