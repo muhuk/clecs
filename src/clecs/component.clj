@@ -76,7 +76,7 @@
   cdata
   :   A map containing component data.
   "
-  [c cdata]
+  [^Component c cdata]
   ((.validate c) cdata))
 
 
