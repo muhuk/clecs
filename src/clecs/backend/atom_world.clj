@@ -93,17 +93,9 @@
 
 (def atom-world-factory
   "
-  #### Examples:
+  Factory for creating atom-world's.
 
-      (clecs.world/world atom-world-factory
-                         {:components [(component ...)
-                                       (component ...)
-                                       (component ...)
-                                       ...]
-                          :initializer (fn [w] ...)
-                          :systems [(system ...)
-                                    (system ...)
-                                    ...]})
+  See also [[clecs.world/world]].
   "
   (reify
     IWorldFactory

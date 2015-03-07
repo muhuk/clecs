@@ -92,3 +92,9 @@
     (throw (IllegalArgumentException. ":process-fn must be a function.")))
   (cond-> s
           (not (contains? s :process-fn)) (assoc-process-fn)))
+
+
+;; Hide internals from documentation generator.
+(doseq [v [#'->System
+           #'map->System]]
+  (alter-meta! v assoc :no-doc true))

@@ -10,7 +10,7 @@
 
 
 (defmacro component
-  "Creates a component definition.
+  "Create a component definition.
 
   #### Parameters:
 
@@ -95,3 +95,9 @@
 (defmethod validate-param Boolean [_ v] (or (true? v) (false? v)))
 (defmethod validate-param Integer [_ v] (integer? v))
 (defmethod validate-param String [_ v] (string? v))
+
+
+;; Hide internals from documentation generator.
+(doseq [v [#'->Component
+           #'map->Component]]
+  (alter-meta! v assoc :no-doc true))

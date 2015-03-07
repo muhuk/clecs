@@ -238,14 +238,48 @@
 
   #### Parameters:
 
+  world-factory
+  :   A instance of [[IWorldFactory]].
+
   params
-  :   A map of world parameters. `params` must
-      at least have a `:components` & `:systems`
-      keys.
+  :   A map of world parameters. Keys recognized by
+      all backends are described below:
+
+      :components
+      :   A sequence of [[clecs.component/component]]
+          instances. At least one component must be
+          specified.
+
+      :initializer
+      :   A function that takes an editable world and
+          run as soon as the world is created.
+
+      :systems
+      :   A sequence of [[clecs.system/system]]
+          instances. At least one system must be
+          specified.
+
+      Any other keys will be passed to the factory.
+      See the backend's documentation for recognized
+      parameters.
+
+
+  #### Examples:
+
+      (clecs.world/world atom-world-factory
+                         {:components [(component ...)
+                                       (component ...)
+                                       (component ...)
+                                       ...]
+                          :initializer (fn [w] ...)
+                          :systems [(system ...)
+                                    (system ...)
+                                    ...]})
   "
-  [world-factory {components :components
-                  initializer :initializer
-                  systems :systems :as params}]
+  [world-factory
+   {components :components
+    initializer :initializer
+    systems :systems :as params}]
   (-validate-world components systems)
   (let [systems-map (->> systems
                          (map (juxt :name identity))
