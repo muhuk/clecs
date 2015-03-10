@@ -27,8 +27,8 @@
 (defn- compile-query* [q]
   (let [[query-type & query-elements] q
         loop-fn (case query-type
-                  :all all-loop
-                  :any any-loop)]
+                  :clecs.query/all all-loop
+                  :clecs.query/any any-loop)]
     (fn [component-names]
       (let [pred (make-pred component-names)]
         (loop-fn query-elements pred)))))

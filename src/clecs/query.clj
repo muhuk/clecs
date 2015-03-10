@@ -44,7 +44,7 @@
 
 
 (defmacro ^:private make-query-command [command-symbol]
-  (let [command-keyword (keyword command-symbol)]
+  (let [command-keyword (keyword (str *ns*) (str command-symbol))]
   `(defn ~command-symbol
      [& ~'elements]
      (into [~command-keyword]
@@ -70,5 +70,5 @@
 
 (defn query? [q]
   (and (coll? q)
-       (not (nil? (and (#{:all :any} (first q))
+       (not (nil? (and (#{::all ::any} (first q))
                        (fnext q))))))
