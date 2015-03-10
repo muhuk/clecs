@@ -44,21 +44,22 @@
 
 
 (defmacro ^:private make-query-command [command-symbol]
+  (let [command-keyword (keyword command-symbol)]
   `(defn ~command-symbol
      [& ~'elements]
-     (into [~(keyword command-symbol)]
-           (mapcat (process-element ~(keyword command-symbol)) ~'elements))))
+     (into [~command-keyword]
+           (mapcat ~(process-element command-keyword) ~'elements)))))
 
 
 (defn ^:private process-element [same-keyword]
-  (fn [x]
+  `(fn [x#]
     (cond
      ;; If it's a component type; pass it as is.
-     (keyword? x) [x]
+     (keyword? x#) [x#]
      ;; If it's a sub-query of the same type; inline.
-     (= (first x) same-keyword) (rest x)
+     (= (first x#) ~same-keyword) (rest x#)
      ;; If it's a sub-query of another type; pass it as is.
-     :else [x])))
+     :else [x#])))
 
 
 (make-query-command all)
