@@ -1,6 +1,6 @@
 (ns clecs.backend.atom-world.query-test
   (:require [clecs.backend.atom-world.query :refer :all]
-            [clecs.query :refer [all any]]
+            [clecs.query :refer [all any query?]]
             [midje.sweet :refer :all]))
 
 
@@ -43,10 +43,5 @@
 
 
 (facts "-compile-query validates its input."
-       (-compile-query nil) => (throws IllegalArgumentException)
-       (-compile-query []) => (throws IllegalArgumentException)
-       (-compile-query [..not-a-query-node..]) => (throws IllegalArgumentException)
-       (-compile-query (all)) => (throws IllegalArgumentException)
-       (-compile-query (any)) => (throws IllegalArgumentException)
-       (-compile-query (all ..component-name..)) => fn?
-       (-compile-query (any ..component-name..)) => fn?)
+       (-compile-query ..q..) => (throws IllegalArgumentException)
+       (provided (query? ..q..) => false))
