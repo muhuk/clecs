@@ -1,6 +1,5 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
-            [clecs.backend.atom-world.query :as query]
             [clecs.component :refer [component]]
             [clecs.system :refer [system]]
             [clecs.test.checkers :refer :all]
@@ -171,16 +170,16 @@
 (fact "world/query returns a seq."
       (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
                                     ..e2.. #{..c2..}}}]
-        (world/query (->AtomEditableWorld nil nil) ..q..) => seq?
-        (provided (query/-compile-query ..q..) => (partial some #{..c1..}))))
+        (world/query (->AtomEditableWorld nil nil)
+                     (partial some #{..c1..})) => seq?))
 
 
 (fact "world/query compiles query and then calls the result with a seq of component labels."
       (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
                                     ..e2.. #{..c2..}
                                     ..e3.. #{..c3..}}}]
-        (sort-by str (world/query (->AtomEditableWorld nil nil) ..q..)) => [..e1.. ..e3..]
-        (provided (query/-compile-query ..q..) => (partial some #{..c1.. ..c3..}))))
+        (sort-by str (world/query (->AtomEditableWorld nil nil)
+                                  (partial some #{..c1.. ..c3..}))) => [..e1.. ..e3..]))
 
 
 (fact "world/remove-component works."

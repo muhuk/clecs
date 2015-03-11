@@ -37,38 +37,99 @@
   it is considered bad design to query too many
   components at once.
 
-  See also [[clecs.world.queryable/IQueryableWorld]].")
+  See also [[clecs.world.queryable/IQueryableWorld]]."
+  (:import [clojure.lang Keyword]))
 
 
-(declare process-element)
+(defprotocol ^:no-doc IQuery)
 
 
-(defmacro ^:private make-query-command [command-symbol]
-  (let [command-keyword (keyword (str *ns*) (str command-symbol))]
-  `(defn ~command-symbol
-     [& ~'elements]
-     (into [~command-keyword]
-           (mapcat ~(process-element command-keyword) ~'elements)))))
+(defprotocol ^:no-doc IQueryNode
+  (satisfies [this components])
+  (simplify [this]))
 
 
-(defn ^:private process-element [same-keyword]
-  `(fn [x#]
-    (cond
-     ;; If it's a component type; pass it as is.
-     (keyword? x#) [x#]
-     ;; If it's a sub-query of the same type; inline.
-     (= (first x#) ~same-keyword) (rest x#)
-     ;; If it's a sub-query of another type; pass it as is.
-     :else [x#])))
+(defrecord Query [root]
+  clojure.lang.IFn
+  (invoke [this components] (satisfies this (set components)))
+  IQuery
+  IQueryNode
+  (satisfies [_ components] (satisfies root components))
+  (simplify [_]
+            (->Query (simplify root))))
 
 
-(make-query-command all)
+(defrecord All [children]
+  IQueryNode
+  (satisfies [_ components] (loop [[head & tail] (seq children)]
+                              (if (nil? head)
+                                true
+                                (if (satisfies head components)
+                                  (recur tail)
+                                  false))))
+  (simplify [_]
+            (->> children
+                 (map simplify)
+                 (reduce (fn [acc elem]
+                           (if (instance? Query elem)
+                             (if (instance? All (:root elem))
+                               (into acc (get-in elem [:root :children]))
+                               (conj acc (:root elem)))
+                             (conj acc elem)))
+                         #{})
+                 (->All))))
 
 
-(make-query-command any)
+(defrecord Any [children]
+  IQueryNode
+  (satisfies [_ components] (loop [[head & tail] (seq children)]
+                              (if (nil? head)
+                                false
+                                (if (satisfies head components)
+                                  true
+                                  (recur tail)))))
+  (simplify [_]
+            (->> children
+                 (map simplify)
+                 (reduce (fn [acc elem]
+                           (if (instance? Query elem)
+                             (if (instance? Any (:root elem))
+                               (into acc (get-in elem [:root :children]))
+                               (conj acc (:root elem)))
+                             (conj acc elem)))
+                         #{})
+                 (->Any))))
 
 
-(defn query? [q]
-  (and (coll? q)
-       (not (nil? (and (#{::all ::any} (first q))
-                       (fnext q))))))
+
+(extend-protocol IQueryNode
+  Keyword
+  (satisfies [this components] (contains? components this))
+  (simplify [this] this))
+
+
+(defn- query [constructor elems]
+  (if (seq elems)
+    (-> (set elems)
+        (constructor)
+        (->Query)
+        (simplify))
+    (throw (IllegalArgumentException. "You cannot create an empty query"))))
+
+
+(defn all [& elems]
+  (query ->All elems))
+
+
+(defn any [& elems]
+  (query ->Any elems))
+
+
+;; Hide internals from documentation generator.
+(doseq [v [#'->All
+           #'map->All
+           #'->Any
+           #'map->Any
+           #'->Query
+           #'map->Query]]
+  (alter-meta! v assoc :no-doc true))

@@ -5,8 +5,7 @@
   `clojure.core/atom` internally.
 
   Currently systems run sequentially."
-  (:require [clecs.backend.atom-world.query :as query]
-            [clecs.util :refer [map-values]]
+  (:require [clecs.util :refer [map-values]]
             [clecs.world :refer [-run
                                  IEditableWorld
                                  IQueryableWorld
@@ -64,13 +63,12 @@
                (throw (RuntimeException. (str "Unknown component " cname))))
              (get-in *state* [:components cname eid]))
   (query [_ q]
-         (let [f (query/-compile-query q)]
-           (reduce-kv (fn [coll k v]
-                        (if (f (seq v))
-                          (conj coll k)
-                          coll))
-                      (seq [])
-                      (:entities *state*)))))
+         (reduce-kv (fn [coll k v]
+                      (if (q (seq v))
+                        (conj coll k)
+                        coll))
+                    (seq [])
+                    (:entities *state*))))
 
 
 (deftype AtomWorld [components systems state]
