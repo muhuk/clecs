@@ -1,6 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.component :refer [component]]
+            [clecs.query :refer [accesses]]
             [clecs.system :refer [system]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
@@ -167,19 +168,25 @@
                                                                 #"TestComponentB")))
 
 
-(fact "world/query returns a seq."
-      (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
-                                    ..e2.. #{..c2..}}}]
-        (world/query (->AtomEditableWorld nil nil)
-                     (partial some #{..c1..})) => seq?))
-
-
-(fact "world/query compiles query and then calls the result with a seq of component labels."
+(fact "world/query calls the query with a seq of component labels."
       (binding [*state* {:entities {..e1.. #{..c1.. ..c2..}
                                     ..e2.. #{..c2..}
                                     ..e3.. #{..c3..}}}]
-        (sort-by str (world/query (->AtomEditableWorld nil nil)
-                                  (partial some #{..c1.. ..c3..}))) => [..e1.. ..e3..]))
+        (world/query (->AtomEditableWorld nil nil) --q--) => (just [..e1.. ..e3..] :in-any-order)
+        (provided (accesses anything) => #{}
+                  (--q-- (just [..c1.. ..c2..] :in-any-order)) => true
+                  (--q-- [..c2..]) => false
+                  (--q-- [..c3..]) => true)))
+
+
+(fact "world/query rejects queries trying to access unknown components."
+      (world/query (->AtomEditableWorld {::TestComponentA ..a..
+                                         ::TestComponentC ..c..}
+                                        nil) ..q..) => (throws RuntimeException
+                                                               #"Unknown components"
+                                                               #"TestComponentB")
+      (provided (accesses ..q..) => #{::TestComponentB
+                                      ::TestComponentC}))
 
 
 (fact "world/remove-component works."

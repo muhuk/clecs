@@ -106,8 +106,8 @@
          (q [:a :b :c :d]) => truthy))
 
 
-(facts "IQueryNode/component-set returns all components in the query tree."
-       (component-set (all :a :b)) => #{:a :b}
-       (component-set (any :a :b)) => #{:a :b}
-       (component-set (all :a (any :b :c))) => #{:a :b :c}
-       (component-set (any :a (all :b :c))) => #{:a :b :c})
+(facts "IQueryNode/accesses returns all components in the query tree."
+       (accesses (all :a :b)) => #{:a :b}
+       (accesses (any :a :b)) => #{:a :b}
+       (accesses (all :a (any :b :c))) => #{:a :b :c}
+       (accesses (any :a (all :b :c))) => #{:a :b :c})

@@ -41,10 +41,6 @@
   (:import [clojure.lang Keyword]))
 
 
-(defprotocol ^:no-doc IQuery
-  (component-set [this]))
-
-
 (defprotocol ^:no-doc IQueryNode
   (satisfies [this components])
   (simplify [this]))
@@ -53,8 +49,6 @@
 (defrecord Query [root cs]
   clojure.lang.IFn
   (invoke [this components] (satisfies this (set components)))
-  IQuery
-  (component-set [_] cs)
   IQueryNode
   (satisfies [_ components] (satisfies root components))
   (simplify [_]
@@ -122,6 +116,10 @@
         (->Query nil)
         (simplify))
     (throw (IllegalArgumentException. "You cannot create an empty query"))))
+
+
+(defn accesses [q]
+  (:cs q))
 
 
 (defn all [& elems]
