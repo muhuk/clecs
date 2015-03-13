@@ -77,11 +77,9 @@
                             systems
                             nil)]
         (world/process! w ..dt..) => irrelevant
-        (provided (->AtomEditableWorld {:Foo (:Foo components)
-                                        :Bar (:Bar components)}
+        (provided (->AtomEditableWorld #{:Foo :Bar}
                                        {:Foo (:Foo components)}) => ..editable-1..
-                  (->AtomEditableWorld {:Bar (:Bar components)
-                                        :Baz (:Baz components)}
+                  (->AtomEditableWorld #{:Bar :Baz}
                                        {:Bar (:Bar components)}) => ..editable-2..
                   (--s1-- ..editable-1.. ..dt..) => irrelevant
                   (--s2-- ..editable-2.. ..dt..) => irrelevant)))
@@ -105,7 +103,7 @@
 (fact "world/-set-component adds the component if entity doesn't have one."
       (let [eid 1
             cdata {}
-            w (->AtomEditableWorld {::TestComponentA ..c..} nil)
+            w (->AtomEditableWorld #{::TestComponentA} nil)
             initial-state {:components {}
                            :entities {eid #{}}}
             expected-state {:components {::TestComponentA {eid cdata}}
@@ -119,7 +117,7 @@
       (let [eid 1
             c-old {:a ..a.. :b ..b..}
             c-new {:a ..c.. :b ..d..}
-            w (->AtomEditableWorld {::TestComponentB ..c..} nil)
+            w (->AtomEditableWorld #{::TestComponentB} nil)
             initial-state {:components {::TestComponentB {eid c-old}}
                             :entities {eid #{::TestComponentB}}}
             expected-state {:components {::TestComponentB {eid c-new}}
@@ -157,7 +155,7 @@
 
 (fact "world/component resolves queried component."
       (binding [*state* {:components {::TestComponentA {..eid.. ..component..}}}]
-        (let [w (->AtomEditableWorld {::TestComponentA ..c..} nil)]
+        (let [w (->AtomEditableWorld #{::TestComponentA} nil)]
           (world/component w ..eid.. ::TestComponentA) => ..component..)))
 
 
@@ -180,8 +178,8 @@
 
 
 (fact "world/query rejects queries trying to access unknown components."
-      (world/query (->AtomEditableWorld {::TestComponentA ..a..
-                                         ::TestComponentC ..c..}
+      (world/query (->AtomEditableWorld #{::TestComponentA
+                                          ::TestComponentC}
                                         nil) ..q..) => (throws RuntimeException
                                                                #"Unknown components"
                                                                #"TestComponentB")

@@ -66,9 +66,9 @@
                (throw (RuntimeException. (str "Unknown component " cname))))
              (get-in *state* [:components cname eid]))
   (query [_ q]
-         (when-not (subset? (accesses q) (set (keys readables)))
+         (when-not (subset? (accesses q) readables)
            (throw (RuntimeException. (str "Unknown components " (difference (accesses q)
-                                                                            (set (keys readables)))))))
+                                                                            readables)))))
          (reduce-kv (fn [coll k v]
                       (if (q (seq v))
                         (conj coll k)
@@ -88,8 +88,7 @@
         this)
   (process! [this dt]
             (doseq [s (vals systems)
-                    :let [readables (select-keys components (union (:reads s)
-                                                                   (:writes s)))
+                    :let [readables (union (:reads s) (:writes s))
                           writables (select-keys components (:writes s))]]
               (-run this readables writables s dt))
             this))
