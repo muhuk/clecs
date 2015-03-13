@@ -49,14 +49,14 @@
   (simplify [this]))
 
 
-(defrecord Query [root]
+(defrecord Query [root cs]
   clojure.lang.IFn
   (invoke [this components] (satisfies this (set components)))
   IQuery
   IQueryNode
   (satisfies [_ components] (satisfies root components))
   (simplify [_]
-            (->Query (simplify root))))
+            (->Query (simplify root) nil)))
 
 
 (defrecord All [children]
@@ -112,7 +112,7 @@
   (if (seq elems)
     (-> (set elems)
         (constructor)
-        (->Query)
+        (->Query nil)
         (simplify))
     (throw (IllegalArgumentException. "You cannot create an empty query"))))
 

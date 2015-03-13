@@ -1,6 +1,7 @@
 (ns clecs.query-test
   (:require [clecs.query :refer :all]
-            [midje.sweet :refer :all]))
+            [midje.sweet :refer :all])
+  (:import [clecs.query All Any Query]))
 
 
 (facts "Query primitives return an IQuery."
@@ -11,23 +12,25 @@
 
 
 (fact "all inlines other `all` children."
-      (all :a (all :b :c) :d) => (->Query (->All #{:a :b :c :d})))
+      (all :a (all :b :c) :d) => (just (Query. (All. #{:a :b :c :d}) irrelevant)))
 
 
 (fact "all doesn't inline `any` children."
-             (all :a (any :b :c) :d) => (->Query (->All #{:a
-                                                          (->Any #{:b :c})
-                                                          :d})))
+      (all :a (any :b :c) :d) => (just (Query. (All. #{:a
+                                                        (Any. #{:b :c})
+                                                        :d})
+                                                irrelevant)))
 
 
 (fact "any inlines other `any` children."
-      (any :a (any :b :c) :d) => (->Query (->Any #{:a :b :c :d})))
+      (any :a (any :b :c) :d) => (just (Query. (Any. #{:a :b :c :d}) irrelevant)))
 
 
 (fact "any doesn't inline `all` children."
-      (any :a (all :b :c) :d) => (->Query (->Any #{:a
-                                                   (->All #{:b :c})
-                                                   :d})))
+      (any :a (all :b :c) :d) => (just (Query. (Any. #{:a
+                                                       (All. #{:b :c})
+                                                       :d})
+                                               irrelevant)))
 
 
 (fact "Multiple levels of nesting is allowed."
@@ -36,22 +39,25 @@
                 (any :c
                      (all :d
                           (any :e))))) =>
-      (->Query (->Any #{:a
-                        (->All #{:b
-                                 (->Any #{:c
-                                          (->All #{:d
-                                                   (->Any #{:e})})})})})))
+      (just (Query. (Any. #{:a
+                            (All. #{:b
+                                    (Any. #{:c
+                                            (All. #{:d
+                                                    (Any. #{:e})})})})})
+                    irrelevant)))
 
 
 (facts "Queries can be build from sub-queries."
        (let [sub-query-one (all :x :y)
              sub-query-two (all :u :v :w)]
-         (any sub-query-one sub-query-two) => (->Query (->Any #{(->All #{:x :y})
-                                                                (->All #{:u :v :w})})))
+         (any sub-query-one sub-query-two) => (just (Query. (Any. #{(All. #{:x :y})
+                                                                    (All. #{:u :v :w})})
+                                                            irrelevant)))
        (let [sub-query-one (any :x :y)
              sub-query-two (any :u :v :w)]
-         (all sub-query-one sub-query-two) => (->Query (->All #{(->Any #{:x :y})
-                                                                (->Any #{:u :v :w})}))))
+         (all sub-query-one sub-query-two) => (just (Query. (All. #{(Any. #{:x :y})
+                                                                    (Any. #{:u :v :w})})
+                                                            irrelevant))))
 
 
 (fact "A query must have at least one criteria."
