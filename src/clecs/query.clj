@@ -41,7 +41,8 @@
   (:import [clojure.lang Keyword]))
 
 
-(defprotocol ^:no-doc IQuery)
+(defprotocol ^:no-doc IQuery
+  (component-set [this]))
 
 
 (defprotocol ^:no-doc IQueryNode
@@ -53,10 +54,16 @@
   clojure.lang.IFn
   (invoke [this components] (satisfies this (set components)))
   IQuery
+  (component-set [_] cs)
   IQueryNode
   (satisfies [_ components] (satisfies root components))
   (simplify [_]
-            (->Query (simplify root) nil)))
+            (let [new-root (simplify root)
+                  cs (->> new-root
+                          (tree-seq (partial satisfies? IQueryNode) :children)
+                          (filter keyword?)
+                          (set))]
+              (->Query new-root cs))))
 
 
 (defrecord All [children]
