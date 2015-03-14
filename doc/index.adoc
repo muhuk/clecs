@@ -45,7 +45,13 @@ API documentation is link:http://clecs.muhuk.com/2.0.x/api/[here].
 Changelog
 ---------
 
-.Changes Since Version 1.1.x
+.Changes Since Version 2.0.0
+
+* Added validation to `atom-world`'s `query` implementation. It doesn't allow
+unknown (unreadable by currently running system) components to be queries anymore.
+
+
+.Changes Since Version 1.1.0
 
 * `ITransactableWorld` and transaction concept are removed.
 +
@@ -139,7 +145,7 @@ of records:
 * Deprecated `IComponent` is removed.
 
 
-.Changes Since Version 1.0.x
+.Changes Since Version 1.0.0
 
 * Components are no longer records. The same API still works but since
 a java class is not generated anymore you are likely to get an error
@@ -164,7 +170,7 @@ style system you can write a system as:
 ----
 
 
-.Changes Since Version 0.2.x
+.Changes Since Version 0.2.0
 
 * Replaced function based queries with data driven queries. See `clecs.query`.
 
