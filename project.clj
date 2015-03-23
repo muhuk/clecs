@@ -9,12 +9,14 @@
             [lein-asciidoctor "0.1.14"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
-  :profiles {:dev {:dependencies [[midje "1.6.3"]]}
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]
+                   :source-paths ["dev"]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
           :src-linenum-anchor-prefix "L"
-          :output-dir "target/doc/api"}
+          :output-dir "target/doc/api"
+          :writer writer/write-docs}
   :asciidoctor {:extract-css true
                 :format :html5
                 :source-highlight true
