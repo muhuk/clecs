@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0-alpha5"]]
   :plugins [[codox "0.8.10"]
             [jonase/eastwood "0.2.1"]
-            [lein-asciidoctor "0.1.12"]
+            [lein-asciidoctor "0.1.14"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
   :profiles {:dev {:dependencies [[midje "1.6.3"]]}
