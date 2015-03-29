@@ -1,6 +1,6 @@
 (ns clecs.component
-  (:refer-clojure :exclude [name])
-  (:require [clojure.string :refer [join]]))
+  (:require [clojure.string :refer [join]])
+  (:refer-clojure :exclude [name]))
 
 
 (declare make-validator)

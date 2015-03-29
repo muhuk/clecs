@@ -1,11 +1,9 @@
 (ns clecs.world-test
-  (:require [clecs.world :refer :all]
+  (:require [clecs.component :refer [validate]]
+            [clecs.test.mock :as mock]
+            [clecs.world :refer :all]
             [clecs.world.validate :refer [-validate-world]]
-            [clecs.component :refer [component validate] :rename {component c}]
-            [clecs.system :refer [system]]
-            [clecs.test.checkers :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.test.mock :as mock]))
+            [midje.sweet :refer :all]))
 
 
 

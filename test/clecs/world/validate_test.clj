@@ -1,10 +1,8 @@
 (ns clecs.world.validate-test
-  (:require [clecs.world.validate :refer :all]
-            [clecs.component :refer [component validate] :rename {component c}]
+  (:require [clecs.component :refer [component] :rename {component c}]
             [clecs.system :refer [system]]
-            [clecs.test.checkers :refer :all]
-            [midje.sweet :refer :all]
-            [clecs.test.mock :as mock]))
+            [clecs.world.validate :refer :all]
+            [midje.sweet :refer :all]))
 
 
 (fact "-validate-world throws exception if components or systems are empty."

@@ -1,7 +1,7 @@
 (ns clecs.system
-  (:refer-clojure :exclude [name])
   (:require [clojure.set :refer [difference]]
-            [clojure.string :as s]))
+            [clojure.string :as s])
+  (:refer-clojure :exclude [name]))
 (ns-unmap *ns* 'System)
 
 
