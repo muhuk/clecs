@@ -2,12 +2,16 @@
   (:require [clojure.set :refer [difference union]]))
 
 
-(defn ^:no-doc validate-world [components systems]
-  (cond
-   (empty? components) (throw (RuntimeException.
-                               "You must provide at least one component."))
-   (empty? systems) (throw (RuntimeException.
-                            "You must provide at least one system.")))
+(defn validate-components [components]
+  (when (empty? components)
+    (throw (RuntimeException.
+            "You must provide at least one component."))))
+
+
+(defn validate-systems [components systems]
+  (when (empty? systems)
+    (throw (RuntimeException.
+            "You must provide at least one system.")))
   (let [component-names (set (map :name components))
         system-components (into {}
                                 (map #(vector (:name %)
@@ -24,3 +28,8 @@
           (throw (RuntimeException. (str s
                                          " is using unknown components: "
                                          unknown-components))))))))
+
+
+(defn ^:no-doc validate-world [components systems]
+  (validate-components components)
+  (validate-systems components systems))
