@@ -9,8 +9,8 @@
             [lein-asciidoctor "0.1.14"]
             [lein-cloverage "1.0.2"]
             [lein-midje "3.1.3"]]
-  :profiles {:dev {:dependencies [[midje "1.6.3"]]
-                   :source-paths ["dev"]}
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]}
+             :codox {:source-paths ["codox"]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codox {:defaults {:doc/format :markdown}
           :src-dir-uri "http://github.com/muhuk/clecs/blob/master/"
@@ -27,6 +27,6 @@
                         "snapshots" :clojars}
   :aliases {"all" ["with-profile" "dev:dev,1.6"]
             "docs" ["do"
-                    "doc,"
+                    "with-profile" "codox" "doc,"
                     "asciidoctor,"
                     "cloverage" "-o" "target/doc/coverage"]})
