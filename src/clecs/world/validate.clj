@@ -2,7 +2,7 @@
   (:require [clojure.set :refer [difference union]]))
 
 
-(defn ^:no-doc -validate-world [components systems]
+(defn ^:no-doc validate-world [components systems]
   (cond
    (empty? components) (throw (RuntimeException.
                                "You must provide at least one component."))

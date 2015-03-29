@@ -2,7 +2,7 @@
   (:require [clecs.component :refer [validate]]
             [clecs.test.mock :as mock]
             [clecs.world :refer :all]
-            [clecs.world.validate :refer [-validate-world]]
+            [clecs.world.validate :refer [validate-world]]
             [midje.sweet :refer :all]))
 
 
@@ -37,7 +37,7 @@
         (world mock/mock-world-factory {:components components
                                         :initializer initializer
                                         :systems systems}) => w
-        (provided (-validate-world components systems) => nil
+        (provided (validate-world components systems) => nil
                   (mock/-world mock/mock-world-factory
                                {:c1 {:name :c1}
                                 :c2 {:name :c2}

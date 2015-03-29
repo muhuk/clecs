@@ -51,7 +51,7 @@
       Queries can be only be run by systems.
   "
   (:require [clecs.component :refer [validate]]
-            [clecs.world.validate :refer [-validate-world]]))
+            [clecs.world.validate :refer [validate-world]]))
 
 
 (defprotocol IEditableWorld
@@ -277,7 +277,7 @@
    {components :components
     initializer :initializer
     systems :systems :as params}]
-  (-validate-world components systems)
+  (validate-world components systems)
   (let [systems-map (->> systems
                          (map (juxt :name identity))
                          (into {}))
