@@ -33,11 +33,13 @@
                         {:name :c3}]
             systems [{:name :s1}
                      {:name :s2}
-                     {:name :s3}]]
+                     {:name :s3}]
+            supported-types [:c1 :c2 :c3]]
         (world mock/mock-world-factory {:components components
                                         :initializer initializer
                                         :systems systems}) => w
-        (provided (validate-world components systems) => nil
+        (provided (mock/-supported-types mock/mock-world-factory) => supported-types
+                  (validate-world components systems supported-types) => nil
                   (mock/-world mock/mock-world-factory
                                {:c1 {:name :c1}
                                 :c2 {:name :c2}

@@ -183,6 +183,9 @@
 
 
 (defprotocol IWorldFactory
+  (-supported-types
+   [this]
+   "Component parameter types supported by this backend.")
   (-world
    [this components systems extra-config]
    "Creates a world.
@@ -277,7 +280,9 @@
    {components :components
     initializer :initializer
     systems :systems :as params}]
-  (validate-world components systems)
+  (validate-world components
+                  systems
+                  (-supported-types world-factory))
   (let [systems-map (->> systems
                          (map (juxt :name identity))
                          (into {}))

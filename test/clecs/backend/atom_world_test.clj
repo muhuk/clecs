@@ -15,6 +15,13 @@
 ;; World Initialization.
 
 
+(fact "Supported types for atom-world."
+      (world/-supported-types atom-world-factory) => (contains [Boolean
+                                                                Integer
+                                                                String]
+                                                               :in-any-order))
+
+
 (fact "Atom world implements IWorld."
       (world/-world atom-world-factory
                     nil

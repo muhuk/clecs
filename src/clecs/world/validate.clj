@@ -1,5 +1,5 @@
 (ns clecs.world.validate
-  (:require [clojure.set :refer [difference union]]))
+  (:require [clojure.set :refer [difference superset? union]]))
 
 
 (declare -validate-components
@@ -16,23 +16,26 @@
       - At least one system must be defined.
       - Each component must be used by at least one system.
       - Systems can't access to unknown components."
-  [components systems]
-  (-validate-components components)
+  [components systems supported-types]
+  (-validate-components components supported-types)
   (-validate-systems components systems))
 
 
-(defn ^:no-doc -validate-components [components]
+(defn ^:no-doc -validate-components [components supported-types]
   (when (empty? components)
     (throw (RuntimeException.
-            "You must provide at least one component."))))
+            "You must provide at least one component.")))
+  (let [types-used (set (mapcat #(-> % (:params) (vals)) components))
+        supported-types (set supported-types)]
+    (when-not (superset? supported-types types-used)
+      (throw (RuntimeException. (format "Parameter types %s are not supported."
+                                        (difference types-used supported-types)))))))
 
 
 (defn ^:no-doc -validate-systems [components systems]
   (when (empty? systems)
     (throw (RuntimeException.
             "You must provide at least one system.")))
-
-
   (let [components-defined (set (map :name components))
         components-by-system (into {}
                                    (map (fn [s]

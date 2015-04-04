@@ -38,6 +38,7 @@
 (def-mock-fn -component)
 (def-mock-fn -run)
 (def-mock-fn -set-component)
+(def-mock-fn -supported-types)
 (def-mock-fn -world)
 (def-mock-fn add-entity)
 (def-mock-fn component)
@@ -70,6 +71,7 @@
 (def mock-world-factory
   (reify
     IWorldFactory
+    (-supported-types [this] (-supported-types this))
     (-world [this components systems extra-config] (-world this
                                                            components
                                                            systems

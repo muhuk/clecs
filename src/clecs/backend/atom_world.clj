@@ -102,6 +102,7 @@
   "
   (reify
     IWorldFactory
+    (-supported-types [_] #{Boolean Integer String})
     (-world [_ components systems _] (->AtomWorld components
                                                   systems
                                                   (atom initial_state)))))
