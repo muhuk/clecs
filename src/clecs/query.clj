@@ -72,11 +72,11 @@
             (->> children
                  (map simplify)
                  (reduce (fn [acc elem]
-                           (if (instance? Query elem)
-                             (if (instance? All (:root elem))
-                               (into acc (get-in elem [:root :children]))
-                               (conj acc (:root elem)))
-                             (conj acc elem)))
+                           (cond
+                            (not (instance? Query elem)) (conj acc elem)
+                            (instance? All (:root elem)) (into acc (get-in elem [:root :children]))
+                            (= (count (get-in elem [:root :children])) 1) (conj acc (first (get-in elem [:root :children])))
+                            :else (conj acc (:root elem))))
                          #{})
                  (->All))))
 
@@ -93,11 +93,11 @@
             (->> children
                  (map simplify)
                  (reduce (fn [acc elem]
-                           (if (instance? Query elem)
-                             (if (instance? Any (:root elem))
-                               (into acc (get-in elem [:root :children]))
-                               (conj acc (:root elem)))
-                             (conj acc elem)))
+                           (cond
+                            (not (instance? Query elem)) (conj acc elem)
+                            (instance? Any (:root elem)) (into acc (get-in elem [:root :children]))
+                            (= (count (get-in elem [:root :children])) 1) (conj acc (first (get-in elem [:root :children])))
+                            :else (conj acc (:root elem))))
                          #{})
                  (->Any))))
 

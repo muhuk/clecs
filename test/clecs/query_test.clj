@@ -38,12 +38,12 @@
            (all :b
                 (any :c
                      (all :d
-                          (any :e))))) =>
+                          (any :e :f))))) =>
       (just (Query. (Any. #{:a
                             (All. #{:b
                                     (Any. #{:c
                                             (All. #{:d
-                                                    (Any. #{:e})})})})})
+                                                    (Any. #{:e :f})})})})})
                     irrelevant)))
 
 
@@ -58,6 +58,13 @@
          (all sub-query-one sub-query-two) => (just (Query. (All. #{(Any. #{:x :y})
                                                                     (Any. #{:u :v :w})})
                                                             irrelevant))))
+
+
+(facts "Single element sub-queries are eliminated."
+       (all :a) => (just (Query. (All. #{:a}) irrelevant))
+       (any :a) => (just (Query. (Any. #{:a}) irrelevant))
+       (all :a (any :b) :c) => (just (Query. (All. #{:a :b :c}) irrelevant))
+       (any :a (all :b) :c) => (just (Query. (Any. #{:a :b :c}) irrelevant)))
 
 
 (fact "A query must have at least one criteria."
