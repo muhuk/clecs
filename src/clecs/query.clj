@@ -46,18 +46,18 @@
   (simplify [this]))
 
 
-(defrecord Query [root cs]
+(defrecord Query [root components]
   clojure.lang.IFn
-  (invoke [this components] (satisfies this (set components)))
+  (invoke [this cs] (satisfies this (set cs)))
   IQueryNode
-  (satisfies [_ components] (satisfies root components))
+  (satisfies [_ cs] (satisfies root cs))
   (simplify [_]
             (let [new-root (simplify root)
-                  cs (->> new-root
-                          (tree-seq (partial satisfies? IQueryNode) :children)
-                          (filter keyword?)
-                          (set))]
-              (->Query new-root cs))))
+                  components (->> new-root
+                                  (tree-seq (partial satisfies? IQueryNode) :children)
+                                  (filter keyword?)
+                                  (set))]
+              (->Query new-root components))))
 
 
 (defrecord All [children]
@@ -119,7 +119,7 @@
 
 
 (defn accesses [q]
-  (:cs q))
+  (:components q))
 
 
 (defn all [& elems]
