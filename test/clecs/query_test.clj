@@ -64,7 +64,11 @@
        (all :a) => (just (Query. (All. #{:a}) irrelevant))
        (any :a) => (just (Query. (Any. #{:a}) irrelevant))
        (all :a (any :b) :c) => (just (Query. (All. #{:a :b :c}) irrelevant))
-       (any :a (all :b) :c) => (just (Query. (Any. #{:a :b :c}) irrelevant)))
+       (any :a (all :b) :c) => (just (Query. (Any. #{:a :b :c}) irrelevant))
+       (any (all :a :b :c)) => (just (Query. (All. #{:a :b :c}) irrelevant))
+       (all (any :a :b :c)) => (just (Query. (Any. #{:a :b :c}) irrelevant))
+       (all :a (any (all :b :c)) :d) => (just (Query. (All. #{:a :b :c :d}) irrelevant))
+       (any :a (all (any :b :c)) :d) => (just (Query. (Any. #{:a :b :c :d}) irrelevant)))
 
 
 (fact "A query must have at least one criteria."

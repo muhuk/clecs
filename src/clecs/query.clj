@@ -69,7 +69,7 @@
                                 (if (satisfies head components)
                                   (recur tail)
                                   false))))
-  (simplify [_] (->All (simplify-children All children))))
+  (simplify [_] (simplify-children All ->All children)))
 
 
 (defrecord Any [children]
@@ -80,8 +80,7 @@
                                 (if (satisfies head components)
                                   true
                                   (recur tail)))))
-  (simplify [_] (->Any (simplify-children Any children))))
-
+  (simplify [_] (simplify-children Any ->Any children)))
 
 
 (extend-protocol IQueryNode
@@ -122,20 +121,25 @@
 
 (defn- simplify-children
   "Simplify, flatten & inline children with respect to node-type."
-  [node-type children]
-  (->> children
-       (map simplify)
-       (reduce (fn [acc elem]
-                 (cond
-                  ;; Not an IQueryNode, add as is.
-                  (not (instance? Query elem)) (conj acc elem)
-                  ;; A query with root node with the same type, inline its children.
-                  (instance? node-type (:root elem)) (into acc (get-in elem [:root :children]))
-                  ;; A query with a root node with one element, inline the element.
-                  (= (count (get-in elem [:root :children])) 1) (conj acc (first (get-in elem [:root :children])))
-                  ;; A query with root node of different type add the root node.
-                  :else (conj acc (:root elem))))
-               #{})))
+  [node-type constructor children]
+  (let [f (fn [acc elem]
+            (cond
+             ;; Not a query, add as is.
+             (not (instance? Query elem)) (conj acc elem)
+             ;; A query with root node with the same type, inline its children.
+             (instance? node-type (:root elem)) (into acc (get-in elem [:root :children]))
+             ;; A query with a root node with one element, inline the element.
+             (= (count (get-in elem [:root :children])) 1) (conj acc (first (get-in elem [:root :children])))
+             ;; A query with root node of different type add the root node.
+             :else (conj acc (:root elem))))
+        new-children (->> children
+                          (map simplify)
+                          (reduce f #{}))]
+    (if (and (= (count new-children) 1)
+             (not (keyword? (first (seq new-children))))
+             (satisfies? IQueryNode (first (seq new-children))))
+      (first new-children)
+      (constructor new-children))))
 
 
 ;; Hide internals from documentation generator.
