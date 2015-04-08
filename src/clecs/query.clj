@@ -41,6 +41,9 @@
   (:import [clojure.lang Keyword]))
 
 
+(declare recursively-components)
+
+
 (defprotocol ^:no-doc IQueryNode
   (satisfies [this components])
   (simplify [this]))
@@ -53,11 +56,8 @@
   (satisfies [_ cs] (satisfies root cs))
   (simplify [_]
             (let [new-root (simplify root)
-                  components (->> new-root
-                                  (tree-seq (partial satisfies? IQueryNode) :children)
-                                  (filter keyword?)
-                                  (set))]
-              (->Query new-root components))))
+                  cs (recursively-components new-root)]
+              (->Query new-root cs))))
 
 
 (defrecord All [children]
@@ -128,6 +128,15 @@
 
 (defn any [& elems]
   (query ->Any elems))
+
+
+(defn- recursively-components
+  "Recursively walking root, Return a set of all component names used."
+  [root]
+  (->> root
+       (tree-seq (partial satisfies? IQueryNode) :children)
+       (filter keyword?)
+       (set)))
 
 
 ;; Hide internals from documentation generator.
