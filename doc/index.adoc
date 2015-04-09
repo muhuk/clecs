@@ -50,6 +50,7 @@ Changelog
 * Added validation to `atom-world`'s `query` implementation. It doesn't allow
 unknown (unreadable by currently running system) components to be queries anymore.
 
+* `clecs.query/accesses` is deprecated. Use `accessed` instead.
 
 .Changes Since Version 1.1.0
 

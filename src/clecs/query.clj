@@ -98,8 +98,11 @@
     (throw (IllegalArgumentException. "You cannot create an empty query"))))
 
 
-(defn accesses [q]
+(defn accessed [q]
   (:components q))
+
+
+(def ^{:deprecated "2.1.0"} accesses accessed)
 
 
 (defn all [& elems]

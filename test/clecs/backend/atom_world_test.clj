@@ -1,7 +1,7 @@
 (ns clecs.backend.atom-world-test
   (:require [clecs.backend.atom-world :refer :all]
             [clecs.component :refer [component]]
-            [clecs.query :refer [accesses]]
+            [clecs.query :refer [accessed]]
             [clecs.system :refer [system]]
             [clecs.test.checkers :refer :all]
             [clecs.world :as world]
@@ -178,7 +178,7 @@
                                     ..e2.. #{..c2..}
                                     ..e3.. #{..c3..}}}]
         (world/query (->AtomEditableWorld nil nil) --q--) => (just [..e1.. ..e3..] :in-any-order)
-        (provided (accesses anything) => #{}
+        (provided (accessed anything) => #{}
                   (--q-- (just [..c1.. ..c2..] :in-any-order)) => true
                   (--q-- [..c2..]) => false
                   (--q-- [..c3..]) => true)))
@@ -190,7 +190,7 @@
                                         nil) ..q..) => (throws RuntimeException
                                                                #"Unknown components"
                                                                #"TestComponentB")
-      (provided (accesses ..q..) => #{::TestComponentB
+      (provided (accessed ..q..) => #{::TestComponentB
                                       ::TestComponentC}))
 
 

@@ -5,7 +5,7 @@
   `clojure.core/atom` internally.
 
   Currently systems run sequentially."
-  (:require [clecs.query :refer [accesses]]
+  (:require [clecs.query :refer [accessed]]
             [clecs.util :refer [map-values]]
             [clecs.world :refer [-run
                                  IEditableWorld
@@ -66,8 +66,8 @@
                (throw (RuntimeException. (str "Unknown component " cname))))
              (get-in *state* [:components cname eid]))
   (query [_ q]
-         (when-not (subset? (accesses q) readables)
-           (throw (RuntimeException. (str "Unknown components " (difference (accesses q)
+         (when-not (subset? (accessed q) readables)
+           (throw (RuntimeException. (str "Unknown components " (difference (accessed q)
                                                                             readables)))))
          (reduce-kv (fn [coll k v]
                       (if (q (seq v))

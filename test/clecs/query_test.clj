@@ -117,8 +117,8 @@
          (q [:a :b :c :d]) => truthy))
 
 
-(facts "IQueryNode/accesses returns all components in the query tree."
-       (accesses (all :a :b)) => #{:a :b}
-       (accesses (any :a :b)) => #{:a :b}
-       (accesses (all :a (any :b :c))) => #{:a :b :c}
-       (accesses (any :a (all :b :c))) => #{:a :b :c})
+(facts "IQueryNode/accessed returns all components in the query tree."
+       (accessed (all :a :b)) => #{:a :b}
+       (accessed (any :a :b)) => #{:a :b}
+       (accessed (all :a (any :b :c))) => #{:a :b :c}
+       (accessed (any :a (all :b :c))) => #{:a :b :c})
