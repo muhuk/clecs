@@ -49,6 +49,35 @@
          components.
 
       Queries can be only be run by systems.
+
+
+  #### Relationships Between Concepts
+
+      +++++++++++++++++++++++++++++++++++++
+      |                                   |
+      |  Main  +++++++++++++++++++++++++  |
+      |  Loop  |                       |  |
+      |        |  World                |  |
+      |        |                       |  |
+      |        |  +++++++++++++++++++  |  |
+      |        |  |                 |  |  |
+      |        |  |  Components     |  |  |
+      |        |  |                 |  |  |
+      |        |  +++++++++++++++++++  |  |
+      |        |  |                 |  |  |
+      |        |  |  Systems        |  |  |
+      |        |  |                 |  |  |
+      |        |  |  +++++++++++++  |  |  |
+      |        |  |  |           |  |  |  |
+      |        |  |  |  Queries  |  |  |  |
+      |        |  |  |           |  |  |  |
+      |        |  |  +++++++++++++  |  |  |
+      |        |  |                 |  |  |
+      |        |  +++++++++++++++++++  |  |
+      |        |                       |  |
+      |        +++++++++++++++++++++++++  |
+      |                                   |
+      +++++++++++++++++++++++++++++++++++++
   "
   (:require [clecs.component :refer [validate]]
             [clecs.world.validate :refer [validate-world]]))

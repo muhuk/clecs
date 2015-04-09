@@ -12,6 +12,14 @@ Entity-component-system for Clojure.
 
 image:https://travis-ci.org/muhuk/clecs.svg?branch=master["Build Status", link=https://travis-ci.org/muhuk/clecs]
 
+Goals of this project are:
+
+* Be game-engine agnostic.
+
+* Support massive games as well as fast-paced ones.
+
+* Transparently optimize operations.
+
 
 Latest Release
 --------------
@@ -27,7 +35,47 @@ image:http://clojars.org/clecs/latest-version.svg["Clojars Project", link=http:/
 Usage
 -----
 
-TODO: Fill this in.
+Clecs is not a fully featured game engine. A game engine typically provides
+user input, sound and video output and a main loop. Then the application
+code is written to glue these features to form a game. Clecs helps organize
+the application code by restricting the data model and state management.
+
+Clecs is built on these five concepts; entities, components, systems, worlds
+& queries. See  http://clecs.muhuk.com/latest/api/clecs.world.html[clecs.world]
+documentation for more info on these concepts and how to create a world.
+It would be helpful to read that first.
+
+Once you have your world initialized, it is quite easy to use it in your
+main loop:
+
+[source, Clojure]
+----
+;; Initialize your world
+(def w (clecs.world/world ...))
+
+;; Call process! on it in your main loop
+(game-engine/main-loop (fn [dt] (clecs.world/process! w dt)))
+----
+
+`process!` returns the world. World interacts with the game engine via
+systems. For example a rendering system would be written like:
+
+[source, Clojure]
+----
+;; render-background & render-entity use
+;; game engine's methods on screen to do
+;; actual rendering.
+(defn rendering-system [screen]
+  (fn [w dt]
+    (render-background screen)
+    (doseq [eid (clecs.world/query w renderable-entities)]
+      (render-entity w eid screen))))
+----
+
+This way other systems in the world would have no knowledge
+about the game engine doing any rendering. It might as well
+be that there are multiple game engindes running or none.
+
 
 
 Examples
